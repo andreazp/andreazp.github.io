@@ -611,7 +611,7 @@
     $("#project-meta").replaceChildren(...meta.map(([k, v]) => h("div", {}, h("dt", { text: k }), h("dd", { text: v }))));
     // Big call-to-action (e.g. Steam demo) under the badge, and again as a banner at the end
     const linkBtn = (l, cls) => h("a", { class: cls, "data-nav": true, href: l.url, target: "_blank", rel: "noopener" },
-      h("span", { class: "play-icon", "aria-hidden": "true" }), h("span", { text: l.label }), h("span", { "aria-hidden": "true", text: "↗" }));
+      l.play ? h("span", { class: "play-icon", "aria-hidden": "true" }) : null, h("span", { text: l.label }), h("span", { "aria-hidden": "true", text: "↗" }));
     const mainLink = p.links?.[0];
     $("#project-cta").replaceChildren(...(mainLink ? [linkBtn(mainLink, "btn cta-btn")] : []));
 
