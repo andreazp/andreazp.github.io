@@ -578,7 +578,8 @@
     grid.replaceChildren(...list.map((p, i) => {
       const card = h("a", { class: "level", href: `#projects/${p.id}`, "data-goto": `projects/${p.id}`, "data-nav": true },
         h("span", { class: "level-art" }, projectCover(p),
-          p.media?.length ? h("span", { class: "level-num", text: `${p.media.length} ${p.media.length === 1 ? "item" : "items"}` }) : null),
+          p.media?.length ? h("span", { class: "level-num", text: `${p.media.length} ${p.media.length === 1 ? "item" : "items"}` }) : null,
+          p.ribbon ? h("span", { class: "level-ribbon", text: p.ribbon }) : null),
         h("span", { class: "level-info" },
           h("h3", { text: p.title }),
           h("span", { class: "level-summary", text: p.summary }),
@@ -591,6 +592,11 @@
   }
 
   // --- Project page ---
+  // Feature clips play silently like GIFs while on screen (not with reduced motion)
+  const featureVideos = new IntersectionObserver(entries => entries.forEach(e => {
+    if (e.isIntersecting && !reduceMotion) e.target.play().catch(() => {});
+    else e.target.pause();
+  }), { threshold: 0.35 });
   let currentProject = null;
   function renderProject(p) {
     currentProject = p;
@@ -603,13 +609,48 @@
 
     const meta = [["Studio", p.studio], ["Role", p.role], ["Year", p.year], ["Tools", p.tools?.join(", ")]].filter(([, v]) => v);
     $("#project-meta").replaceChildren(...meta.map(([k, v]) => h("div", {}, h("dt", { text: k }), h("dd", { text: v }))));
+    // Big call-to-action (e.g. Steam demo) under the badge, and again as a banner at the end
+    const linkBtn = (l, cls) => h("a", { class: cls, "data-nav": true, href: l.url, target: "_blank", rel: "noopener" },
+      h("span", { class: "play-icon", "aria-hidden": "true" }), h("span", { text: l.label }), h("span", { "aria-hidden": "true", text: "↗" }));
+    const mainLink = p.links?.[0];
+    $("#project-cta").replaceChildren(...(mainLink ? [linkBtn(mainLink, "btn cta-btn")] : []));
+
+    // Feature points: a string, or { text, media } where media is an image or video file
+    const points = (p.sections ?? []).flatMap(s => s.points ?? []).map(pt => typeof pt === "string" ? { text: pt } : pt);
+    const zoomables = points.filter(pt => pt.media);
+    const openPoint = pt => openLightbox(zoomables.map(z => ({
+      render: () => kindOf(z.media) === "video"
+        ? Object.assign(h("video", { src: z.media, controls: true, autoplay: true, loop: true, playsinline: true }), { muted: true })
+        : h("img", { src: z.media, alt: z.alt ?? z.text }),
+      kicker: p.title, title: "", note: z.text
+    })), zoomables.indexOf(pt));
+    const pointEl = raw => {
+      const pt = typeof raw === "string" ? { text: raw } : raw;
+      const same = points.find(x => x.text === pt.text && x.media === pt.media) ?? pt;
+      if (!pt.media) return h("li", { class: "feature" }, h("p", { class: "feature-text", text: pt.text }));
+      const isVid = kindOf(pt.media) === "video";
+      const m = isVid
+        ? Object.assign(h("video", { src: pt.media, loop: true, playsinline: true, preload: "metadata", "aria-hidden": "true" }), { muted: true })
+        : h("img", { src: pt.media, alt: "", loading: "lazy" });
+      if (isVid && pt.poster) m.poster = pt.poster;
+      if (isVid) featureVideos.observe(m);
+      const b = h("button", { class: `feature-media${isVid ? " is-video" : ""}`, "data-nav": true, "aria-label": `View full size: ${pt.text}` }, m);
+      b.addEventListener("click", () => openPoint(same));
+      return h("li", { class: "feature has-media" }, b, h("p", { class: "feature-text", text: pt.text }));
+    };
+
     $("#project-desc").replaceChildren(
       ...(p.description ?? []).map(t => h("p", { text: t })),
       ...(p.sections ?? []).map(s => h("section", { class: "project-section" },
         h("h3", { text: s.title }),
-        h("ul", {}, ...(s.points ?? []).map(t => h("li", { text: t }))))),
-      ...(p.links?.length ? [h("div", { class: "project-links" },
-        ...p.links.map((l, i) => h("a", { class: i ? "btn" : "btn primary", "data-nav": true, href: l.url, target: "_blank", rel: "noopener", text: `${l.label} ↗` })))] : []));
+        h("ul", { class: "features" }, ...(s.points ?? []).map(pointEl)))),
+      ...(mainLink ? [h("aside", { class: "cta-banner" },
+        h("div", {},
+          h("p", { class: "cta-banner-title", text: p.ctaTitle ?? "Try it yourself" }),
+          p.ctaText ? h("p", { class: "cta-banner-text", text: p.ctaText }) : null),
+        h("div", { class: "cta-banner-actions" },
+          linkBtn(mainLink, "btn cta-btn"),
+          ...p.links.slice(1).map(l => linkBtn(l, "btn"))))] : []));
 
     const media = p.media?.length ? p.media : [{ src: p.cover, caption: p.title }];
     const images = media.map((m, i) => ({ m, i })).filter(x => kindOf(x.m.src) === "image");

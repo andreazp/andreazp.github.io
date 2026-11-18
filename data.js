@@ -33,7 +33,7 @@ window.PORTFOLIO = {
         ]
       },
       {
-        role: "Game Programmer",
+        role: "Associate Game Engineer",
         company: "Designmatic",
         location: "Remote / Germany",
         start: "2024", end: "2025",
@@ -217,6 +217,9 @@ window.PORTFOLIO = {
       role: "Associate Game Engineer",
       tools: ["Unity", "C#", "UI Toolkit"],
       award: "Pitched to PlayStation at GDC",
+      ribbon: "▶ Playable demo on Steam",               // optional label on the project card
+      ctaTitle: "Play the demo on Steam",
+      ctaText: "Ayna: Shattered Truth has a playable demo on Steam. Try the systems above in the game.",
       summary: "UI, gameplay and enemy systems for a Unity game with a playable demo on Steam, pitched to PlayStation at GDC.",
       description: [
         "As Associate Game Engineer in Designmatic’s Game Development division, I worked remotely on “Ayna: Shattered Truth” from July 2024 to December 2025, building systems across the game’s UI, gameplay and enemies in C# and Unity. I also contributed to the game’s PlayStation pitch at GDC."
