@@ -43,6 +43,15 @@ window.PORTFOLIO = {
         ]
       },
       {
+        role: "Digital Marketing Intern",
+        company: "Lab Mkt Digital, Tecnológico de Monterrey",
+        location: "Querétaro, Mexico",
+        start: "2023", end: "",
+        points: [
+          "Part of the Digital Marketing Lab team, creating social media content, graphics and videos for Tec de Monterrey campus Querétaro and Prepa Tec campus Querétaro."
+        ]
+      },
+      {
         role: "STEAM Arts Teacher",
         company: "UNESCO Center for Peace",
         location: "Frederick, MD, USA",
