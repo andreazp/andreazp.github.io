@@ -229,7 +229,6 @@ window.PORTFOLIO = {
         {
           title: "User interface",
           points: [
-            "Designed and implemented the initial UI structures and layouts across the entire game.",
             "Built the vendor system end to end, from data management to UI: player and vendor inventories, and purchasable items that unlock gameplay.",
             "Created an upgrader system for specific NPCs that lets players buy and unlock upgrades, handling the full process.",
             "Added a favourites system so players can keep track of vendor and upgrader items they want to buy.",
@@ -257,7 +256,7 @@ window.PORTFOLIO = {
         {
           title: "Enemy behaviour",
           points: [
-            "Built a flying enemies framework from scratch, used for every flying enemy in the game.",
+            "Built a flying enemies framework from scratch that can be used to create the behaviour and gameplay of all flying enemies in the game.",
             "Developed several ground enemies from the game design requirements, including behaviour, VFX and SFX.",
             "Programmed a smoke enemy that triggers a fullscreen shader effect to block the player’s vision.",
             "Created a ground snake trap system that tracks player movement, shoots projectiles and switches tracking sides."
