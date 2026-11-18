@@ -274,97 +274,49 @@ window.PORTFOLIO = {
       ]
     },
     {
-      id: "clinicvet",
-      title: "ClinicVET",
-      year: "",                                             // TODO: year
+      id: "grayscale",
+      title: "ClinicVET & more at Grayscale Interactive",
+      year: "2023 — Present",
       category: "ui",
       hue: 200,
       cover: "assets/projects/clinicvet/hero.webp",
-      studio: "Grayscale Interactive · for NUPEC",
-      role: "UI/UX design & programming (all UI)",
-      tools: ["Unreal Engine", "Blueprints", "Firebase"],
-      summary: "A 3D veterinary app for NUPEC. I designed and built its entire user interface, from the first designs to the programming.",
+      studio: "Grayscale Interactive",
+      role: "UI/UX Artist & Programmer",
+      tools: ["Unreal Engine", "Unity", "Blueprints", "Firebase"],
+      summary: "At Grayscale Interactive I was responsible for all of the UI of ClinicVET, a 3D veterinary app for NUPEC, and I contribute to the studio’s other projects, including ArgentXR and Ford.",
       description: [
-        "ClinicVET is a custom app made by Grayscale Interactive for NUPEC. It gives veterinarians interactive 3D anatomy, side-by-side condition comparisons and annotations to help them explain a dog’s health to its owner. It works as a visual communication aid, not a diagnostic tool, and runs on desktop, tablet and mobile.",
-        "I was responsible for everything UI-related in the app."
+        "Grayscale Interactive is a studio in Querétaro, Mexico, that builds VR training, AR and interactive 3D experiences for clients across North America. I work as part of its team on UI/UX design and programming in Unity and Unreal Engine."
       ],
       sections: [
         {
-          title: "My work",
+          title: "ClinicVET · 3D veterinary app for NUPEC",
+          intro: "ClinicVET gives veterinarians interactive 3D anatomy, side-by-side condition comparisons and annotations to help them explain a dog’s health to its owner. It works as a visual communication aid, not a diagnostic tool, and runs on desktop, tablet and mobile. The app was built by the Grayscale Interactive team, and I was responsible for all of its UI.",
           points: [
-            "Designed the complete user interface.",
+            { text: "Designed the complete user interface.", media: "assets/projects/clinicvet/devices.webp" },
             "Programmed all of the UI in Unreal Engine, including custom Blueprints.",
             "Connected parts of the UI to Firebase."
           ]
         },
         {
-          title: "What the app does",
+          title: "What ClinicVET does",
           points: [
-            "Starts from a dog model that can switch between male and female anatomy.",
+            { text: "Starts from a dog model that can switch between male and female anatomy.", media: "assets/projects/clinicvet/hero.webp" },
             "Moves from the exterior to the skeleton and organ systems, with rotate, zoom and pan.",
             "Shows common clinical conditions with the affected organ next to a healthy reference.",
             "Lets the vet write or draw directly over the model and save the annotated images for later consultations."
           ]
-        }
-      ],
-      media: [
-        { src: "assets/projects/clinicvet/preview.mp4", poster: "assets/projects/clinicvet/preview-poster.webp", caption: "App preview" },
-        { src: "assets/projects/clinicvet/hero.webp", caption: "3D anatomy view" },
-        { src: "assets/projects/clinicvet/devices.webp", caption: "Desktop, tablet and mobile" }
-      ]
-    },
-    {
-      id: "argent-xr",
-      title: "ArgentXR",
-      year: "2026",
-      category: "ui",
-      hue: 280,
-      cover: "assets/projects/argent-xr/cover.png",
-      studio: "Grayscale Interactive",
-      role: "Icon design, motion & UI proposals",
-      tools: [],                                            // TODO: tools you used
-      ribbon: "Free public beta · Nov 2026",
-      summary: "Grayscale’s browser platform that turns 3D and CAD models into interactive web and AR experiences. I designed its icons, motion animations and splash screens.",
-      description: [
-        "ArgentXR is Grayscale Interactive’s browser-based platform for turning 3D and CAD models into interactive web and augmented reality experiences, with no coding and no app downloads. Models come in from tools like Blender, Rhino, SketchUp, SOLIDWORKS and Siemens NX, and can be shared as a link or embedded on sites built with Webflow, WordPress, Wix and more."
-      ],
-      sections: [
+        },
         {
-          title: "My work",
+          title: "ArgentXR",
+          intro: "Grayscale’s browser-based platform for turning 3D and CAD models into interactive web and augmented reality experiences, with no coding and no app downloads. Free public beta, November 2026. My part:",
           points: [
             "Icon design.",
             "Motion animations.",
             "Splash screens.",
             "UI proposals."
+            // TODO: add media, e.g. { text: "Icon design.", media: "assets/projects/argent-xr/icons.png" }
           ]
-        }
-      ],
-      ctaTitle: "See ArgentXR",
-      ctaText: "Free public beta, November 2026.",
-      links: [
-        { label: "Visit ArgentXR", url: "https://argentxr.com/en/" }
-      ],
-      media: [
-        { src: "assets/projects/argent-xr/cover.png", caption: "ArgentXR" },
-        { src: null, caption: "Icons" },                     // TODO
-        { src: null, caption: "Motion", kind: "video" }      // TODO
-      ]
-    },
-    {
-      id: "grayscale",
-      title: "Client projects at Grayscale Interactive",
-      year: "2023 — Present",
-      category: "ui",
-      hue: 20,
-      cover: "assets/projects/grayscale/ford.webp",
-      studio: "Grayscale Interactive",
-      role: "UI/UX Artist & Programmer",
-      tools: ["Unity", "Unreal Engine"],
-      summary: "UI/UX design and programming for VR, AR and interactive 3D projects — clients include Ford, NUPEC and Tec de Monterrey.",
-      description: [
-        "Grayscale Interactive is a studio in Querétaro, Mexico, that builds VR training, AR and interactive 3D experiences for clients across North America. I develop UI/UX designs and programming across its Unity and Unreal Engine projects. My biggest ones have their own pages: ClinicVET and ArgentXR."
-      ],
-      sections: [
+        },
         {
           title: "Other projects",
           points: [
@@ -374,6 +326,7 @@ window.PORTFOLIO = {
         }
       ],
       media: [
+        { src: "assets/projects/clinicvet/preview.mp4", poster: "assets/projects/clinicvet/preview-poster.webp", caption: "ClinicVET · app preview" },
         { src: "assets/projects/grayscale/ford.webp", caption: "Ford" }
       ]
     },

@@ -643,6 +643,7 @@
       ...(p.description ?? []).map(t => h("p", { text: t })),
       ...(p.sections ?? []).map(s => h("section", { class: "project-section" },
         h("h3", { text: s.title }),
+        s.intro ? h("p", { class: "section-intro", text: s.intro }) : null,
         h("ul", { class: "features" }, ...(s.points ?? []).map(pointEl)))),
       ...(mainLink ? [h("aside", { class: "cta-banner" },
         h("div", {},
