@@ -603,7 +603,13 @@
 
     const meta = [["Studio", p.studio], ["Role", p.role], ["Year", p.year], ["Tools", p.tools?.join(", ")]].filter(([, v]) => v);
     $("#project-meta").replaceChildren(...meta.map(([k, v]) => h("div", {}, h("dt", { text: k }), h("dd", { text: v }))));
-    $("#project-desc").replaceChildren(...(p.description ?? []).map(t => h("p", { text: t })));
+    $("#project-desc").replaceChildren(
+      ...(p.description ?? []).map(t => h("p", { text: t })),
+      ...(p.sections ?? []).map(s => h("section", { class: "project-section" },
+        h("h3", { text: s.title }),
+        h("ul", {}, ...(s.points ?? []).map(t => h("li", { text: t }))))),
+      ...(p.links?.length ? [h("div", { class: "project-links" },
+        ...p.links.map((l, i) => h("a", { class: i ? "btn" : "btn primary", "data-nav": true, href: l.url, target: "_blank", rel: "noopener", text: `${l.label} ↗` })))] : []));
 
     const media = p.media?.length ? p.media : [{ src: p.cover, caption: p.title }];
     const images = media.map((m, i) => ({ m, i })).filter(x => kindOf(x.m.src) === "image");

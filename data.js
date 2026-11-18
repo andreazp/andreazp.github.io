@@ -214,14 +214,56 @@ window.PORTFOLIO = {
       hue: 265,
       cover: null,
       studio: "Designmatic",
-      role: "Game Programmer",
-      tools: ["Unity", "C#"],
+      role: "Associate Game Engineer",
+      tools: ["Unity", "C#", "UI Toolkit"],
       award: "Pitched to PlayStation at GDC",
-      summary: "Core gameplay mechanics and UI systems for a game pitched to PlayStation at GDC.",
+      summary: "UI, gameplay and enemy systems for a Unity game with a playable demo on Steam, pitched to PlayStation at GDC.",
       description: [
-        "Developed core gameplay mechanics and UI systems using C# and Unity.",
-        "Contributed to the PlayStation pitch for “Ayna: Shattered Truth” at GDC."
-        // TODO: a line about your favourite system or the hardest problem you solved
+        "As Associate Game Engineer in Designmatic’s Game Development division, I worked remotely on “Ayna: Shattered Truth” from July 2024 to December 2025, building systems across the game’s UI, gameplay and enemies in C# and Unity. I also contributed to the game’s PlayStation pitch at GDC."
+      ],
+      // Optional: headed lists shown under the description
+      sections: [
+        {
+          title: "User interface",
+          points: [
+            "Designed and implemented the initial UI structures and layouts across the entire game.",
+            "Built the vendor system end to end, from data management to UI: player and vendor inventories, and purchasable items that unlock gameplay.",
+            "Created an upgrader system for specific NPCs that lets players buy and unlock upgrades, handling the full process.",
+            "Added a favourites system so players can keep track of vendor and upgrader items they want to buy.",
+            "Developed the runtime player inventory with Unity’s UI Toolkit and data bindings.",
+            "Built a dialog bubble system that plays dialog sequences in-game.",
+            "Implemented item pick-up notifications on the HUD using a list view.",
+            "Created a tab-based journal UI that shows the player’s abilities and upgrades.",
+            "Extended the settings menu: VSync, FPS limiter, language, monitor resolution and display mode.",
+            "Built a narrative inspection setup that shows an icon and story text when players interact with objects."
+          ]
+        },
+        {
+          title: "Gameplay",
+          points: [
+            "Chest opening: the player walks automatically into position while animations, VFX and SFX play in sync.",
+            "A map system that unlocks map areas in the UI, plus map posts where players pick up maps.",
+            "A rotating platform system with smooth transitions between fixed steps, including looping and reverse looping.",
+            "Collapsible platforms with animations, VFX and SFX synced to gameplay logic.",
+            "Checkpoint interactions, including player animations for left and right triggers.",
+            "A new item pick-up system for automatic and manual pick-ups.",
+            "Moving platforms that react to player projectiles, with game-feel touches like shader glow.",
+            "Breakable ground, bouncing mushrooms and falling block traps."
+          ]
+        },
+        {
+          title: "Enemy behaviour",
+          points: [
+            "Built a flying enemies framework from scratch, used for every flying enemy in the game.",
+            "Developed several ground enemies from the game design requirements, including behaviour, VFX and SFX.",
+            "Programmed a smoke enemy that triggers a fullscreen shader effect to block the player’s vision.",
+            "Created a ground snake trap system that tracks player movement, shoots projectiles and switches tracking sides."
+          ]
+        }
+      ],
+      // Optional: buttons at the end of the page
+      links: [
+        { label: "Play the demo on Steam", url: "https://store.steampowered.com/app/1742390/Ayna_Shattered_Truth/" }
       ],
       media: [
         { src: null, caption: "Gameplay", kind: "video" },   // TODO
