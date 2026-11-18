@@ -1,0 +1,8 @@
+# Source/design files, not part of the site
+*.af
+assets/CV_AndreaZamudio2026_original.pdf
+
+# OS junk
+Thumbs.db
+desktop.ini
+.DS_Store

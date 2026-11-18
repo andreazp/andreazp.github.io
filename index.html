@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Portfolio</title>
+  <meta name="description" content="Portfolio — game UI/UX, motion graphics and illustration.">
+  <meta name="theme-color" content="#f5f2ec">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,200..800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body data-input="pointer">
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <canvas id="bg" aria-hidden="true"></canvas>
+  <div class="grain" aria-hidden="true"></div>
+
+  <div class="frame">
+    <header class="topbar" id="topbar">
+      <a class="brand" href="#menu" data-goto="menu" data-nav>
+        <img class="brand-logo" src="assets/logo.png" alt="" width="44" height="24">
+        <span class="brand-text"><strong id="brand-name"></strong><small id="brand-role"></small></span>
+      </a>
+
+      <nav class="site-nav" id="site-nav" aria-label="Main">
+        <ul id="site-nav-list"></ul>
+      </nav>
+
+      <div class="topbar-actions">
+        <span class="status-chip"><i class="dot" aria-hidden="true"></i><span id="availability"></span></span>
+        <button class="icon-btn" id="sound-toggle" aria-pressed="true">
+          <span class="sound-icon" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+          <span class="sr-only">Sound effects</span>
+        </button>
+        <button class="icon-btn menu-btn" id="menu-btn" aria-expanded="false" aria-controls="site-nav">
+          <span class="burger" aria-hidden="true"><i></i><i></i></span>
+          <span class="sr-only">Menu</span>
+        </button>
+      </div>
+    </header>
+
+    <main id="main" tabindex="-1">
+      <!-- TITLE -->
+      <section class="screen" id="screen-title" data-screen="title" aria-labelledby="title-name">
+        <div class="home">
+          <div class="title-wrap">
+            <p class="eyebrow" id="title-eyebrow"></p>
+            <h1 class="title" id="title-name"></h1>
+            <p class="catchphrase" id="title-catch"></p>
+            <div class="title-actions">
+              <a class="press-start" href="#menu" data-goto="menu" data-nav>Explore my work</a>
+              <a class="btn" href="#cv" data-goto="cv" data-nav>Read my CV</a>
+            </div>
+            <p class="title-hint" aria-hidden="true">or press <kbd>Enter</kbd></p>
+          </div>
+
+          <!-- Decorative toy box: everything here is also reachable from the nav. -->
+          <div class="playground" id="playground" aria-hidden="true">
+            <span class="pg-label">Playground — drag &amp; throw me</span>
+          </div>
+        </div>
+        <p class="title-foot">© <span id="year"></span> · Built by hand — HTML, CSS, JS</p>
+      </section>
+
+      <!-- MAIN MENU -->
+      <section class="screen" id="screen-menu" data-screen="menu" aria-labelledby="menu-h">
+        <h2 class="sr-only" id="menu-h">Main menu</h2>
+        <div class="menu-layout">
+          <nav class="menu" aria-label="Sections">
+            <p class="eyebrow" aria-hidden="true">Main menu</p>
+            <ul id="menu-list"></ul>
+          </nav>
+          <aside class="panel menu-preview" aria-hidden="true">
+            <p class="eyebrow" id="preview-kicker"></p>
+            <p class="preview-title" id="preview-title"></p>
+            <p id="preview-body"></p>
+            <div class="preview-meter"><span id="preview-meter-fill"></span></div>
+          </aside>
+        </div>
+      </section>
+
+      <!-- PROJECTS -->
+      <section class="screen" id="screen-projects" data-screen="projects" aria-labelledby="projects-h">
+        <div class="screen-head">
+          <h2 class="screen-title" id="projects-h">Projects</h2>
+          <div class="tab-row" id="project-tabs" role="group" aria-label="Filter projects"></div>
+        </div>
+        <div class="level-grid" id="project-grid"></div>
+      </section>
+
+      <!-- PROJECT PAGE -->
+      <section class="screen" id="screen-project" data-screen="project" aria-labelledby="project-h">
+        <a class="back-link" href="#projects" data-goto="projects" data-nav>← All projects</a>
+        <div class="project-head">
+          <div class="project-intro">
+            <p class="eyebrow" id="project-kicker"></p>
+            <h2 class="screen-title project-title" id="project-h"></h2>
+            <p class="project-summary" id="project-summary"></p>
+            <p class="badge" id="project-award" hidden></p>
+          </div>
+          <dl class="project-meta" id="project-meta"></dl>
+        </div>
+        <div class="viewer-slot" id="project-viewer"></div>
+        <div class="project-body" id="project-desc"></div>
+        <nav class="project-pager" id="project-pager" aria-label="More projects"></nav>
+      </section>
+
+      <!-- MOTION -->
+      <section class="screen" id="screen-motion" data-screen="motion" aria-labelledby="motion-h">
+        <div class="screen-head">
+          <h2 class="screen-title" id="motion-h">Motion</h2>
+          <p class="muted screen-sub">Motion graphics and short film.</p>
+        </div>
+        <div class="reel">
+          <div class="viewer-slot" id="motion-viewer"></div>
+          <aside class="panel reel-info" aria-live="polite">
+            <p class="eyebrow" id="reel-kicker"></p>
+            <h3 id="reel-title"></h3>
+            <p class="badge" id="reel-award" hidden></p>
+            <p class="muted" id="reel-desc"></p>
+            <ul class="chips" id="reel-tools"></ul>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ILLUSTRATION -->
+      <section class="screen" id="screen-illustration" data-screen="illustration" aria-labelledby="illu-h">
+        <div class="screen-head">
+          <h2 class="screen-title" id="illu-h">Illustration</h2>
+          <div class="illu-side">
+            <p class="muted screen-sub" id="illu-intro"></p>
+            <div class="illu-links" id="illu-links"></div>
+          </div>
+        </div>
+        <div class="gallery" id="gallery"></div>
+      </section>
+
+      <!-- ABOUT -->
+      <section class="screen" id="screen-about" data-screen="about" aria-labelledby="about-h">
+        <div class="screen-head"><h2 class="screen-title" id="about-h">About</h2></div>
+        <div class="about-layout">
+          <div class="panel profile">
+            <button class="avatar" id="avatar" data-nav aria-label="Poke the avatar"><span id="avatar-initials" aria-hidden="true"></span></button>
+            <h3 id="about-name"></h3>
+            <p class="muted" id="about-class"></p>
+            <dl class="stats" id="about-stats"></dl>
+          </div>
+          <div class="panel bio">
+            <p class="eyebrow">Bio</p>
+            <div id="about-bio"></div>
+            <p class="eyebrow">Traits</p>
+            <ul class="chips" id="about-traits"></ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- SKILLS -->
+      <section class="screen" id="screen-skills" data-screen="skills" aria-labelledby="skills-h">
+        <div class="screen-head">
+          <h2 class="screen-title" id="skills-h">Skills</h2>
+          <p class="muted screen-sub">Pick a skill to see the details.</p>
+        </div>
+        <div class="skills-layout">
+          <div class="skill-groups" id="skill-groups"></div>
+          <aside class="panel skill-detail" aria-live="polite">
+            <p class="eyebrow" id="skill-group-name"></p>
+            <h3 id="skill-name"></h3>
+            <div class="skill-level" aria-hidden="true"><span id="skill-level-fill"></span></div>
+            <p class="muted" id="skill-level-label"></p>
+            <p id="skill-note"></p>
+          </aside>
+        </div>
+      </section>
+
+      <!-- CV -->
+      <section class="screen" id="screen-cv" data-screen="cv" aria-labelledby="cv-h">
+        <div class="screen-head">
+          <h2 class="screen-title" id="cv-h">CV</h2>
+          <div class="cv-head-actions" id="cv-head-actions"></div>
+        </div>
+        <div class="cv-layout">
+          <div class="cv-main">
+            <p class="cv-summary" id="cv-summary"></p>
+            <ul class="chips cv-focus" id="cv-focus"></ul>
+            <dl class="cv-highlights" id="cv-highlights"></dl>
+            <h3 class="eyebrow">Experience</h3>
+            <ol class="timeline" id="cv-experience"></ol>
+            <div class="cv-awards-wrap" id="cv-awards-wrap">
+              <h3 class="eyebrow">Awards &amp; honours</h3>
+              <ul class="cv-awards" id="cv-awards"></ul>
+            </div>
+          </div>
+          <aside class="cv-side" id="cv-side"></aside>
+        </div>
+      </section>
+
+      <!-- CONTACT -->
+      <section class="screen" id="screen-contact" data-screen="contact" aria-labelledby="contact-h">
+        <div class="screen-head"><h2 class="screen-title" id="contact-h">Contact</h2></div>
+        <div class="panel contact-panel">
+          <p class="contact-lead" id="contact-lead"></p>
+          <div class="contact-actions" id="contact-actions"></div>
+          <p class="muted toast" id="contact-toast" role="status"></p>
+        </div>
+      </section>
+    </main>
+
+    <footer class="hud-bottom" aria-hidden="true">
+      <div class="prompts" id="prompts"></div>
+      <span class="build" title="↑ ↑ ↓ ↓ ← → ← → B A">v1.0</span>
+    </footer>
+  </div>
+
+  <!-- LIGHTBOX (full-size images) -->
+  <div class="modal lightbox" id="lightbox" data-arrows hidden>
+    <div class="modal-backdrop" data-close></div>
+    <figure class="lb-card" role="dialog" aria-modal="true" aria-labelledby="lb-title">
+      <div class="lb-media" id="lb-media"></div>
+      <figcaption class="lb-caption">
+        <p class="eyebrow" id="lb-kicker"></p>
+        <h2 id="lb-title"></h2>
+        <p class="badge" id="lb-award" hidden></p>
+        <p class="muted" id="lb-note"></p>
+        <div class="viewer-bar">
+          <button class="icon-btn" data-nav data-lb="-1" aria-label="Previous">←</button>
+          <span class="viewer-count" id="lb-count"></span>
+          <button class="icon-btn" data-nav data-lb="1" aria-label="Next">→</button>
+        </div>
+      </figcaption>
+      <button class="modal-close icon-btn" data-close data-nav aria-label="Close">✕</button>
+    </figure>
+  </div>
+
+  <canvas id="fx" aria-hidden="true"></canvas>
+  <p class="global-toast" id="global-toast" role="status" aria-live="polite"></p>
+  <p class="sr-only" id="route-announcer" aria-live="polite"></p>
+
+  <script src="data.js"></script>
+  <script src="main.js"></script>
+</body>
+</html>
