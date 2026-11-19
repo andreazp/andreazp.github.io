@@ -669,7 +669,9 @@
     currentProject = p;
     $("#project-kicker").textContent = labelFor(p.category) ?? "";
     $("#project-h").textContent = p.title;
-    $("#project-summary").textContent = p.summary ?? "";
+    $("#project-text").replaceChildren(
+      ...(p.summary ? [h("p", { class: "ap-summary", text: p.summary })] : []),
+      ...(p.description ?? []).map(t => h("p", { text: t })));
     const award = $("#project-award");
     award.textContent = p.award ? `✦ ${p.award}` : "";
     award.hidden = !p.award;
@@ -708,7 +710,6 @@
     };
 
     $("#project-desc").replaceChildren(
-      ...(p.description ?? []).map(t => h("p", { class: "project-lead", text: t })),
       ...sections.map(s => h("section", { class: s.featured ? "project-section featured" : "project-section" },
         h("h3", {}, h("span", { text: s.title }), h("small", { text: String(s.points.length) })),
         s.intro ? h("p", { class: "section-intro", text: s.intro }) : null,
@@ -745,14 +746,38 @@
     }));
 
     const k = D.projects.indexOf(p);
-    const prevP = D.projects[(k - 1 + D.projects.length) % D.projects.length];
     const nextP = D.projects[(k + 1) % D.projects.length];
-    $("#project-pager").replaceChildren(
-      h("a", { class: "pager-link", href: `#projects/${prevP.id}`, "data-goto": `projects/${prevP.id}`, "data-nav": true },
-        h("small", { text: "← Previous project" }), h("strong", { text: prevP.title })),
-      h("a", { class: "pager-link next", href: `#projects/${nextP.id}`, "data-goto": `projects/${nextP.id}`, "data-nav": true },
-        h("small", { text: "Next project →" }), h("strong", { text: nextP.title })));
+    const toProject = (el, q) => Object.assign(el, { href: `#projects/${q.id}` }).setAttribute("data-goto", `projects/${q.id}`);
+    const next = $("#project-next");
+    toProject(next, nextP);
+    next.replaceChildren(
+      h("span", { class: "ap-next-text" }, h("small", { text: "Next →" }), h("strong", { text: nextP.title })),
+      h("span", { class: "ap-next-art" }, projectCover(nextP)));
+    const arrow = $("#project-arrow");
+    toProject(arrow, nextP);
+    arrow.setAttribute("aria-label", `Next project: ${nextP.title}`);
+    $("#project-more").replaceChildren(...D.projects.filter(q => q !== p && q !== nextP).map(q => {
+      const a = h("a", { class: "ap-more-item", "data-nav": true, title: q.title, "aria-label": q.title }, projectCover(q));
+      toProject(a, q);
+      return h("li", {}, a);
+    }));
+    $(".ap-more").hidden = !$("#project-more").children.length;
+    $("#screen-project").scrollTop = 0;
   }
+
+  /* ================= Footer (project pages and other long screens) ================= */
+  function renderFooter(el) {
+    const c = D.contact ?? {};
+    el.replaceChildren(
+      h("div", { class: "footer-main" },
+        h("p", { class: "footer-name", text: D.name }),
+        h("p", { class: "footer-role", text: D.role })),
+      h("div", { class: "footer-links" },
+        c.email ? h("a", { href: `mailto:${c.email}`, "data-nav": true, text: c.email }) : null,
+        ...(c.links ?? []).map(l => h("a", { href: l.url, target: "_blank", rel: "noopener", "data-nav": true, text: `${l.label} ↗` }))),
+      h("p", { class: "footer-copy", text: `© ${new Date().getFullYear()} ${D.name}` }));
+  }
+  $$("[data-footer]").forEach(renderFooter);
 
   /* ================= Motion ================= */
   const MOTION = D.motion ?? { reel: [] };

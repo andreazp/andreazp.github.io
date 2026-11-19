@@ -1094,3 +1094,83 @@ main { position: relative; min-height: 0; }
 .lb-video { position: relative; width: 100%; aspect-ratio: 16 / 9; background: #111; }
 .lb-video > *, .lb-video > .stage-zoom > img { position: absolute; inset: 0; width: 100%; height: 100%; display: block; border: 0; }
 .lb-video > video { object-fit: contain; }
+
+/* ---------- Project page v6 (ArtStation-style): media column + info sidebar ---------- */
+.ap {
+  display: grid; grid-template-columns: minmax(0, 1fr) clamp(300px, 28vw, 420px);
+  grid-template-areas: "media side"; gap: clamp(24px, 3vw, 48px); align-items: start;
+}
+.ap-media { grid-area: media; }
+.ap-side { grid-area: side; display: grid; gap: 28px; }
+.ap-media .stack-item { gap: 8px; }
+.ap-media.project-stack { gap: clamp(20px, 3vw, 40px); }
+.ap-head { display: grid; justify-items: start; gap: 14px; }
+.ap-head .back-link { margin: 0 0 4px; }
+.ap-cat { display: flex; align-items: center; gap: 8px; margin: 0; font-size: 14px; font-weight: 500; color: var(--muted); }
+.ap-cat svg { width: 18px; height: 18px; fill: var(--faint); }
+.ap-title { margin: 0; font-size: clamp(32px, 3.2vw, 48px); line-height: 1.05; letter-spacing: -0.04em; text-wrap: balance; }
+.ap-head .badge { margin: 0; }
+.ap-text p { margin: 0 0 14px; font-size: 16px; line-height: 1.7; color: var(--muted); }
+.ap-text .ap-summary { font-size: 18px; line-height: 1.55; color: var(--text); }
+.ap-head .project-cta { margin: 0; width: 100%; }
+.ap-head .cta-btn { width: 100%; justify-content: center; }
+.ap-head .project-info { margin: 0; width: 100%; }
+.ap-head .info-fact, .ap-head .info-tools { flex: 1 1 100%; }
+.ap-nav { display: grid; gap: 20px; padding-top: 24px; border-top: 1px solid var(--line); }
+.ap-next {
+  display: grid; grid-template-columns: minmax(0, 1fr) 128px; min-height: 112px; overflow: hidden;
+  border: 1px solid var(--line); border-radius: var(--radius); background: var(--panel-solid);
+  transition: border-color 0.2s, translate 0.4s var(--spring), box-shadow 0.3s;
+}
+.ap-next:hover, .ap-next.selected { border-color: var(--line-strong); translate: 0 -3px; box-shadow: 0 20px 40px -24px var(--shadow-color); }
+.ap-next-text { display: flex; flex-direction: column; justify-content: space-between; align-items: flex-end; gap: 10px; padding: 14px 16px; text-align: right; }
+.ap-next-text small { font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.ap-next-text strong { font-family: var(--font-display); font-size: 17px; line-height: 1.2; letter-spacing: -0.02em; }
+.ap-next-art { position: relative; overflow: hidden; background: var(--bg-2); }
+.ap-next-art > * { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: scale 0.6s var(--ease); }
+.ap-next:hover .ap-next-art > * { scale: 1.06; }
+.ap-more { padding: 18px; border-radius: var(--radius); background: var(--bg-2); }
+.ap-more[hidden] { display: none; }
+.ap-more h3 { margin: 0 0 14px; text-align: center; font-size: 18px; letter-spacing: -0.02em; }
+.ap-more ul { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.ap-more-item { position: relative; display: block; aspect-ratio: 1; overflow: hidden; border-radius: 10px; background: var(--panel); }
+.ap-more-item > * { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: scale 0.5s var(--ease); }
+.ap-more-item:hover > *, .ap-more-item.selected > * { scale: 1.08; }
+.ap ~ .project-body { margin-top: clamp(40px, 7vh, 72px); }
+.ap-arrow {
+  position: fixed; right: clamp(4px, 1vw, 16px); top: 50%; z-index: 5; translate: 0 -50%;
+  width: 48px; height: 48px; display: grid; place-items: center; border-radius: 50%;
+  background: var(--panel-solid); border: 1px solid var(--line); box-shadow: 0 10px 30px -14px var(--shadow-color);
+  transition: translate 0.35s var(--spring), border-color 0.2s;
+}
+.ap-arrow svg { width: 24px; height: 24px; fill: none; stroke: var(--text); stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+.ap-arrow:hover, .ap-arrow.selected { translate: 4px -50%; border-color: var(--line-strong); }
+
+@media (max-width: 960px) {
+  .ap { grid-template-columns: minmax(0, 1fr); grid-template-areas: none; }
+  .ap-side { display: contents; }
+  .ap-head { order: -1; }
+  .ap-media { grid-area: auto; }
+  .ap-arrow { display: none; }
+}
+
+/* ---------- Footer ---------- */
+.site-footer {
+  margin-top: clamp(56px, 10vh, 110px); padding: 28px 0 8px; border-top: 1px solid var(--line);
+  display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 18px 40px;
+}
+.footer-name { margin: 0; font-family: var(--font-display); font-size: clamp(24px, 2.4vw, 32px); font-weight: 700; letter-spacing: -0.035em; }
+.footer-role { margin: 2px 0 0; color: var(--muted); }
+.footer-links { display: flex; flex-wrap: wrap; gap: 8px 22px; }
+.footer-links a { font-weight: 500; text-decoration: underline; text-decoration-color: var(--line-strong); text-underline-offset: 4px; transition: text-decoration-color 0.2s, color 0.2s; }
+.footer-links a:hover, .footer-links a.selected { color: var(--accent-text); text-decoration-color: currentColor; }
+.footer-copy { flex-basis: 100%; margin: 0; font-size: 13px; color: var(--faint); }
+/* sidebar details: one compact box instead of separate tiles; leave room for the next arrow */
+@media (min-width: 961px) { #screen-project .ap, #screen-project .project-body { padding-right: 56px; } }
+.ap-head .project-info { gap: 0; border: 1px solid var(--line); border-radius: var(--radius); background: var(--panel-solid); overflow: hidden; }
+.ap-head .info-fact, .ap-head .info-tools { border: 0; border-radius: 0; background: none; padding: 10px 14px; }
+.ap-head .project-info > li + li { border-top: 1px solid var(--line); }
+.ap-head .info-icon { width: 34px; height: 34px; border-radius: 10px; }
+.ap-head .info-icon svg { width: 18px; height: 18px; }
+.ap-head .info-tools { padding: 12px 14px 14px; }
+.ap-next, .ap-next:hover, .ap-more-item { text-decoration: none; color: inherit; }
