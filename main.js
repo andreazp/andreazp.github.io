@@ -345,6 +345,7 @@
     if (kind === "video") {
       const v = h("video", { src: item.src, controls: true, playsinline: true, preload: "metadata", "aria-label": alt || "Video" });
       if (item.poster) v.poster = item.poster;
+      if (opts.autoplay) v.autoplay = true;
       return v;
     }
     if (kind === "youtube" || kind === "vimeo") {
@@ -354,7 +355,7 @@
           : yt ? h("img", { src: `https://i.ytimg.com/vi/${yt}/hqdefault.jpg`, alt: "" })
           : (opts.placeholder?.(item, i, true) ?? motionCanvas(item.caption ?? "video", item.hue)),
         h("span", { class: "play-btn", "aria-hidden": "true" }));
-      b.addEventListener("click", () => {
+      const play = () => {
         // YouTube refuses embeds that don't say which site they're on (error 153),
         // so pass the origin and keep the referrer.
         const origin = /^https?:$/.test(location.protocol) ? `&origin=${encodeURIComponent(location.origin)}` : "";
@@ -362,6 +363,12 @@
                        : `https://player.vimeo.com/video/${vm}?autoplay=1`;
         const f = h("iframe", { src, title: alt || "Video", allow: "autoplay; encrypted-media; fullscreen; picture-in-picture; web-share",
           referrerpolicy: "strict-origin-when-cross-origin", allowfullscreen: true });
+        f._restore = b; // leaving the screen swaps the player back to its poster
+        return f;
+      };
+      if (opts.autoplay) return play();
+      b.addEventListener("click", () => {
+        const f = play();
         b.replaceWith(f);
         // Focusing the player makes YouTube keep its controls on screen, so only do it for keyboard/gamepad users
         if (inputMode !== "pointer") f.focus();
@@ -715,42 +722,27 @@
           linkBtn(mainLink, "btn cta-btn"),
           ...p.links.slice(1).map(l => linkBtn(l, "btn"))))] : []));
 
-    // Big video card right under the title (the first video, or the first item if there are none),
-    // then everything else as a gallery grid that opens in the lightbox.
+    // The work first: every photo and video stacked full width under the title, details after.
     const media = (p.media?.length ? p.media : [{ src: p.cover, caption: p.title }])
       .map((m, i) => ({ ...m, hue: (p.hue ?? 200) + i * 25, seed: `${p.id}-${i}` }));
     const isVid = m => ["video", "youtube", "vimeo"].includes(kindOf(m.src)) || (!m.src && m.kind === "video");
-    const featured = media.find(m => isVid(m) && m.src) ?? media.find(isVid) ?? media[0];
-    const rest = media.filter(m => m !== featured);
     const placeholder = (item, i, big = true) => isVid(item)
       ? motionCanvas(item.seed, item.hue, big)
       : coverCanvas(item.seed, item.hue, "Image coming soon");
-    const lbItem = m => ({
-      render: () => kindOf(m.src) === "image" ? h("img", { src: m.src, alt: m.alt ?? m.caption ?? "" })
-        : h("div", { class: "lb-video" }, mediaEl(m, 0, { placeholder })),
-      kicker: p.title, title: m.caption ?? "", note: m.note ?? ""
-    });
-
-    Viewer($("#project-feature"), [featured], {
-      label: "Media", placeholder,
-      zoom: () => openLightbox([lbItem(featured)], 0)
-    });
-
-    $("#project-gallery").hidden = !rest.length;
-    $("#project-gallery-grid").replaceChildren(...rest.map((m, i) => {
-      const kind = kindOf(m.src);
-      const art = m.poster ? h("img", { src: m.poster, alt: "", loading: "lazy" })
-        : kind === "image" ? h("img", { src: m.src, alt: "", loading: "lazy" })
-        : kind === "youtube" ? h("img", { src: `https://i.ytimg.com/vi/${ytId(m.src)}/hqdefault.jpg`, alt: "", loading: "lazy" })
-        : kind === "video" ? h("video", { src: `${m.src}#t=0.1`, muted: true, preload: "metadata", tabindex: "-1" })
-        : placeholder(m, i, false);
-      const b = h("button", { class: "gallery-tile", "data-nav": true, "aria-label": `Open ${m.caption || `item ${i + 1}`}` },
-        h("span", { class: "gallery-tile-art" }, art, isVid(m) ? h("span", { class: "play-btn small", "aria-hidden": "true" }) : null),
-        m.caption ? h("span", { class: "gallery-tile-cap" },
-          h("strong", { text: m.caption }), m.note ? h("small", { text: m.note }) : null) : null);
-      b.addEventListener("click", () => openLightbox(rest.map(lbItem), i));
-      b.style.animationDelay = `${i * 60}ms`;
-      return h("li", {}, b);
+    const images = media.filter(m => kindOf(m.src) === "image");
+    $("#project-stack").replaceChildren(...media.map(m => {
+      let el;
+      if (kindOf(m.src) === "image") {
+        el = h("button", { class: "stack-img", "data-nav": true, "aria-label": `View full size: ${m.caption || p.title}` },
+          h("img", { src: m.src, alt: m.alt ?? m.caption ?? "", loading: "lazy" }));
+        el.addEventListener("click", () => openLightbox(images.map(x => ({
+          render: () => h("img", { src: x.src, alt: x.alt ?? x.caption ?? "" }),
+          kicker: p.title, title: x.caption ?? "", note: x.note ?? ""
+        })), images.indexOf(m)));
+      } else {
+        el = h("div", { class: "stack-media" }, mediaEl(m, 0, { placeholder }));
+      }
+      return h("figure", { class: "stack-item" }, el, m.caption ? h("figcaption", { text: m.caption }) : null);
     }));
 
     const k = D.projects.indexOf(p);
@@ -765,21 +757,28 @@
 
   /* ================= Motion ================= */
   const MOTION = D.motion ?? { reel: [] };
-  // One big card per video: title on top, the player underneath.
-  $("#motion-list").replaceChildren(...MOTION.reel.map(r => {
-    const slot = h("div", { class: "motion-player" });
-    const card = h("article", { class: "motion-card" },
-      h("header", { class: "motion-card-head" },
-        h("div", {},
-          h("p", { class: "eyebrow", text: [r.context, r.year].filter(Boolean).join(" · ") }),
-          h("h3", { class: "motion-title", text: r.title })),
-        r.award ? h("p", { class: "badge", text: `✦ ${r.award}` }) : null),
-      slot);
-    Viewer(slot, [{ src: r.video, poster: r.poster, caption: r.description ?? "", alt: r.title, kind: "video" }], {
-      label: "Video",
-      placeholder: (item, i, big) => motionCanvas(r.title, r.hue, big)
-    });
-    return card;
+  // A grid of video tiles; each opens in the lightbox and starts playing.
+  const reelCtx = r => [r.context, r.year].filter(Boolean).join(" · ");
+  const openReel = i => openLightbox(MOTION.reel.map(r => ({
+    render: () => h("div", { class: "lb-video" }, mediaEl({ src: r.video, poster: r.poster, alt: r.title, kind: "video" }, 0,
+      { autoplay: true, placeholder: (it, k, big) => motionCanvas(r.title, r.hue, big) })),
+    kicker: reelCtx(r), title: r.title, award: r.award, note: r.description ?? ""
+  })), i);
+  $("#motion-list").replaceChildren(...MOTION.reel.map((r, i) => {
+    const yt = ytId(r.video);
+    const art = r.poster ? h("img", { src: r.poster, alt: "", loading: "lazy" })
+      : yt ? h("img", { src: `https://i.ytimg.com/vi/${yt}/hqdefault.jpg`, alt: "", loading: "lazy" })
+      : isVideoFile(r.video) ? h("video", { src: `${r.video}#t=0.1`, muted: true, preload: "metadata", tabindex: "-1" })
+      : motionCanvas(r.title, r.hue, false);
+    const b = h("button", { class: "motion-tile", "data-nav": true, "aria-label": `Play ${r.title}` },
+      h("span", { class: "motion-tile-art" }, art, h("span", { class: "play-btn small", "aria-hidden": "true" })),
+      h("span", { class: "motion-tile-text" },
+        h("small", { text: reelCtx(r) }),
+        h("strong", { text: r.title }),
+        r.award ? h("span", { class: "badge", text: `✦ ${r.award}` }) : null));
+    b.addEventListener("click", () => openReel(i));
+    b.style.animationDelay = `${i * 70}ms`;
+    return h("li", {}, b);
   }));
 
   /* ================= Illustration ================= */
@@ -919,6 +918,10 @@
 
     const leaving = $(".screen.active");
     viewers.forEach(v => { if (leaving?.contains(v.root)) v.stop(); });
+    if (leaving) {
+      $$("video", leaving).forEach(v => v.pause());
+      $$("iframe", leaving).forEach(f => { if (f._restore) f.replaceWith(f._restore); else f.replaceWith(); });
+    }
 
     for (const s of $$(".screen")) {
       const on = s.dataset.screen === id;
