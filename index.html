@@ -105,7 +105,11 @@
             <p class="badge" id="project-award" hidden></p>
           </div>
         </header>
-        <div class="viewer-slot project-gallery" id="project-viewer"></div>
+        <div class="feature-card" id="project-feature"></div>
+        <section class="project-gallery" id="project-gallery" aria-labelledby="project-gallery-h">
+          <h3 id="project-gallery-h">Gallery</h3>
+          <ul class="gallery-grid" id="project-gallery-grid"></ul>
+        </section>
         <ul class="project-info" id="project-meta" aria-label="Project details"></ul>
         <div class="project-body" id="project-desc"></div>
         <nav class="project-pager" id="project-pager" aria-label="More projects"></nav>
@@ -117,16 +121,7 @@
           <h2 class="screen-title" id="motion-h">Motion</h2>
           <p class="muted screen-sub">Motion graphics and short film.</p>
         </div>
-        <div class="reel">
-          <div class="viewer-slot" id="motion-viewer"></div>
-          <aside class="panel reel-info" aria-live="polite">
-            <p class="eyebrow" id="reel-kicker"></p>
-            <h3 id="reel-title"></h3>
-            <p class="badge" id="reel-award" hidden></p>
-            <p class="muted" id="reel-desc"></p>
-            <ul class="chips" id="reel-tools"></ul>
-          </aside>
-        </div>
+        <div class="motion-list" id="motion-list"></div>
       </section>
 
       <!-- ILLUSTRATION -->

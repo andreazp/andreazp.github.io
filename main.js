@@ -332,6 +332,45 @@
   const vimeoId = u => u?.match(/vimeo\.com\/(?:video\/)?(\d+)/)?.[1];
   const kindOf = src => !src ? "none" : isVideoFile(src) ? "video" : ytId(src) ? "youtube" : vimeoId(src) ? "vimeo" : "image";
 
+  // One piece of media: zoomable image, video file, or click-to-play YouTube/Vimeo poster.
+  function mediaEl(item, i, opts = {}) {
+    const kind = kindOf(item.src);
+    const alt = item.alt ?? item.caption ?? "";
+    if (kind === "image") {
+      const b = h("button", { class: "stage-zoom", "data-nav": true, "aria-label": `View full size: ${alt || "image"}` },
+        h("img", { src: item.src, alt }));
+      b.addEventListener("click", () => opts.zoom?.(i));
+      return b;
+    }
+    if (kind === "video") {
+      const v = h("video", { src: item.src, controls: true, playsinline: true, preload: "metadata", "aria-label": alt || "Video" });
+      if (item.poster) v.poster = item.poster;
+      return v;
+    }
+    if (kind === "youtube" || kind === "vimeo") {
+      const yt = ytId(item.src), vm = vimeoId(item.src);
+      const b = h("button", { class: "embed-poster", "data-nav": true, "aria-label": `Play video: ${alt || "video"}` },
+        item.poster ? h("img", { src: item.poster, alt: "" })
+          : yt ? h("img", { src: `https://i.ytimg.com/vi/${yt}/hqdefault.jpg`, alt: "" })
+          : (opts.placeholder?.(item, i, true) ?? motionCanvas(item.caption ?? "video", item.hue)),
+        h("span", { class: "play-btn", "aria-hidden": "true" }));
+      b.addEventListener("click", () => {
+        // YouTube refuses embeds that don't say which site they're on (error 153),
+        // so pass the origin and keep the referrer.
+        const origin = /^https?:$/.test(location.protocol) ? `&origin=${encodeURIComponent(location.origin)}` : "";
+        const src = yt ? `https://www.youtube.com/embed/${yt}?autoplay=1&rel=0&playsinline=1&iv_load_policy=3${origin}`
+                       : `https://player.vimeo.com/video/${vm}?autoplay=1`;
+        const f = h("iframe", { src, title: alt || "Video", allow: "autoplay; encrypted-media; fullscreen; picture-in-picture; web-share",
+          referrerpolicy: "strict-origin-when-cross-origin", allowfullscreen: true });
+        b.replaceWith(f);
+        // Focusing the player makes YouTube keep its controls on screen, so only do it for keyboard/gamepad users
+        if (inputMode !== "pointer") f.focus();
+      });
+      return b;
+    }
+    return h("div", { class: "embed-poster is-placeholder" }, opts.placeholder?.(item, i, true) ?? motionCanvas(item.caption ?? "media", item.hue));
+  }
+
   /*
    * A media viewer: big stage + prev/next + caption + thumbnails.
    * items: [{ src, poster, caption, kind }]
@@ -355,43 +394,7 @@
     slot.replaceChildren(root);
     let idx = 0;
 
-    function stageMedia(item, i) {
-      const kind = kindOf(item.src);
-      const alt = item.alt ?? item.caption ?? "";
-      if (kind === "image") {
-        const b = h("button", { class: "stage-zoom", "data-nav": true, "aria-label": `View full size: ${alt || "image"}` },
-          h("img", { src: item.src, alt }));
-        b.addEventListener("click", () => opts.zoom?.(i));
-        return b;
-      }
-      if (kind === "video") {
-        const v = h("video", { src: item.src, controls: true, playsinline: true, preload: "metadata", "aria-label": alt || "Video" });
-        if (item.poster) v.poster = item.poster;
-        return v;
-      }
-      if (kind === "youtube" || kind === "vimeo") {
-        const yt = ytId(item.src), vm = vimeoId(item.src);
-        const b = h("button", { class: "embed-poster", "data-nav": true, "aria-label": `Play video: ${alt || "video"}` },
-          item.poster ? h("img", { src: item.poster, alt: "" })
-            : yt ? h("img", { src: `https://i.ytimg.com/vi/${yt}/hqdefault.jpg`, alt: "" })
-            : opts.placeholder(item, i, true),
-          h("span", { class: "play-btn", "aria-hidden": "true" }));
-        b.addEventListener("click", () => {
-          // YouTube refuses embeds that don't say which site they're on (error 153),
-          // so pass the origin and keep the referrer.
-          const origin = /^https?:$/.test(location.protocol) ? `&origin=${encodeURIComponent(location.origin)}` : "";
-          const src = yt ? `https://www.youtube.com/embed/${yt}?autoplay=1&rel=0&playsinline=1&iv_load_policy=3${origin}`
-                         : `https://player.vimeo.com/video/${vm}?autoplay=1`;
-          const f = h("iframe", { src, title: alt || "Video", allow: "autoplay; encrypted-media; fullscreen; picture-in-picture; web-share",
-            referrerpolicy: "strict-origin-when-cross-origin", allowfullscreen: true });
-          b.replaceWith(f);
-          // Focusing the player makes YouTube keep its controls on screen, so only do it for keyboard/gamepad users
-          if (inputMode !== "pointer") f.focus();
-        });
-        return b;
-      }
-      return h("div", { class: "embed-poster is-placeholder" }, opts.placeholder(item, i, true));
-    }
+    const stageMedia = (item, i) => mediaEl(item, i, opts);
 
     function thumb(item, i) {
       const kind = kindOf(item.src);
@@ -712,19 +715,43 @@
           linkBtn(mainLink, "btn cta-btn"),
           ...p.links.slice(1).map(l => linkBtn(l, "btn"))))] : []));
 
-    // Gallery at the top: the first thing people see is the work itself
-    const media = p.media?.length ? p.media : [{ src: p.cover, caption: p.title }];
-    const images = media.map((m, i) => ({ m, i })).filter(x => kindOf(x.m.src) === "image");
-    Viewer($("#project-viewer"), media, {
-      label: "Media",
-      placeholder: (item, i) => item.kind === "video"
-        ? motionCanvas(`${p.id}-${i}`, (p.hue ?? 200) + i * 25)
-        : coverCanvas(`${p.id}-${i}`, (p.hue ?? 200) + i * 25, "Image coming soon"),
-      zoom: i => openLightbox(images.map(x => ({
-        render: () => h("img", { src: x.m.src, alt: x.m.alt ?? x.m.caption ?? "" }),
-        kicker: p.title, title: x.m.caption ?? "", note: ""
-      })), Math.max(0, images.findIndex(x => x.i === i)))
+    // Big video card right under the title (the first video, or the first item if there are none),
+    // then everything else as a gallery grid that opens in the lightbox.
+    const media = (p.media?.length ? p.media : [{ src: p.cover, caption: p.title }])
+      .map((m, i) => ({ ...m, hue: (p.hue ?? 200) + i * 25, seed: `${p.id}-${i}` }));
+    const isVid = m => ["video", "youtube", "vimeo"].includes(kindOf(m.src)) || (!m.src && m.kind === "video");
+    const featured = media.find(m => isVid(m) && m.src) ?? media.find(isVid) ?? media[0];
+    const rest = media.filter(m => m !== featured);
+    const placeholder = (item, i, big = true) => isVid(item)
+      ? motionCanvas(item.seed, item.hue, big)
+      : coverCanvas(item.seed, item.hue, "Image coming soon");
+    const lbItem = m => ({
+      render: () => kindOf(m.src) === "image" ? h("img", { src: m.src, alt: m.alt ?? m.caption ?? "" })
+        : h("div", { class: "lb-video" }, mediaEl(m, 0, { placeholder })),
+      kicker: p.title, title: m.caption ?? "", note: m.note ?? ""
     });
+
+    Viewer($("#project-feature"), [featured], {
+      label: "Media", placeholder,
+      zoom: () => openLightbox([lbItem(featured)], 0)
+    });
+
+    $("#project-gallery").hidden = !rest.length;
+    $("#project-gallery-grid").replaceChildren(...rest.map((m, i) => {
+      const kind = kindOf(m.src);
+      const art = m.poster ? h("img", { src: m.poster, alt: "", loading: "lazy" })
+        : kind === "image" ? h("img", { src: m.src, alt: "", loading: "lazy" })
+        : kind === "youtube" ? h("img", { src: `https://i.ytimg.com/vi/${ytId(m.src)}/hqdefault.jpg`, alt: "", loading: "lazy" })
+        : kind === "video" ? h("video", { src: `${m.src}#t=0.1`, muted: true, preload: "metadata", tabindex: "-1" })
+        : placeholder(m, i, false);
+      const b = h("button", { class: "gallery-tile", "data-nav": true, "aria-label": `Open ${m.caption || `item ${i + 1}`}` },
+        h("span", { class: "gallery-tile-art" }, art, isVid(m) ? h("span", { class: "play-btn small", "aria-hidden": "true" }) : null),
+        m.caption ? h("span", { class: "gallery-tile-cap" },
+          h("strong", { text: m.caption }), m.note ? h("small", { text: m.note }) : null) : null);
+      b.addEventListener("click", () => openLightbox(rest.map(lbItem), i));
+      b.style.animationDelay = `${i * 60}ms`;
+      return h("li", {}, b);
+    }));
 
     const k = D.projects.indexOf(p);
     const prevP = D.projects[(k - 1 + D.projects.length) % D.projects.length];
@@ -738,24 +765,22 @@
 
   /* ================= Motion ================= */
   const MOTION = D.motion ?? { reel: [] };
-  if (MOTION.reel.length) {
-    Viewer($("#motion-viewer"), MOTION.reel.map(r => ({ ...r, src: r.video, caption: r.title, kind: "video" })), {
+  // One big card per video: title on top, the player underneath.
+  $("#motion-list").replaceChildren(...MOTION.reel.map(r => {
+    const slot = h("div", { class: "motion-player" });
+    const card = h("article", { class: "motion-card" },
+      h("header", { class: "motion-card-head" },
+        h("div", {},
+          h("p", { class: "eyebrow", text: [r.context, r.year].filter(Boolean).join(" · ") }),
+          h("h3", { class: "motion-title", text: r.title })),
+        r.award ? h("p", { class: "badge", text: `✦ ${r.award}` }) : null),
+      slot);
+    Viewer(slot, [{ src: r.video, poster: r.poster, caption: r.description ?? "", alt: r.title, kind: "video" }], {
       label: "Video",
-      placeholder: (item, i, big) => motionCanvas(item.title, item.hue, big),
-      thumbText: item => h("span", { class: "viewer-thumb-text" },
-        h("strong", { text: item.title }),
-        h("small", { text: [item.context, item.award].filter(Boolean).join(" · ") })),
-      onChange: item => {
-        $("#reel-kicker").textContent = [item.context, item.year].filter(Boolean).join(" · ");
-        $("#reel-title").textContent = item.title;
-        const award = $("#reel-award");
-        award.textContent = item.award ? `✦ ${item.award}` : "";
-        award.hidden = !item.award;
-        $("#reel-desc").textContent = item.description ?? "";
-        $("#reel-tools").replaceChildren(...(item.tools ?? []).map(t => h("li", { text: t })));
-      }
+      placeholder: (item, i, big) => motionCanvas(r.title, r.hue, big)
     });
-  }
+    return card;
+  }));
 
   /* ================= Illustration ================= */
   const ILLU = D.illustration ?? { pieces: [] };
@@ -856,6 +881,7 @@
   function closeOverlay() {
     if (!modalOpen) return;
     overlay.hidden = true;
+    if (overlay === lightbox) $("#lb-media").replaceChildren(); // stop any video playing in it
     overlay = null;
     frame.inert = false;
     modalOpen = false;
