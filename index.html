@@ -57,11 +57,28 @@
             <p class="title-hint" aria-hidden="true">or press <kbd>Enter</kbd></p>
           </div>
 
-          <!-- Decorative toy box: everything here is also reachable from the nav. -->
-          <div class="playground" id="playground" aria-hidden="true">
-            <span class="pg-label">Playground — drag &amp; throw me</span>
+          <!-- Mini game: "Break the UI" -->
+          <div class="arcade" id="arcade">
+            <div class="arcade-hud" aria-hidden="true">
+              <span class="arcade-name">Break the UI</span>
+              <span class="arcade-stat">Score <b id="arcade-score">0</b></span>
+              <span class="arcade-lives" id="arcade-lives"></span>
+              <span class="arcade-stat">Best <b id="arcade-best">0</b></span>
+            </div>
+            <div class="arcade-screen">
+              <canvas id="arcade-canvas" tabindex="0" aria-label="Break the UI, a small brick breaker game. Left and right arrows move, Space launches the ball."></canvas>
+              <div class="arcade-overlay" id="arcade-overlay">
+                <p class="arcade-ov-title" id="arcade-ov-title"></p>
+                <p class="arcade-ov-text" id="arcade-ov-text"></p>
+                <div class="arcade-ov-actions">
+                  <button class="press-start" id="arcade-play" data-nav><span>Play</span></button>
+                  <a class="btn" id="arcade-ov-link" href="#projects" data-goto="projects" data-nav hidden>See my projects</a>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
+        <div class="ticker" id="ticker" aria-hidden="true"></div>
         <p class="title-foot">© <span id="year"></span> · Built by hand — HTML, CSS, JS</p>
       </section>
 

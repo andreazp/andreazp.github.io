@@ -76,6 +76,11 @@
   if (!D.availability) $(".status-chip").remove();
   $("#title-eyebrow").textContent = D.role;
   $("#year").textContent = new Date().getFullYear();
+  // Ticker: the list twice in a row so the loop is seamless
+  const tick = D.ticker ?? [];
+  $("#ticker").hidden = !tick.length;
+  const tickRow = () => h("span", { class: "ticker-row" }, ...tick.flatMap(t => [h("span", { text: t }), h("i", { text: "✦" })]));
+  $("#ticker").replaceChildren(h("div", { class: "ticker-track" }, tickRow(), tickRow()));
 
   // Name: each word rises in on load (no per-letter effects — it stays calm).
   const titleName = $("#title-name");
@@ -944,7 +949,7 @@
     document.body.dataset.screen = id;
     current = id;
     currentRoute = route;
-    if (id === "title") Playground.wake();
+    if (id === "title") Arcade.wake(); else Arcade.sleep();
 
     // Navigation state
     const navId = id === "project" ? "projects" : id;
@@ -1296,183 +1301,225 @@
 
   const SCALE = [523.25, 587.33, 659.25, 783.99, 880, 1046.5, 1174.66, 1318.51];
 
-  // --- Home playground: stickers you can drag, throw and bump (simple 2D physics) ---
-  const Playground = (() => {
-    const box = $("#playground");
-    if (!box) return { wake() {} };
-    const MONSTER = '<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M17 24 12 5l14 12zM47 24l5-19-14 12z" fill="#7c6cf0"/><circle cx="32" cy="37" r="23" fill="#7c6cf0"/><g class="eye"><circle cx="32" cy="33" r="9" fill="#fff"/><circle cx="34" cy="34" r="4.5" fill="#1c1917"/></g><path d="M24 47q8 7 16 0" stroke="#1c1917" stroke-width="3" fill="none" stroke-linecap="round"/></svg>';
-    const STICKERS = [
-      { cls: "st-hire", html: "Hire me ✦", tap: () => go("contact") },
-      { cls: "st-monster", html: MONSTER, tap: () => go("illustration") },
-      { cls: "st-play", html: '<span class="pl"></span>', tap: () => go("motion") },
-      { cls: "st-toggle", html: '<span class="tg"><i></i></span>', tap: el => { const on = el.classList.toggle("on"); Sound.tone(on ? 880 : 520, 0.12, "sine", 0.05, on ? 1100 : 400); } },
-      { cls: "st-code", html: "<b>{ }</b><small>C#</small>", tap: () => go("projects") },
-      { cls: "st-logo", html: '<img src="assets/logo.png" alt="" draggable="false">', tap: (el, b) => { b.va += 28; Sound.select(); } },
-      { cls: "st-star", html: "<b>✦</b><small>2× scholar</small>", tap: el => { const r = el.getBoundingClientRect(); FX.burst(r.left + r.width / 2, r.top + r.height / 2, 40, { power: 8 }); Sound.start(); } },
-      { cls: "st-aa", html: "Aa", tap: el => { el.classList.toggle("bold"); Sound.tone(660, 0.08, "sine", 0.04); } }
-    ];
+  // --- Home mini game: "Break the UI" — a tiny brick breaker made of interface pieces ---
+  // Runs in a fixed 800×500 logical space; the canvas is scaled with CSS (aspect-ratio 8/5).
+  const Arcade = (() => {
+    const box = $("#arcade");
+    if (!box) return { wake() {}, sleep() {} };
+    const cv = $("#arcade-canvas"), ctx = cv.getContext("2d");
+    const scoreEl = $("#arcade-score"), bestEl = $("#arcade-best"), livesEl = $("#arcade-lives");
+    const overlay = $("#arcade-overlay"), ovTitle = $("#arcade-ov-title"), ovText = $("#arcade-ov-text");
+    const playBtn = $("#arcade-play"), ovLink = $("#arcade-ov-link");
+    const W = 800, H = 500, COLS = 8, ROWS = 4, GAP = 10, SIDE = 40, TOP = 46, BH = 36;
+    const BW = (W - SIDE * 2 - GAP * (COLS - 1)) / COLS;
+    const COLORS = ["#e5532a", "#f08c00", "#7c6cf0", "#2a62c9"];
+    const LABELS = ["Play", "OK", "★", "Menu", "Back", "♥", "Save", "HP", "XP", "Map", "◀", "▶", "Quit", "Aa", "⚙", "Shop",
+      "Lvl 2", "✦", "Skip", "Go!", "Pause", "Yes", "No", "100%", "Inv", "★★", "Exit", "Load", "+1", "Start", "Help", "?"];
+    const NOTES = [523.25, 587.33, 659.25, 783.99, 880, 1046.5, 1174.66, 1318.51];
+    const SPEED0 = 430, SPEED_MAX = 720;
 
-    const bodies = STICKERS.map((s, i) => {
-      const el = h("div", { class: `sticker ${s.cls}` });
-      el.innerHTML = s.html;
-      box.append(el);
-      return { el, s, i, x: 0, y: 0, vx: 0, vy: 0, a: (Math.random() - 0.5) * 30, va: 0, w: 0, h: 0, r: 0, drag: null, lastHit: 0 };
-    });
+    let bricks = [], floaters = [], ball, paddle, state = "idle", score = 0, lives = 3, combo = 0;
+    let raf = 0, last = 0, awake = false;
+    const keys = { l: false, r: false };
+    let best = 0;
+    try { best = Number(localStorage.getItem("arcade-best")) || 0; } catch { /* storage blocked */ }
 
-    let W = 0, H = 0, running = false, placed = false, last = 0;
-    function measure() {
-      W = box.clientWidth; H = box.clientHeight;
-      for (const b of bodies) { b.w = b.el.offsetWidth; b.h = b.el.offsetHeight; b.r = (b.w + b.h) / 4; }
+    function scaleCanvas() {
+      const dpr = Math.min(2, window.devicePixelRatio || 1);
+      const w = Math.round(cv.clientWidth * dpr), hh = Math.round(cv.clientHeight * dpr);
+      if (w && (cv.width !== w || cv.height !== hh)) { cv.width = w; cv.height = hh; }
     }
-    function place() {
-      measure();
-      if (!W) return;
-      const cols = Math.max(2, Math.round(Math.sqrt(bodies.length * (W / Math.max(H, 1)))));
-      const rows = Math.ceil(bodies.length / cols);
-      bodies.forEach((b, i) => {
-        if (reduceMotion) {
-          // A still, tidy grid — nothing falls.
-          const c = i % cols, r = Math.floor(i / cols);
-          b.x = (c + 0.5) * (W / cols); b.y = (r + 0.5) * (H / rows); b.a = 0;
-        } else {
-          b.x = b.w / 2 + Math.random() * (W - b.w); b.y = -b.h - i * 70; b.vx = (Math.random() - 0.5) * 4;
-        }
-      });
-      placed = true;
-      render();
+    function reset() {
+      bricks = [];
+      for (let r = 0; r < ROWS; r++) for (let c = 0; c < COLS; c++)
+        bricks.push({ x: SIDE + c * (BW + GAP), y: TOP + r * (BH + GAP), color: COLORS[r], label: LABELS[(r * COLS + c) % LABELS.length], dead: 0 });
+      paddle = { x: W / 2, w: 128, h: 14, y: H - 34 };
+      score = 0; lives = 3; combo = 0; floaters = [];
+      serve();
+      hud();
     }
-    function render() {
-      for (const b of bodies) b.el.style.transform = `translate(${(b.x - b.w / 2).toFixed(1)}px, ${(b.y - b.h / 2).toFixed(1)}px) rotate(${b.a.toFixed(1)}deg)`;
+    function serve() { ball = { x: paddle.x, y: paddle.y - 12, vx: 0, vy: 0, r: 9, speed: SPEED0 }; state = "serve"; combo = 0; }
+    function launch() {
+      const a = (Math.random() * 0.6 - 0.3) - Math.PI / 2;
+      ball.vx = Math.cos(a) * ball.speed; ball.vy = Math.sin(a) * ball.speed;
+      state = "play"; Sound.tone(660, 0.08, "sine", 0.04, 990);
     }
-    function bump(b, speed) {
-      const now = performance.now();
-      if (speed < 5 || now - b.lastHit < 120) return;
-      b.lastHit = now;
-      Sound.tone(220 + b.i * 55, 0.06, "sine", Math.min(0.035, speed * 0.003));
+    function hud() {
+      scoreEl.textContent = score;
+      bestEl.textContent = best;
+      livesEl.replaceChildren(...[0, 1, 2].map(i => h("i", { class: i < lives ? "on" : "" })));
     }
-    function step(dt) {
-      const g = 0.55 * dt, e = 0.5;
-      for (const b of bodies) {
-        if (b.drag) continue;
-        b.vy += g;
-        b.vx *= Math.pow(0.992, dt); b.vy *= Math.pow(0.992, dt);
-        b.x += b.vx * dt; b.y += b.vy * dt;
-        b.a += b.va * dt; b.va *= Math.pow(0.9, dt);
-        const hw = b.w / 2, hh = b.h / 2;
-        if (b.x < hw) { b.x = hw; bump(b, Math.abs(b.vx)); b.vx = Math.abs(b.vx) * e; b.va += b.vy * 0.2; }
-        if (b.x > W - hw) { b.x = W - hw; bump(b, Math.abs(b.vx)); b.vx = -Math.abs(b.vx) * e; b.va -= b.vy * 0.2; }
-        if (b.y > H - hh) {
-          b.y = H - hh; bump(b, Math.abs(b.vy));
-          b.vy = -Math.abs(b.vy) * e; if (Math.abs(b.vy) < 1) b.vy = 0;
-          b.vx *= Math.pow(0.88, dt);           // floor friction
-          b.va += (b.vx * 0.5 - b.va) * 0.3;     // roll along the floor
-        }
-        // Anything moving slowly eases back upright (on the floor or resting on another sticker).
-        if (Math.hypot(b.vx, b.vy) < 1.5) { b.a += (Math.round(b.a / 360) * 360 - b.a) * 0.06 * dt; b.va *= 0.8; }
-        if (b.y < -H) b.y = -H;
+    function showOverlay(title, text, { btn = "Play", link = false } = {}) {
+      ovTitle.textContent = title; ovText.textContent = text;
+      playBtn.querySelector("span").textContent = btn;
+      ovLink.hidden = !link;
+      overlay.hidden = false;
+    }
+    function toScreen(x, y) { // logical → viewport coordinates, for the page-wide confetti
+      const r = cv.getBoundingClientRect();
+      return [r.left + (x / W) * r.width, r.top + (y / H) * r.height];
+    }
+    function end(won) {
+      state = won ? "won" : "over";
+      if (score > best) { best = score; try { localStorage.setItem("arcade-best", String(best)); } catch { /* ignore */ } }
+      hud();
+      if (won) {
+        FX.rain(180); Sound.start();
+        showOverlay("You broke the whole UI!", `Score ${score}. Good thing I build interfaces for a living.`, { btn: "Play again", link: true });
+      } else {
+        Sound.tone(330, 0.3, "sine", 0.05, 160);
+        showOverlay("Game over", `Score ${score}${score && score === best ? " — new best!" : ""}. One more go?`, { btn: "Play again", link: true });
       }
-      // Box collisions between stickers (they settle upright, so boxes fit well).
-      for (let i = 0; i < bodies.length; i++) for (let j = i + 1; j < bodies.length; j++) {
-        const A = bodies[i], B = bodies[j];
-        const dx = B.x - A.x, dy = B.y - A.y;
-        const ox = (A.w + B.w) / 2 * 0.96 - Math.abs(dx), oy = (A.h + B.h) / 2 * 0.96 - Math.abs(dy);
-        if (ox <= 0 || oy <= 0) continue;
-        const alongX = ox < oy;
-        const nx = alongX ? Math.sign(dx) || 1 : 0, ny = alongX ? 0 : Math.sign(dy) || 1;
-        const push = (alongX ? ox : oy) / 2;
-        const aFixed = !!A.drag, bFixed = !!B.drag;
-        if (!aFixed) { A.x -= nx * push * (bFixed ? 2 : 1); A.y -= ny * push * (bFixed ? 2 : 1); }
-        if (!bFixed) { B.x += nx * push * (aFixed ? 2 : 1); B.y += ny * push * (aFixed ? 2 : 1); }
-        const rel = (B.vx - A.vx) * nx + (B.vy - A.vy) * ny;
-        if (rel < 0) {
-          const imp = -(1 + e) * rel / 2;
-          if (!aFixed) { A.vx -= imp * nx; A.vy -= imp * ny; A.va -= imp * 0.25; }
-          if (!bFixed) { B.vx += imp * nx; B.vy += imp * ny; B.va += imp * 0.25; }
-          bump(A, -rel);
+      draw();
+    }
+
+    function step(dt) {
+      const move = 620 * dt;
+      if (keys.l) paddle.x -= move;
+      if (keys.r) paddle.x += move;
+      paddle.x = Math.max(paddle.w / 2, Math.min(W - paddle.w / 2, paddle.x));
+      for (const b of bricks) if (b.dead) b.dead = Math.min(1, b.dead + dt * 5);
+      floaters = floaters.filter(f => (f.t += dt) < 0.8);
+      if (state === "serve") { ball.x = paddle.x; ball.y = paddle.y - 12; return; }
+      if (state !== "play") return;
+
+      for (let s = 0; s < 3; s++) { // sub-steps so the ball can't skip through a brick
+        ball.x += ball.vx * dt / 3; ball.y += ball.vy * dt / 3;
+        if (ball.x < ball.r) { ball.x = ball.r; ball.vx = Math.abs(ball.vx); Sound.bump(); }
+        if (ball.x > W - ball.r) { ball.x = W - ball.r; ball.vx = -Math.abs(ball.vx); Sound.bump(); }
+        if (ball.y < ball.r) { ball.y = ball.r; ball.vy = Math.abs(ball.vy); Sound.bump(); }
+        // paddle: bounce angle depends on where it hits
+        if (ball.vy > 0 && ball.y + ball.r >= paddle.y && ball.y < paddle.y + paddle.h &&
+            Math.abs(ball.x - paddle.x) <= paddle.w / 2 + ball.r) {
+          const k = Math.max(-1, Math.min(1, (ball.x - paddle.x) / (paddle.w / 2)));
+          const a = k * (Math.PI / 3) - Math.PI / 2;
+          ball.vx = Math.cos(a) * ball.speed; ball.vy = Math.sin(a) * ball.speed;
+          ball.y = paddle.y - ball.r; combo = 0;
+          Sound.tone(440, 0.06, "sine", 0.04);
         }
+        // bricks
+        for (const b of bricks) {
+          if (b.dead) continue;
+          const nx = Math.max(b.x, Math.min(ball.x, b.x + BW)), ny = Math.max(b.y, Math.min(ball.y, b.y + BH));
+          const dx = ball.x - nx, dy = ball.y - ny;
+          if (dx * dx + dy * dy > ball.r * ball.r) continue;
+          // reflect on the side with the smallest overlap
+          const ox = Math.min(ball.x + ball.r - b.x, b.x + BW - (ball.x - ball.r));
+          const oy = Math.min(ball.y + ball.r - b.y, b.y + BH - (ball.y - ball.r));
+          if (ox < oy) ball.vx = ball.x < b.x + BW / 2 ? -Math.abs(ball.vx) : Math.abs(ball.vx);
+          else ball.vy = ball.y < b.y + BH / 2 ? -Math.abs(ball.vy) : Math.abs(ball.vy);
+          b.dead = 0.01; combo++;
+          const pts = 10 * combo;
+          score += pts; hud();
+          floaters.push({ x: b.x + BW / 2, y: b.y + BH / 2, text: `+${pts}`, t: 0, color: b.color });
+          ball.speed = Math.min(SPEED_MAX, ball.speed + 7);
+          const sp = Math.hypot(ball.vx, ball.vy); ball.vx *= ball.speed / sp; ball.vy *= ball.speed / sp;
+          FX.burst(...toScreen(b.x + BW / 2, b.y + BH / 2), 12, { power: 5 });
+          Sound.tone(NOTES[Math.min(combo - 1, NOTES.length - 1)], 0.1, "triangle", 0.04);
+          if (bricks.every(q => q.dead)) { end(true); return; }
+          break;
+        }
+        if (ball.y - ball.r > H) {
+          lives--; hud();
+          if (lives <= 0) { end(false); return; }
+          Sound.tone(300, 0.15, "sine", 0.05, 200);
+          serve(); return;
+        }
+      }
+    }
+
+    function rr(x, y, w, hh, r) { ctx.beginPath(); ctx.roundRect(x, y, w, hh, r); }
+    function draw() {
+      scaleCanvas();
+      const s = cv.width / W;
+      ctx.setTransform(s, 0, 0, s, 0, 0);
+      ctx.clearRect(0, 0, W, H);
+      ctx.textAlign = "center"; ctx.textBaseline = "middle";
+      for (const b of bricks) {
+        if (b.dead >= 1) continue;
+        const k = 1 - b.dead, cx = b.x + BW / 2, cy = b.y + BH / 2;
+        ctx.save();
+        ctx.globalAlpha = k;
+        ctx.translate(cx, cy); ctx.scale(0.6 + 0.4 * k, 0.6 + 0.4 * k);
+        ctx.shadowColor = "rgba(80,50,20,.18)"; ctx.shadowBlur = 10; ctx.shadowOffsetY = 4;
+        rr(-BW / 2, -BH / 2, BW, BH, 10); ctx.fillStyle = b.color; ctx.fill();
+        ctx.shadowColor = "transparent";
+        rr(-BW / 2, -BH / 2, BW, BH / 2, [10, 10, 4, 4]); ctx.fillStyle = "rgba(255,255,255,.14)"; ctx.fill();
+        ctx.fillStyle = "#fff"; ctx.font = "600 14px Inter, system-ui, sans-serif";
+        ctx.fillText(b.label, 0, 1);
+        ctx.restore();
+      }
+      for (const f of floaters) {
+        ctx.globalAlpha = 1 - f.t / 0.8;
+        ctx.fillStyle = f.color; ctx.font = "800 18px 'Bricolage Grotesque', Inter, sans-serif";
+        ctx.fillText(f.text, f.x, f.y - f.t * 50);
+      }
+      ctx.globalAlpha = 1;
+      // paddle
+      ctx.shadowColor = "rgba(28,25,23,.25)"; ctx.shadowBlur = 12; ctx.shadowOffsetY = 4;
+      rr(paddle.x - paddle.w / 2, paddle.y, paddle.w, paddle.h, 7); ctx.fillStyle = "#1c1917"; ctx.fill();
+      // ball
+      ctx.beginPath(); ctx.arc(ball.x, ball.y, ball.r, 0, Math.PI * 2); ctx.fillStyle = "#e5532a"; ctx.fill();
+      ctx.shadowColor = "transparent";
+      if (state === "serve" && overlay.hidden) {
+        ctx.fillStyle = "rgba(28,25,23,.55)"; ctx.font = "500 15px Inter, system-ui, sans-serif";
+        ctx.fillText(matchMedia("(hover: none)").matches ? "Tap to launch" : "Click or press Space to launch", W / 2, H - 80);
       }
     }
     function loop(t) {
-      if (current !== "title" || document.hidden) { running = false; return; }
-      const dt = Math.min(2.5, last ? (t - last) / 16.67 : 1);
-      last = t;
-      step(dt);
-      render();
-      requestAnimationFrame(loop);
+      const dt = Math.min(0.033, (t - last) / 1000 || 0); last = t;
+      step(dt); draw();
+      raf = (awake && (state === "play" || state === "serve")) ? requestAnimationFrame(loop) : 0;
     }
-    function wake() {
-      if (!placed) place();
-      if (running || reduceMotion) return;
-      running = true; last = 0;
-      requestAnimationFrame(loop);
-    }
-    document.addEventListener("visibilitychange", () => { if (!document.hidden && current === "title") wake(); });
+    function run() { if (!raf) { last = performance.now(); raf = requestAnimationFrame(loop); } }
 
-    // Dragging & throwing
-    const local = e => { const r = box.getBoundingClientRect(); return [e.clientX - r.left, e.clientY - r.top]; };
-    bodies.forEach(b => {
-      b.el.addEventListener("pointerdown", e => {
-        e.preventDefault();
-        b.el.setPointerCapture(e.pointerId);
-        const [px, py] = local(e), now = performance.now();
-        b.drag = { ox: px - b.x, oy: py - b.y, sx: px, sy: py, t0: now, lx: px, ly: py, lt: now, vx: 0, vy: 0, moved: false };
-        b.vx = b.vy = 0;
-        b.el.classList.add("grabbed");
-        Sound.init();
-        wake();
-      });
-      b.el.addEventListener("pointermove", e => {
-        const d = b.drag; if (!d) return;
-        const [px, py] = local(e), now = performance.now(), dt = Math.max(1, now - d.lt) / 16.67;
-        d.vx = d.vx * 0.5 + ((px - d.lx) / dt) * 0.5; d.vy = d.vy * 0.5 + ((py - d.ly) / dt) * 0.5;
-        d.lx = px; d.ly = py; d.lt = now;
-        if (Math.hypot(px - d.sx, py - d.sy) > 6) d.moved = true;
-        b.x = Math.max(b.w / 2, Math.min(W - b.w / 2, px - d.ox));
-        b.y = Math.max(b.h / 2, Math.min(H - b.h / 2, py - d.oy));
-        b.a += (d.vx * 1.2 - b.a) * 0.15; // lean in the direction of travel
-        if (reduceMotion) render();
-      });
-      const end = () => {
-        const d = b.drag; if (!d) return;
-        b.drag = null;
-        b.el.classList.remove("grabbed");
-        if (!d.moved && performance.now() - d.t0 < 350) {
-          b.el.classList.remove("tapped"); void b.el.offsetWidth; b.el.classList.add("tapped");
-          b.s.tap(b.el, b);
-        } else if (!reduceMotion) {
-          const cap = 38;
-          b.vx = Math.max(-cap, Math.min(cap, d.vx)); b.vy = Math.max(-cap, Math.min(cap, d.vy));
-          b.va = b.vx * 0.8;
-        }
-      };
-      b.el.addEventListener("pointerup", end);
-      b.el.addEventListener("pointercancel", end);
+    function start() {
+      if (state === "idle" || state === "won" || state === "over") reset(); // otherwise: resuming a paused game
+      overlay.hidden = true; Sound.init(); Sound.select();
+      cv.focus({ preventScroll: true });
+      run();
+    }
+    playBtn.addEventListener("click", start);
+
+    // Mouse / finger moves the paddle
+    const aim = e => {
+      const r = cv.getBoundingClientRect();
+      paddle.x = ((e.clientX - r.left) / r.width) * W;
+      if (state === "serve" && !raf && overlay.hidden) run();
+    };
+    cv.addEventListener("pointermove", aim);
+    cv.addEventListener("pointerdown", e => {
+      aim(e);
+      if (!overlay.hidden) return;
+      if (state === "serve") { launch(); run(); }
     });
+    // Keyboard, only while the game has focus — so the site's arrow-key navigation is left alone elsewhere
+    cv.addEventListener("keydown", e => {
+      const k = e.key;
+      if (k === "ArrowLeft" || k === "a") keys.l = true;
+      else if (k === "ArrowRight" || k === "d") keys.r = true;
+      else if (k === " " || k === "Enter") { if (state === "serve") launch(); else if (state !== "play") start(); }
+      else return;
+      e.preventDefault(); e.stopPropagation(); run();
+    });
+    cv.addEventListener("keyup", e => {
+      if (e.key === "ArrowLeft" || e.key === "a") keys.l = false;
+      if (e.key === "ArrowRight" || e.key === "d") keys.r = false;
+    });
+    cv.addEventListener("blur", () => { keys.l = keys.r = false; });
+    new ResizeObserver(() => draw()).observe(cv);
 
-    // Moving the cursor quickly through a sticker gives it a nudge.
-    let pl = null;
-    box.addEventListener("pointermove", e => {
-      if (e.pointerType !== "mouse" || reduceMotion || bodies.some(b => b.drag)) return;
-      const [px, py] = local(e), now = performance.now();
-      if (pl) {
-        const dt = Math.max(1, now - pl.t) / 16.67, vx = (px - pl.x) / dt, vy = (py - pl.y) / dt;
-        if (Math.hypot(vx, vy) > 2) for (const b of bodies) {
-          if (Math.hypot(px - b.x, py - b.y) < b.r + 6) { b.vx += vx * 0.25; b.vy += vy * 0.25 - 1.5; b.va += vx * 0.4; wake(); }
-        }
+    reset(); state = "idle"; hud();
+    showOverlay("Break the UI", "A tiny game, built by hand for this page. Move with your mouse, finger or ← →.");
+    document.fonts?.ready.then(draw);
+
+    return {
+      wake() { awake = true; draw(); },
+      sleep() {
+        awake = false;
+        if (state === "play") { state = "serve"; showOverlay("Paused", "Your game is waiting.", { btn: "Resume" }); }
       }
-      pl = { x: px, y: py, t: now };
-    });
-    box.addEventListener("pointerleave", () => { pl = null; });
-
-    addEventListener("resize", () => {
-      if (!placed) return;
-      measure();
-      for (const b of bodies) { b.x = Math.max(b.w / 2, Math.min(W - b.w / 2, b.x)); b.y = Math.min(H - b.h / 2, b.y); }
-      render(); wake();
-    });
-    // Fonts change sticker sizes once they load.
-    document.fonts?.ready.then(() => { if (placed) { measure(); render(); } });
-    return { wake };
+    };
   })();
 
   // --- Project cards: 3D tilt with a glare that follows the cursor ---
@@ -1535,7 +1582,7 @@
 
   // --- Sparkles when clicking empty space (mouse only, not on touch screens) ---
   document.addEventListener("pointerdown", e => {
-    if (e.pointerType !== "mouse" || modalOpen || e.target.closest("a, button, video, iframe, .panel, .level, .skill, .tab-row, .topbar, .viewer, .playground")) return;
+    if (e.pointerType !== "mouse" || modalOpen || e.target.closest("a, button, video, iframe, .panel, .level, .skill, .tab-row, .topbar, .viewer, .arcade")) return;
     FX.burst(e.clientX, e.clientY, 16, { power: 5, size: 5, gravity: 0.12, decay: 0.025, shape: "dot" });
   });
 

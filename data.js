@@ -21,6 +21,12 @@ window.PORTFOLIO = {
   // Shown big on the title screen. Wrap one word in *asterisks* to highlight it.
   catchphrase: "Interfaces you can *feel* — designed and coded by hand.", // PLACEHOLDER
   availability: "Open to work",         // shown in the top HUD
+  // Scrolling strip at the bottom of the home page — clients, highlights and awards.
+  ticker: [
+    "Ford", "ClinicVET for NUPEC", "Tec de Monterrey", "Ayna — pitched to PlayStation at GDC",
+    "Best VR Game Project 2023", "1st place · Transparencia en Corto", "American Eagle motion contest winner",
+    "National Illustration Award · 3rd place", "Unity · Unreal · C#"
+  ],
 
   // Your CV — shown on the CV screen. The PDF lives in /assets; `file` powers the
   // "Download PDF" buttons (set `file: null` to hide them).
