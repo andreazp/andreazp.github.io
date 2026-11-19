@@ -131,18 +131,24 @@ window.PORTFOLIO = {
         video: null, poster: null, hue: 215, tools: []  // TODO: add the video + tools used (e.g. After Effects, Cavalry)
       },
       {
-        title: "“Transparencia en Corto” 2026",
-        context: "Short film", year: "2026",
+        title: "Falsa Alarma",
+        context: "Short film · “Transparencia en Corto”", year: "2026",
         award: "3rd place, state level",
         description: "Short film entry for the state-level “Transparencia en Corto” contest.",
-        video: null, poster: null, hue: 330, tools: []
+        video: "https://youtu.be/KNDuetcXZGM", poster: null, hue: 330, tools: ["Illustrator", "After Effects", "Premiere Pro"]
       },
       {
-        title: "“Transparencia en Corto” 2023",
-        context: "Short film", year: "2023",
+        title: "Verdad y Justicia",
+        context: "Short film · “Transparencia en Corto”", year: "2023",
         award: "1st place, state level",
         description: "Short film entry for the state-level “Transparencia en Corto” contest.",
-        video: null, poster: null, hue: 30, tools: []
+        video: "https://youtu.be/V969WK2lWOY", poster: null, hue: 30, tools: ["Illustrator", "After Effects", "Premiere Pro"]
+      },
+      {
+        title: "Brewmaster’s Remedies",
+        context: "VR game demo", year: "",               // TODO: year
+        description: "A VR game demo made in Unreal Engine. I did all of the UI, the art direction, 3D assets and textures.",
+        video: "https://youtu.be/7uF-FRlBHMY", poster: null, hue: 100, tools: ["Unreal Engine"]
       },
       {
         title: "UI motion studies",              // PLACEHOLDER — swap for real UI animation clips
@@ -289,7 +295,7 @@ window.PORTFOLIO = {
       ],
       sections: [
         {
-          title: "ClinicVET · 3D veterinary app for NUPEC",
+          title: "ClinicVET · 3D veterinary app for NUPEC", featured: true,
           intro: "ClinicVET gives veterinarians interactive 3D anatomy, side-by-side condition comparisons and annotations to help them explain a dog’s health to its owner. It works as a visual communication aid, not a diagnostic tool, and runs on desktop, tablet and mobile. The app was built by the Grayscale Interactive team, and I was responsible for all of its UI.",
           points: [
             { text: "Designed the complete user interface.", media: "assets/projects/clinicvet/devices.webp" },
@@ -328,6 +334,36 @@ window.PORTFOLIO = {
       media: [
         { src: "assets/projects/clinicvet/preview.mp4", poster: "assets/projects/clinicvet/preview-poster.webp", caption: "ClinicVET · app preview" },
         { src: "assets/projects/grayscale/ford.webp", caption: "Ford" }
+      ]
+    },
+    {
+      id: "brewmasters-remedies",
+      title: "Brewmaster’s Remedies",
+      year: "",                                             // TODO: year
+      category: "game",
+      hue: 100,
+      cover: "https://i.ytimg.com/vi/7uF-FRlBHMY/hqdefault.jpg",
+      studio: "",                                           // TODO: school / team / personal?
+      role: "UI, art direction, 3D assets & textures",
+      tools: ["Unreal Engine"],
+      summary: "A VR game demo made in Unreal Engine. I did all of the UI, the art direction, 3D assets and textures.",
+      description: [
+        "Brewmaster’s Remedies is a VR game demo made in Unreal Engine."
+        // TODO: one or two lines about the game (what the player does)
+      ],
+      sections: [
+        {
+          title: "My work",
+          points: [
+            "All of the UI.",
+            "Art direction.",
+            "3D assets.",
+            "Textures."
+          ]
+        }
+      ],
+      media: [
+        { src: "https://youtu.be/7uF-FRlBHMY", caption: "Gameplay video" }
       ]
     },
     {
