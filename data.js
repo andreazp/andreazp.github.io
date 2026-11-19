@@ -343,7 +343,7 @@ window.PORTFOLIO = {
           },
           points: [
             "Icon design",
-            "Motion animations",
+            { title: "Motion animations", text: "Motion graphics I animated for the ArgentXR page.", media: "assets/projects/argent-xr/join.gif" },
             "Splash screens",
             "UI proposals"
             // TODO: add media, e.g. { text: "Icon design", media: "assets/projects/argent-xr/icons.png" }
@@ -359,6 +359,7 @@ window.PORTFOLIO = {
       ],
       media: [
         { src: "assets/projects/clinicvet/preview.mp4", poster: "assets/projects/clinicvet/preview-poster.webp", caption: "ClinicVET · app preview" },
+        { src: "assets/projects/argent-xr/join.gif", caption: "ArgentXR · motion graphics for the page" },
         { src: "assets/projects/grayscale/ford.webp", caption: "Ford" }
       ]
     },

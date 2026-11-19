@@ -1198,10 +1198,10 @@ main { position: relative; min-height: 0; }
 .ib-focus-name { font-family: var(--font-display); font-size: 18px; letter-spacing: -0.02em; }
 .ib-focus small { font-size: 12px; color: var(--ib-text); }
 .ib-glyph {
-  display: block; width: var(--size); height: var(--size); background: currentColor;
-  -webkit-mask: var(--src) center / contain no-repeat; mask: var(--src) center / contain no-repeat;
-  transition: width 0.35s var(--spring), height 0.35s var(--spring);
+  display: block; width: var(--size); height: var(--size); object-fit: contain; pointer-events: none; user-select: none;
+  transition: width 0.35s var(--spring), height 0.35s var(--spring), filter 0.4s var(--ease);
 }
+.iconboard[data-bg="light"] .ib-glyph { filter: brightness(0) opacity(0.88); }
 .ib-glyph.big { width: 128px; height: 128px; animation: ib-in 0.35s var(--spring); }
 @keyframes ib-in { from { scale: 0.8; opacity: 0.4; } }
 .ib-grid {

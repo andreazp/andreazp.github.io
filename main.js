@@ -772,7 +772,8 @@
   }
 
   /* ================= Icon board: a set of single-colour SVG icons you can inspect ================= */
-  // Icons are drawn as CSS masks, so one file can be shown in any colour on any background.
+  // Icons are plain <img> tags (work even when the site is opened straight from the folder);
+  // white icons are turned dark with a CSS filter on the light background.
   const ICON_WORDS = { fov: "FOV", ui: "UI", xray: "X-ray" };
   const iconLabel = name => name
     .replace(/([a-z])([A-Z0-9])/g, "$1 $2").split(" ")
@@ -783,7 +784,7 @@
     const SIZES = [24, 48, 96];
     const board = h("div", { class: "iconboard", "data-bg": "dark", style: "--size:48px" });
     const glyph = (name, cls = "ib-glyph") =>
-      h("span", { class: cls, "aria-hidden": "true", style: `--src:url("${set.path}${set.prefix ?? ""}${name}.svg")` });
+      h("img", { class: cls, src: `${set.path}${set.prefix ?? ""}${name}.svg`, alt: "", draggable: "false", loading: "lazy" });
     const focusArt = h("span", { class: "ib-focus-art" });
     const focusName = h("strong", { class: "ib-focus-name" });
     const focus = h("div", { class: "ib-focus", "aria-live": "polite" }, focusArt,
