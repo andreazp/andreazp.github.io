@@ -146,7 +146,8 @@ window.PORTFOLIO = {
       },
       {
         title: "Brewmaster’s Remedies",
-        context: "VR game demo", year: "",               // TODO: year
+        context: "VR game demo", year: "2023",
+        award: "Best VR Game Project 2023",
         description: "A VR game demo made in Unreal Engine. I did all of the UI, the art direction, 3D assets and textures.",
         video: "https://youtu.be/7uF-FRlBHMY", poster: null, hue: 100, tools: ["Unreal Engine"]
       },
@@ -339,16 +340,17 @@ window.PORTFOLIO = {
     {
       id: "brewmasters-remedies",
       title: "Brewmaster’s Remedies",
-      year: "",                                             // TODO: year
+      year: "2023",
       category: "game",
       hue: 100,
       cover: "https://i.ytimg.com/vi/7uF-FRlBHMY/hqdefault.jpg",
-      studio: "",                                           // TODO: school / team / personal?
+      studio: "Tecnológico de Monterrey · school project",
       role: "UI, art direction, 3D assets & textures",
       tools: ["Unreal Engine"],
+      award: "Best VR Game Project 2023",
       summary: "A VR game demo made in Unreal Engine. I did all of the UI, the art direction, 3D assets and textures.",
       description: [
-        "Brewmaster’s Remedies is a VR game demo made in Unreal Engine."
+        "Brewmaster’s Remedies is a VR game demo made in Unreal Engine as a school project at Tecnológico de Monterrey. It won Best VR Game Project at the 2023 EAAD Academic Excellence Awards."
         // TODO: one or two lines about the game (what the player does)
       ],
       sections: [
@@ -418,12 +420,13 @@ window.PORTFOLIO = {
       award: "Best AR, VR & 3D Game Project awards",
       summary: "Academic game projects that won Best AR and Best VR Game Project (2023) and Best 3D Game Project (2022).",
       description: [
-        "Tecnológico de Monterrey (EAAD) Academic Excellence Awards: Best AR Game Project (2023), Best VR Game Project (2023) and Best 3D Game Project (2022)."
+        "Tecnológico de Monterrey (EAAD) Academic Excellence Awards: Best AR Game Project (2023), Best VR Game Project (2023) and Best 3D Game Project (2022).",
+        "The Best VR Game Project winner was Brewmaster’s Remedies, which has its own page."
         // TODO: what each game was about
       ],
       media: [
         { src: null, caption: "AR game", kind: "video" },    // TODO
-        { src: null, caption: "VR game", kind: "video" },    // TODO
+        { src: "https://youtu.be/7uF-FRlBHMY", caption: "VR game: Brewmaster’s Remedies" },
         { src: null, caption: "3D game" }                    // TODO
       ]
     }

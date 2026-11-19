@@ -376,9 +376,14 @@
             : opts.placeholder(item, i, true),
           h("span", { class: "play-btn", "aria-hidden": "true" }));
         b.addEventListener("click", () => {
-          const src = yt ? `https://www.youtube-nocookie.com/embed/${yt}?autoplay=1&rel=0`
+          // YouTube refuses embeds that don't say which site they're on (error 153),
+          // so pass the origin and keep the referrer; opened from a file, go to YouTube instead.
+          const web = /^https?:$/.test(location.protocol);
+          if (!web) { window.open(yt ? `https://www.youtube.com/watch?v=${yt}` : `https://vimeo.com/${vm}`, "_blank", "noopener"); return; }
+          const src = yt ? `https://www.youtube.com/embed/${yt}?autoplay=1&rel=0&playsinline=1&origin=${encodeURIComponent(location.origin)}`
                          : `https://player.vimeo.com/video/${vm}?autoplay=1`;
-          const f = h("iframe", { src, title: alt || "Video", allow: "autoplay; fullscreen; picture-in-picture", allowfullscreen: true });
+          const f = h("iframe", { src, title: alt || "Video", allow: "autoplay; encrypted-media; fullscreen; picture-in-picture; web-share",
+            referrerpolicy: "strict-origin-when-cross-origin", allowfullscreen: true });
           b.replaceWith(f);
           f.focus();
         });
