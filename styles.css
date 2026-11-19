@@ -617,29 +617,6 @@ main { position: relative; min-height: 0; }
 .art:hover .art-caption, .art.selected .art-caption, .art:focus-visible .art-caption { opacity: 1; translate: 0 0; }
 @media (hover: none) { .art-caption { opacity: 1; translate: 0 0; } }
 
-/* ---------- About ---------- */
-.about-layout { display: grid; grid-template-columns: minmax(0, 340px) minmax(0, 1fr); gap: 20px; align-items: start; }
-.profile { text-align: center; }
-.avatar {
-  width: 112px; height: 112px; margin: 6px auto 20px;
-  display: grid; place-items: center; border-radius: 50%;
-  font-family: var(--font-display); font-size: 42px; font-weight: 800; letter-spacing: -0.04em;
-  background: radial-gradient(circle at 30% 25%, #ffc29f, var(--accent) 45%, #b93a0e);
-  color: #fff;
-  box-shadow: 0 0 0 6px var(--line);
-  transition: box-shadow 0.3s, scale 0.4s var(--spring);
-}
-.avatar:hover, .avatar.selected { box-shadow: 0 0 0 6px var(--accent-soft); scale: 1.04; }
-.avatar:focus-visible { border-radius: 50%; }
-.avatar.poked { animation: squish 0.6s var(--spring); }
-.profile h3 { font-size: 30px; letter-spacing: -0.035em; }
-.profile .muted { margin: 4px 0 24px; font-size: 14px; }
-.stats { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 0; }
-.stats div { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 14px 10px; }
-.stats dt { font-size: 12px; color: var(--muted); }
-.stats dd { margin: 2px 0 0; font-family: var(--font-display); font-size: 30px; font-weight: 800; letter-spacing: -0.04em; font-variant-numeric: tabular-nums; }
-.bio #about-bio p { margin: 0 0 16px; font-size: clamp(17px, 1.6vw, 20px); line-height: 1.6; }
-.bio #about-bio { margin-bottom: 28px; }
 .chips li:hover { rotate: -4deg; translate: 0 -2px; background: var(--accent-soft); border-color: var(--accent); }
 .chips li:nth-child(even):hover { rotate: 4deg; }
 
@@ -810,7 +787,7 @@ main { position: relative; min-height: 0; }
 }
 
 @media (max-width: 860px) {
-  .menu-layout, .about-layout, .skills-layout, .cv-layout, .reel, .project-head { grid-template-columns: minmax(0, 1fr); }
+  .menu-layout, .skills-layout, .cv-layout, .reel, .project-head { grid-template-columns: minmax(0, 1fr); }
   .menu-preview { display: none; }
   .skill-detail { position: static; order: -1; }
   .cv-side, .skill-detail { position: static; }

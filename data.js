@@ -196,7 +196,6 @@ window.PORTFOLIO = {
     { id: "projects", label: "Projects", kicker: "Level select", body: "Games, client UI and apps — each with its own gallery of photos and video." },
     { id: "motion",   label: "Motion",   kicker: "Cutscenes", body: "Award-winning motion graphics and short films." },
     { id: "illustration", label: "Illustration", kicker: "Concept art", body: "Award-winning illustration, urban art and sketchbook pieces." },
-    { id: "about",    label: "About",    kicker: "Player profile", body: "Who I am, how I work, and the stats behind the character." },
     { id: "skills",   label: "Skills",   kicker: "Skill tree", body: "Art and engineering abilities, levelled up over the years." },
     { id: "cv",       label: "CV",       kicker: "Quest log", body: "Where I've worked, what I studied, and a PDF copy to keep." },
     { id: "contact",  label: "Contact",  kicker: "Multiplayer", body: "Looking for a UI artist who can also ship the code? Let's talk." }
@@ -422,21 +421,6 @@ window.PORTFOLIO = {
       ]
     }
   ],
-
-  about: {
-    class: "Class: Artist / Engineer hybrid", // PLACEHOLDER
-    bio: [
-      "I'm a UI artist and programmer who lives in the space between a beautiful mockup and a shipped, responsive interface.", // PLACEHOLDER
-      "I care about readability under pressure, motion that explains itself, and menus that feel great on a controller."
-    ],
-    stats: [
-      { label: "Years in games", value: "6" },    // PLACEHOLDER
-      { label: "Titles shipped", value: "4" },
-      { label: "Icons drawn", value: "1,200+" },
-      { label: "Coffee / day", value: "3" }
-    ],
-    traits: ["Pixel-precise", "Controller-first", "Accessibility nerd", "Motion design", "Design systems"]
-  },
 
   // level: 0–100 — PLACEHOLDER levels, adjust to taste. Notes come from the CV.
   skills: [

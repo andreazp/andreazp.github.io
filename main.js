@@ -69,7 +69,6 @@
   setSound(Sound.on);
 
   /* ================= Basics ================= */
-  const initials = D.name.split(/\s+/).map(w => w[0]).join("").slice(0, 2).toUpperCase();
   $("#brand-name").textContent = D.name;
   $("#brand-role").textContent = D.role;
   $(".brand").setAttribute("aria-label", `${D.name} — home`);
@@ -805,18 +804,6 @@
     return b;
   }));
 
-  /* ================= About ================= */
-  $("#avatar-initials").textContent = initials;
-  $("#about-name").textContent = D.name;
-  $("#about-class").textContent = D.about.class;
-  $("#about-stats").append(...D.about.stats.map(s => h("div", {}, h("dt", { text: s.label }), h("dd", { text: s.value }))));
-  $("#about-bio").append(...D.about.bio.map(t => h("p", { text: t })));
-  $("#about-traits").append(...D.about.traits.map(t => h("li", { text: t })));
-  $(".bio").append(h("div", { class: "contact-actions", style: "margin-top:28px" },
-    h("a", { class: "btn primary", href: "#projects", "data-nav": true, "data-goto": "projects", text: "View projects" }),
-    D.cv ? h("a", { class: "btn", href: "#cv", "data-nav": true, "data-goto": "cv", text: "Read my CV" }) : null,
-    h("a", { class: "btn", href: "#contact", "data-nav": true, "data-goto": "contact", text: "Get in touch" })));
-
   /* ================= Skills ================= */
   const rank = lv => lv >= 90 ? "Master" : lv >= 75 ? "Expert" : lv >= 60 ? "Adept" : "Apprentice";
   function showSkill(g, s) {
@@ -890,7 +877,7 @@
   }
 
   /* ================= Routing ================= */
-  const SCREENS = ["title", "menu", "projects", "project", "motion", "illustration", "about", "skills", "cv", "contact"];
+  const SCREENS = ["title", "menu", "projects", "project", "motion", "illustration", "skills", "cv", "contact"];
   let current = null;      // screen id
   let currentRoute = null; // full route, e.g. "projects/ayna"
   let selected = null;
@@ -932,7 +919,6 @@
     document.body.dataset.screen = id;
     current = id;
     currentRoute = route;
-    if (id === "about") countUpStats();
     if (id === "title") Playground.wake();
 
     // Navigation state
@@ -1504,41 +1490,6 @@
       el.style.setProperty("--my", `${(dy * 0.35).toFixed(1)}px`);
     });
   }
-
-  // --- About: stats count up on every visit ---
-  function countUpStats() {
-    $$("#about-stats dd").forEach((dd, i) => {
-      const final = dd.dataset.final ??= dd.textContent;
-      const m = final.match(/^([\d,]+)(.*)$/);
-      if (!m || reduceMotion) return;
-      const target = parseInt(m[1].replace(/,/g, ""), 10);
-      const fmt = n => (m[1].includes(",") ? n.toLocaleString("en-US") : String(n)) + m[2];
-      const t0 = performance.now() + i * 90, dur = 1100;
-      dd.textContent = fmt(0);
-      const step = now => {
-        const k = Math.min(1, Math.max(0, (now - t0) / dur));
-        dd.textContent = fmt(Math.round(target * (1 - Math.pow(1 - k, 4))));
-        if (k < 1) requestAnimationFrame(step);
-      };
-      requestAnimationFrame(step);
-    });
-  }
-
-  // --- About: pokeable avatar ---
-  const avatar = $("#avatar");
-  const POKES = ["Hi there!", "Hey, that tickles", "Okay, okay…", "Still here?", "You're persistent", "Fine. One more.", "…", "Seriously?", "Alright, you win"];
-  let pokes = 0;
-  avatar.addEventListener("click", () => {
-    avatar.classList.remove("poked");
-    void avatar.offsetWidth;
-    avatar.classList.add("poked");
-    const r = avatar.getBoundingClientRect();
-    FX.burst(r.left + r.width / 2, r.top + r.height / 2, 18 + pokes * 4, { power: 6 + pokes, spread: 1 });
-    Sound.tone(SCALE[pokes % SCALE.length], 0.2, "sine", 0.05, SCALE[pokes % SCALE.length] * 1.5);
-    showToast(POKES[Math.min(pokes, POKES.length - 1)]);
-    pokes++;
-    if (pokes === POKES.length) setParty(true, "You unlocked party mode 🎉");
-  });
 
   // --- Konami code → party mode ---
   const CODE = ["ArrowUp", "ArrowUp", "ArrowDown", "ArrowDown", "ArrowLeft", "ArrowRight", "ArrowLeft", "ArrowRight", "b", "a"];
