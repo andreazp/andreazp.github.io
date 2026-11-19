@@ -1483,9 +1483,9 @@
     showToast(msg ?? (on ? "Party mode on 🎉 Enter the code again to stop." : "Party's over."), 3000);
   }
 
-  // --- Sparkles when clicking empty space ---
+  // --- Sparkles when clicking empty space (mouse only, not on touch screens) ---
   document.addEventListener("pointerdown", e => {
-    if (modalOpen || e.target.closest("a, button, video, iframe, .panel, .level, .skill, .tab-row, .topbar, .viewer, .playground")) return;
+    if (e.pointerType !== "mouse" || modalOpen || e.target.closest("a, button, video, iframe, .panel, .level, .skill, .tab-row, .topbar, .viewer, .playground")) return;
     FX.burst(e.clientX, e.clientY, 16, { power: 5, size: 5, gravity: 0.12, decay: 0.025, shape: "dot" });
   });
 

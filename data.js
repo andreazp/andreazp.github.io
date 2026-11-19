@@ -390,24 +390,6 @@ window.PORTFOLIO = {
       ]
     },
     {
-      id: "vst-plugins",
-      title: "VST audio plugin interfaces",
-      year: "2020 — 2021",
-      category: "ui",
-      hue: 150,
-      cover: null,
-      studio: "Tec Audio Coders",
-      role: "UI/UX Artist",
-      tools: [],                                            // TODO
-      summary: "User interfaces and interactive workflows for custom VST audio plugins.",
-      description: [
-        "Developed user interfaces and interactive workflows for custom VST audio plugins."
-      ],
-      media: [
-        { src: null, caption: "Plugin UI" }                  // TODO
-      ]
-    },
-    {
       id: "tec-xr",
       title: "AR, VR & 3D game projects",
       year: "2022 — 2023",
