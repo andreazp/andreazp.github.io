@@ -8,6 +8,14 @@
  *   assets/illustration/            illustration images
  */
 window.PORTFOLIO = {
+  // Splash animation shown when the site opens (once per visit). Export from After Effects / Cavalry as .mp4
+  // and put it in assets/splash/. Leave video as null to turn the splash off.
+  splash: {
+    video: null,                // e.g. "assets/splash/splash.mp4" (landscape, 16:9)
+    videoMobile: null,          // optional portrait version for phones, e.g. "assets/splash/splash-mobile.mp4"
+    background: "#f5f2ec"       // colour behind the video (match your animation's first/last frame)
+  },
+
   name: "Andrea Zamudio",
   role: "UI Artist & Programmer",
   // Shown big on the title screen. Wrap one word in *asterisks* to highlight it.
@@ -130,13 +138,13 @@ window.PORTFOLIO = {
         description: "Short film entry for the state-level “Transparencia en Corto” contest.",
         video: "https://youtu.be/KNDuetcXZGM", poster: null, hue: 330, tools: ["Illustrator", "After Effects", "Premiere Pro"]
       },
-      {
+      /*{
         title: "American Eagle — winning video",
         context: "Motion graphics", year: "2026",
         award: "Won a trip to Barcelona",
         description: "Original motion graphics piece that won American Eagle's contest.", // TODO: a line about the idea
         video: null, poster: null, hue: 215, tools: []  // TODO: add the video + tools used (e.g. After Effects, Cavalry)
-      },
+      },*/
       {
         title: "Verdad y Justicia",
         context: "Short film · “Transparencia en Corto”", year: "2023",
@@ -236,37 +244,37 @@ window.PORTFOLIO = {
         {
           title: "User interface",
           points: [
-            "Built the vendor system end to end, from data management to UI: player and vendor inventories, and purchasable items that unlock gameplay.",
-            "Created an upgrader system for specific NPCs that lets players buy and unlock upgrades, handling the full process.",
-            "Added a favourites system so players can keep track of vendor and upgrader items they want to buy.",
-            "Developed the runtime player inventory with Unity’s UI Toolkit and data bindings.",
-            "Built a dialog bubble system that plays dialog sequences in-game.",
-            "Implemented item pick-up notifications on the HUD using a list view.",
-            "Created a tab-based journal UI that shows the player’s abilities and upgrades.",
-            "Extended the settings menu: VSync, FPS limiter, language, monitor resolution and display mode.",
-            "Built a narrative inspection setup that shows an icon and story text when players interact with objects."
+            { title: "Vendor system", text: "Built the vendor system end to end, from data management to UI: player and vendor inventories, and purchasable items that unlock gameplay." },
+            { title: "NPC upgrader", text: "Created an upgrader system for specific NPCs that lets players buy and unlock upgrades, handling the full process." },
+            { title: "Favourites", text: "Added a favourites system so players can keep track of vendor and upgrader items they want to buy." },
+            { title: "Player inventory", text: "Developed the runtime player inventory with Unity’s UI Toolkit and data bindings." },
+            { title: "Dialog bubbles", text: "Built a dialog bubble system that plays dialog sequences in-game." },
+            { title: "Pick-up notifications", text: "Implemented item pick-up notifications on the HUD using a list view." },
+            { title: "Journal UI", text: "Created a tab-based journal UI that shows the player’s abilities and upgrades." },
+            { title: "Settings menu", text: "Extended the settings menu: VSync, FPS limiter, language, monitor resolution and display mode." },
+            { title: "Narrative inspection", text: "Built a narrative inspection setup that shows an icon and story text when players interact with objects." }
           ]
         },
         {
           title: "Gameplay",
           points: [
-            "Chest opening: the player walks automatically into position while animations, VFX and SFX play in sync.",
-            "A map system that unlocks map areas in the UI, plus map posts where players pick up maps.",
-            "A rotating platform system with smooth transitions between fixed steps, including looping and reverse looping.",
-            "Collapsible platforms with animations, VFX and SFX synced to gameplay logic.",
-            "Checkpoint interactions, including player animations for left and right triggers.",
-            "A new item pick-up system for automatic and manual pick-ups.",
-            "Moving platforms that react to player projectiles, with game-feel touches like shader glow.",
-            "Breakable ground, bouncing mushrooms and falling block traps."
+            { title: "Chest opening", text: "Chest opening: the player walks automatically into position while animations, VFX and SFX play in sync." },
+            { title: "Map system", text: "A map system that unlocks map areas in the UI, plus map posts where players pick up maps." },
+            { title: "Rotating platforms", text: "A rotating platform system with smooth transitions between fixed steps, including looping and reverse looping." },
+            { title: "Collapsible platforms", text: "Collapsible platforms with animations, VFX and SFX synced to gameplay logic." },
+            { title: "Checkpoints", text: "Checkpoint interactions, including player animations for left and right triggers." },
+            { title: "Item pick-ups", text: "A new item pick-up system for automatic and manual pick-ups." },
+            { title: "Moving platforms", text: "Moving platforms that react to player projectiles, with game-feel touches like shader glow." },
+            { title: "Traps & hazards", text: "Breakable ground, bouncing mushrooms and falling block traps." }
           ]
         },
         {
           title: "Enemy behaviour",
           points: [
-            "Built a flying enemies framework from scratch that can be used to create the behaviour and gameplay of all flying enemies in the game.",
-            "Developed several ground enemies from the game design requirements, including behaviour, VFX and SFX.",
-            "Programmed a smoke enemy that triggers a fullscreen shader effect to block the player’s vision.",
-            "Created a ground snake trap system that tracks player movement, shoots projectiles and switches tracking sides."
+            { title: "Flying enemies framework", text: "Built a flying enemies framework from scratch that can be used to create the behaviour and gameplay of all flying enemies in the game." },
+            { title: "Ground enemies", text: "Developed several ground enemies from the game design requirements, including behaviour, VFX and SFX." },
+            { title: "Smoke enemy", text: "Programmed a smoke enemy that triggers a fullscreen shader effect to block the player’s vision." },
+            { title: "Snake trap", text: "Created a ground snake trap system that tracks player movement, shoots projectiles and switches tracking sides." }
           ]
         }
       ],
@@ -287,6 +295,7 @@ window.PORTFOLIO = {
       category: "ui",
       hue: 200,
       cover: "assets/projects/clinicvet/hero.webp",
+      hero: "assets/projects/clinicvet/hero.webp",          // big image at the top of the page (image or .mp4)
       studio: "Grayscale Interactive",
       role: "UI/UX Artist & Programmer",
       tools: ["Unreal Engine", "Unity", "Blueprints", "Firebase"],
@@ -299,35 +308,35 @@ window.PORTFOLIO = {
           title: "ClinicVET · 3D veterinary app for NUPEC", featured: true,
           intro: "ClinicVET gives veterinarians interactive 3D anatomy, side-by-side condition comparisons and annotations to help them explain a dog’s health to its owner. It works as a visual communication aid, not a diagnostic tool, and runs on desktop, tablet and mobile. The app was built by the Grayscale Interactive team, and I was responsible for all of its UI.",
           points: [
-            { text: "Designed the complete user interface.", media: "assets/projects/clinicvet/devices.webp" },
-            "Programmed all of the UI in Unreal Engine, including custom Blueprints.",
-            "Connected parts of the UI to Firebase."
+            { title: "Complete UI design", text: "Designed the complete user interface.", media: "assets/projects/clinicvet/devices.webp" },
+            { title: "UI programming in Unreal", text: "Programmed all of the UI in Unreal Engine, including custom Blueprints." },
+            { title: "Firebase integration", text: "Connected parts of the UI to Firebase." }
           ]
         },
         {
           title: "What ClinicVET does",
           points: [
-            { text: "Starts from a dog model that can switch between male and female anatomy.", media: "assets/projects/clinicvet/hero.webp" },
-            "Moves from the exterior to the skeleton and organ systems, with rotate, zoom and pan.",
-            "Shows common clinical conditions with the affected organ next to a healthy reference.",
-            "Lets the vet write or draw directly over the model and save the annotated images for later consultations."
+            { title: "Male & female anatomy", text: "Starts from a dog model that can switch between male and female anatomy.", media: "assets/projects/clinicvet/hero.webp" },
+            { title: "Exterior to organs", text: "Moves from the exterior to the skeleton and organ systems, with rotate, zoom and pan." },
+            { title: "Condition comparisons", text: "Shows common clinical conditions with the affected organ next to a healthy reference." },
+            { title: "Draw & save notes", text: "Lets the vet write or draw directly over the model and save the annotated images for later consultations." }
           ]
         },
         {
           title: "ArgentXR",
           intro: "Grayscale’s browser-based platform for turning 3D and CAD models into interactive web and augmented reality experiences, with no coding and no app downloads. Free public beta, November 2026. My part:",
           points: [
-            "Icon design.",
-            "Motion animations.",
-            "Splash screens.",
-            "UI proposals."
-            // TODO: add media, e.g. { text: "Icon design.", media: "assets/projects/argent-xr/icons.png" }
+            "Icon design",
+            "Motion animations",
+            "Splash screens",
+            "UI proposals"
+            // TODO: add media, e.g. { text: "Icon design", media: "assets/projects/argent-xr/icons.png" }
           ]
         },
         {
           title: "Other projects",
           points: [
-            "Ford: UI assets for EV Cooling System Diagnostics."   // TODO: confirm project
+            { title: "Ford · UI assets", text: "Ford: UI assets for EV Cooling System Diagnostics." }   // TODO: confirm project
             // TODO: add the other projects you worked on
           ]
         }
@@ -345,10 +354,10 @@ window.PORTFOLIO = {
       hue: 100,
       cover: "https://i.ytimg.com/vi/7uF-FRlBHMY/hqdefault.jpg",
       studio: "Tecnológico de Monterrey · school project",
-      role: "UI, art direction, 3D assets & textures",
-      tools: ["Unreal Engine"],
+      role: "UI design & art direction",
+      tools: ["Unreal Engine", "Substance Designer", "Illustrator"],
       award: "Best VR Game Project 2023",
-      summary: "A VR game demo made in Unreal Engine. I did all of the UI, the art direction, 3D assets and textures.",
+      summary: "A VR game demo made in Unreal Engine. I designed the full UI and the art direction, and also worked on 3D assets and textures.",
       description: [
         "Brewmaster’s Remedies is a VR game demo made in Unreal Engine as a school project at Tecnológico de Monterrey. It won Best VR Game Project at the 2023 EAAD Academic Excellence Awards."
         // TODO: one or two lines about the game (what the player does)
@@ -357,10 +366,10 @@ window.PORTFOLIO = {
         {
           title: "My work",
           points: [
-            "All of the UI.",
-            "Art direction.",
-            "3D assets.",
-            "Textures."
+            "Full UI design",
+            "Art direction",
+            "3D assets",
+            "Textures"
           ]
         }
       ],

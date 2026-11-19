@@ -610,53 +610,79 @@
     else e.target.pause();
   }), { threshold: 0.35 });
   let currentProject = null;
+  const linkBtn = (l, cls) => h("a", { class: cls, "data-nav": true, href: l.url, target: "_blank", rel: "noopener" },
+    l.play ? h("span", { class: "play-icon", "aria-hidden": "true" }) : null, h("span", { text: l.label }), h("span", { "aria-hidden": "true", text: "↗" }));
+  const ambientVideo = (src, poster) => {
+    const v = Object.assign(h("video", { src, loop: true, playsinline: true, preload: "metadata", "aria-hidden": "true" }), { muted: true });
+    if (poster) v.poster = poster;
+    featureVideos.observe(v);
+    return v;
+  };
+
+  // Big background for the top of a project page:
+  // hero → first video file → cover / first image → YouTube thumbnail → generated art
+  function heroMedia(p) {
+    const media = p.media ?? [];
+    if (p.hero) return kindOf(p.hero) === "video" ? ambientVideo(p.hero) : h("img", { src: p.hero, alt: "" });
+    const vid = media.find(m => kindOf(m.src) === "video");
+    if (vid) return ambientVideo(vid.src, vid.poster);
+    const img = p.cover || media.find(m => kindOf(m.src) === "image")?.src;
+    if (img) return h("img", { src: img, alt: "" });
+    const yt = media.map(m => ytId(m.src)).find(Boolean);
+    if (yt) return h("img", { src: `https://i.ytimg.com/vi/${yt}/hqdefault.jpg`, alt: "" });
+    return h("div", { class: "hero-fallback", style: `--h:${p.hue ?? 200}` });
+  }
+
   function renderProject(p) {
     currentProject = p;
-    $("#project-kicker").textContent = [labelFor(p.category), p.year].filter(Boolean).join(" · ");
+    $("#project-kicker").textContent = labelFor(p.category) ?? "";
     $("#project-h").textContent = p.title;
+    $("#project-role").textContent = [p.role, p.studio].filter(Boolean).join(" · ");
     $("#project-summary").textContent = p.summary ?? "";
     const award = $("#project-award");
     award.textContent = p.award ? `✦ ${p.award}` : "";
     award.hidden = !p.award;
+    $("#project-hero-media").replaceChildren(heroMedia(p));
+    $("#project-meta").replaceChildren(...[...(p.tools ?? []), p.year].filter(Boolean).map(t => h("li", { text: t })));
 
-    const meta = [["Studio", p.studio], ["Role", p.role], ["Year", p.year], ["Tools", p.tools?.join(", ")]].filter(([, v]) => v);
-    $("#project-meta").replaceChildren(...meta.map(([k, v]) => h("div", {}, h("dt", { text: k }), h("dd", { text: v }))));
-    // Big call-to-action (e.g. Steam demo) under the badge, and again as a banner at the end
-    const linkBtn = (l, cls) => h("a", { class: cls, "data-nav": true, href: l.url, target: "_blank", rel: "noopener" },
-      l.play ? h("span", { class: "play-icon", "aria-hidden": "true" }) : null, h("span", { text: l.label }), h("span", { "aria-hidden": "true", text: "↗" }));
     const mainLink = p.links?.[0];
     $("#project-cta").replaceChildren(...(mainLink ? [linkBtn(mainLink, "btn cta-btn")] : []));
 
-    // Feature points: a string, or { text, media } where media is an image or video file
-    const points = (p.sections ?? []).flatMap(s => s.points ?? []).map(pt => typeof pt === "string" ? { text: pt } : pt);
-    const zoomables = points.filter(pt => pt.media);
-    const openPoint = pt => openLightbox(zoomables.map(z => ({
-      render: () => kindOf(z.media) === "video"
-        ? Object.assign(h("video", { src: z.media, controls: true, autoplay: true, loop: true, playsinline: true }), { muted: true })
-        : h("img", { src: z.media, alt: z.alt ?? z.text }),
-      kicker: p.title, title: "", note: z.text
-    })), zoomables.indexOf(pt));
-    const pointEl = raw => {
-      const pt = typeof raw === "string" ? { text: raw } : raw;
-      const same = points.find(x => x.text === pt.text && x.media === pt.media) ?? pt;
-      if (!pt.media) return h("li", { class: "feature" }, h("p", { class: "feature-text", text: pt.text }));
-      const isVid = kindOf(pt.media) === "video";
-      const m = isVid
-        ? Object.assign(h("video", { src: pt.media, loop: true, playsinline: true, preload: "metadata", "aria-hidden": "true" }), { muted: true })
-        : h("img", { src: pt.media, alt: "", loading: "lazy" });
-      if (isVid && pt.poster) m.poster = pt.poster;
-      if (isVid) featureVideos.observe(m);
-      const b = h("button", { class: `feature-media${isVid ? " is-video" : ""}`, "data-nav": true, "aria-label": `View full size: ${pt.text}` }, m);
-      b.addEventListener("click", () => openPoint(same));
-      return h("li", { class: "feature has-media" }, b, h("p", { class: "feature-text", text: pt.text }));
+    // Highlights: each point becomes a card with a short title and optional image/video.
+    // A point is a string, or { title, text, media }. Cards with details open in the lightbox.
+    const sections = (p.sections ?? []).map((s, si) => ({
+      ...s, hue: (p.hue ?? 200) + si * 28,
+      points: (s.points ?? []).map(pt => ({ ...(typeof pt === "string" ? { text: pt } : pt), hue: (p.hue ?? 200) + si * 28, section: s.title }))
+    }));
+    const detailed = sections.flatMap(s => s.points).filter(c => c.media || (c.title && c.text));
+    const openCard = c => openLightbox(detailed.map(d => ({
+      render: () => !d.media ? coverCanvas(d.title ?? d.text, d.hue)
+        : kindOf(d.media) === "video"
+          ? Object.assign(h("video", { src: d.media, controls: true, autoplay: true, loop: true, playsinline: true }), { muted: true })
+          : h("img", { src: d.media, alt: d.alt ?? d.title ?? d.text }),
+      kicker: `${p.title} · ${d.section}`, title: d.title ?? "", note: d.text ?? ""
+    })), detailed.indexOf(c));
+    let n = 0;
+    const card = c => {
+      n++;
+      const title = c.title ?? c.text;
+      const art = c.media
+        ? (kindOf(c.media) === "video" ? ambientVideo(c.media, c.poster) : h("img", { src: c.media, alt: "", loading: "lazy" }))
+        : h("span", { class: "hl-num", "aria-hidden": "true", text: String(n).padStart(2, "0") });
+      const inner = [h("span", { class: `hl-art${c.media ? " has-media" : ""}` }, art), h("span", { class: "hl-title", text: title })];
+      if (!detailed.includes(c)) return h("li", {}, h("div", { class: "hl-card", style: `--h:${c.hue}` }, ...inner));
+      const b = h("button", { class: "hl-card is-open", style: `--h:${c.hue}`, "data-nav": true, "aria-label": `${title}: show details` },
+        ...inner, h("span", { class: "hl-more", "aria-hidden": "true", text: "+" }));
+      b.addEventListener("click", () => openCard(c));
+      return h("li", {}, b);
     };
 
     $("#project-desc").replaceChildren(
-      ...(p.description ?? []).map(t => h("p", { text: t })),
-      ...(p.sections ?? []).map(s => h("section", { class: s.featured ? "project-section featured" : "project-section" },
-        h("h3", { text: s.title }),
+      ...(p.description ?? []).map(t => h("p", { class: "project-lead", text: t })),
+      ...sections.map(s => h("section", { class: s.featured ? "project-section featured" : "project-section" },
+        h("h3", {}, h("span", { text: s.title }), h("small", { text: String(s.points.length) })),
         s.intro ? h("p", { class: "section-intro", text: s.intro }) : null,
-        h("ul", { class: "features" }, ...(s.points ?? []).map(pointEl)))),
+        h("ul", { class: "highlights" }, ...s.points.map(card)))),
       ...(mainLink ? [h("aside", { class: "cta-banner" },
         h("div", {},
           h("p", { class: "cta-banner-title", text: p.ctaTitle ?? "Try it yourself" }),
@@ -665,21 +691,20 @@
           linkBtn(mainLink, "btn cta-btn"),
           ...p.links.slice(1).map(l => linkBtn(l, "btn"))))] : []));
 
-    const media = p.media?.length ? p.media : [{ src: p.cover, caption: p.title }];
-    const images = media.map((m, i) => ({ m, i })).filter(x => kindOf(x.m.src) === "image");
-    Viewer($("#project-viewer"), media, {
-      label: "Media",
-      placeholder: (item, i) => item.kind === "video"
-        ? motionCanvas(`${p.id}-${i}`, (p.hue ?? 200) + i * 25)
-        : coverCanvas(`${p.id}-${i}`, (p.hue ?? 200) + i * 25, "Image coming soon"),
-      zoom: i => {
-        const list = images.map(x => ({
+    // Gallery at the end, only with real media
+    const media = (p.media ?? []).filter(m => m.src);
+    $("#project-gallery").hidden = !media.length;
+    if (media.length) {
+      const images = media.map((m, i) => ({ m, i })).filter(x => kindOf(x.m.src) === "image");
+      Viewer($("#project-viewer"), media, {
+        label: "Media",
+        placeholder: (item, i) => motionCanvas(`${p.id}-${i}`, (p.hue ?? 200) + i * 25),
+        zoom: i => openLightbox(images.map(x => ({
           render: () => h("img", { src: x.m.src, alt: x.m.alt ?? x.m.caption ?? "" }),
           kicker: p.title, title: x.m.caption ?? "", note: ""
-        }));
-        openLightbox(list, Math.max(0, images.findIndex(x => x.i === i)));
-      }
-    });
+        })), Math.max(0, images.findIndex(x => x.i === i)))
+      });
+    } else $("#project-viewer").replaceChildren();
 
     const k = D.projects.indexOf(p);
     const prevP = D.projects[(k - 1 + D.projects.length) % D.projects.length];
@@ -1488,6 +1513,38 @@
     if (e.pointerType !== "mouse" || modalOpen || e.target.closest("a, button, video, iframe, .panel, .level, .skill, .tab-row, .topbar, .viewer, .playground")) return;
     FX.burst(e.clientX, e.clientY, 16, { power: 5, size: 5, gravity: 0.12, decay: 0.025, shape: "dot" });
   });
+
+  /* ================= Splash ================= */
+  // Plays Andrea's intro animation once per visit, with a Skip button. Off when splash.video is empty.
+  (function splash() {
+    const cfg = D.splash ?? {};
+    const phone = matchMedia("(max-width: 720px) and (orientation: portrait)").matches;
+    const src = (phone && cfg.videoMobile) || cfg.video;
+    let seen = false;
+    try { seen = sessionStorage.getItem("splash-seen") === "1"; } catch {}
+    if (!src || seen || reduceMotion) return;
+    try { sessionStorage.setItem("splash-seen", "1"); } catch {}
+    const v = Object.assign(h("video", { src, autoplay: true, playsinline: true, preload: "auto", "aria-hidden": "true" }), { muted: true });
+    const skip = h("button", { class: "splash-skip", "data-nav": true, text: "Skip →" });
+    const el = h("div", { class: "splash", role: "dialog", "aria-label": "Intro animation", style: `background:${cfg.background ?? "#f5f2ec"}` }, v, skip);
+    let done = false;
+    const end = () => {
+      if (done) return; done = true;
+      el.classList.add("is-leaving");
+      removeEventListener("keydown", onKey, true);
+      setTimeout(() => el.remove(), 700);
+    };
+    const onKey = e => { if (["Escape", "Enter", " "].includes(e.key)) { e.preventDefault(); e.stopPropagation(); end(); } };
+    v.addEventListener("ended", end);
+    v.addEventListener("error", end);
+    skip.addEventListener("click", end);
+    el.addEventListener("click", e => { if (e.target !== skip) end(); });
+    addEventListener("keydown", onKey, true);
+    setTimeout(end, 15000); // safety net
+    document.body.append(el);
+    v.play().catch(end);
+    skip.focus({ preventScroll: true });
+  })();
 
   /* ================= Boot ================= */
   setFilter("all");
