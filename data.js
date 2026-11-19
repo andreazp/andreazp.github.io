@@ -124,18 +124,18 @@ window.PORTFOLIO = {
   motion: {
     reel: [
       {
-        title: "American Eagle — winning video",
-        context: "Motion graphics", year: "2026",
-        award: "Won a trip to Barcelona",
-        description: "Original motion graphics piece that won American Eagle's contest.", // TODO: a line about the idea
-        video: null, poster: null, hue: 215, tools: []  // TODO: add the video + tools used (e.g. After Effects, Cavalry)
-      },
-      {
         title: "Falsa Alarma",
         context: "Short film · “Transparencia en Corto”", year: "2026",
         award: "3rd place, state level",
         description: "Short film entry for the state-level “Transparencia en Corto” contest.",
         video: "https://youtu.be/KNDuetcXZGM", poster: null, hue: 330, tools: ["Illustrator", "After Effects", "Premiere Pro"]
+      },
+      {
+        title: "American Eagle — winning video",
+        context: "Motion graphics", year: "2026",
+        award: "Won a trip to Barcelona",
+        description: "Original motion graphics piece that won American Eagle's contest.", // TODO: a line about the idea
+        video: null, poster: null, hue: 215, tools: []  // TODO: add the video + tools used (e.g. After Effects, Cavalry)
       },
       {
         title: "Verdad y Justicia",
@@ -148,8 +148,8 @@ window.PORTFOLIO = {
         title: "Brewmaster’s Remedies",
         context: "VR game demo", year: "2023",
         award: "Best VR Game Project 2023",
-        description: "A VR game demo made in Unreal Engine. I did all of the UI, the art direction, 3D assets and textures.",
-        video: "https://youtu.be/7uF-FRlBHMY", poster: null, hue: 100, tools: ["Unreal Engine"]
+        description: "A VR game demo made in Unreal Engine. Designer of full UI and art direction. Also worked on 3D assets and textures.",
+        video: "https://youtu.be/7uF-FRlBHMY", poster: null, hue: 100, tools: ["Unreal Engine", "Substance Designer", "Illustrator"]
       },
       {
         title: "UI motion studies",              // PLACEHOLDER — swap for real UI animation clips
