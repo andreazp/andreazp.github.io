@@ -718,6 +718,7 @@
       ...sections.map(s => h("section", { class: s.featured ? "project-section featured" : "project-section" },
         h("h3", {}, h("span", { text: s.title }), h("small", { text: String(s.points.length) })),
         s.intro ? h("p", { class: "section-intro", text: s.intro }) : null,
+        s.icons?.files?.length ? iconBoard(s.icons) : null,
         h("ul", { class: "highlights" }, ...s.points.map(card)))),
       ...(mainLink ? [h("aside", { class: "cta-banner" },
         h("div", {},
@@ -768,6 +769,57 @@
     }));
     $(".ap-more").hidden = !$("#project-more").children.length;
     $("#screen-project").scrollTop = 0;
+  }
+
+  /* ================= Icon board: a set of single-colour SVG icons you can inspect ================= */
+  // Icons are drawn as CSS masks, so one file can be shown in any colour on any background.
+  const ICON_WORDS = { fov: "FOV", ui: "UI", xray: "X-ray" };
+  const iconLabel = name => name
+    .replace(/([a-z])([A-Z0-9])/g, "$1 $2").split(" ")
+    .map((w, i) => ICON_WORDS[w.toLowerCase()] ?? (i ? w.toLowerCase() : w[0].toUpperCase() + w.slice(1)))
+    .join(" ");
+  function iconBoard(set) {
+    const BGS = [["dark", "Dark"], ["light", "Light"], ["brand", "Colour"]];
+    const SIZES = [24, 48, 96];
+    const board = h("div", { class: "iconboard", "data-bg": "dark", style: "--size:48px" });
+    const glyph = (name, cls = "ib-glyph") =>
+      h("span", { class: cls, "aria-hidden": "true", style: `--src:url("${set.path}${set.prefix ?? ""}${name}.svg")` });
+    const focusArt = h("span", { class: "ib-focus-art" });
+    const focusName = h("strong", { class: "ib-focus-name" });
+    const focus = h("div", { class: "ib-focus", "aria-live": "polite" }, focusArt,
+      h("span", {}, focusName, h("small", { text: "64 × 64 · SVG" })));
+    const show = name => { focusArt.replaceChildren(glyph(name, "ib-glyph big")); focusName.textContent = iconLabel(name); };
+
+    const seg = (label, opts, attr, apply) => {
+      const btns = opts.map(([val, text]) => {
+        const b = h("button", { class: "ib-opt", "data-nav": true, "aria-pressed": "false", text });
+        b.addEventListener("click", () => {
+          btns.forEach(x => x.setAttribute("aria-pressed", String(x === b)));
+          apply(val); Sound.tone(880, 0.06, "sine", 0.03);
+        });
+        return b;
+      });
+      btns[attr].setAttribute("aria-pressed", "true");
+      return h("div", { class: "ib-seg", role: "group", "aria-label": label }, ...btns);
+    };
+
+    const tiles = set.files.map((name, i) => {
+      const b = h("button", { class: "ib-icon", "data-nav": true, "aria-label": iconLabel(name), title: iconLabel(name), style: `--i:${i}` },
+        glyph(name));
+      b.addEventListener("click", () => { show(name); b.classList.remove("pop"); void b.offsetWidth; b.classList.add("pop"); Sound.tone(660 + (i % 8) * 60, 0.08, "triangle", 0.03); });
+      b.addEventListener("pointerenter", () => show(name));
+      b.addEventListener("focus", () => show(name));
+      return h("li", {}, b);
+    });
+    show(set.files[0]);
+
+    board.append(
+      h("div", { class: "ib-bar" },
+        h("p", { class: "ib-title" }, h("span", { text: set.title ?? "Icon set" }), h("small", { text: `${set.files.length} icons` })),
+        seg("Background", BGS, 0, v => { board.dataset.bg = v; }),
+        seg("Icon size", SIZES.map(s => [s, `${s}px`]), 1, v => { board.style.setProperty("--size", `${v}px`); })),
+      h("div", { class: "ib-body" }, focus, h("ul", { class: "ib-grid" }, ...tiles)));
+    return board;
   }
 
   /* ================= Footer (project pages and other long screens) ================= */

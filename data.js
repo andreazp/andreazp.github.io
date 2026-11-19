@@ -330,6 +330,17 @@ window.PORTFOLIO = {
         {
           title: "ArgentXR",
           intro: "Grayscale’s browser-based platform for turning 3D and CAD models into interactive web and augmented reality experiences, with no coding and no app downloads. Free public beta, November 2026. My part:",
+          // Interactive icon board. Files are `${path}${prefix}${name}.svg` — remove a name to hide that icon.
+          icons: {
+            title: "ArgentXR icon set",
+            path: "assets/projects/argent-xr/icons/", prefix: "argent_icon_",
+            files: ["actions", "actionsSquare", "actionsSquare2", "animation1", "animation2", "cam", "camSpeed", "camSquare",
+              "component", "cube", "cursor", "cut", "cutSquare", "directionalLight", "enterFullscreen", "exitFullscreen",
+              "explode", "explodeSquare", "farClipping", "focus", "fov", "fovSquare", "gizmo", "library1", "library2",
+              "library3", "library4", "lightning", "materials", "nearClipping", "newPalette", "newPalette2", "palette1",
+              "palette2", "palette3", "rotate", "running", "seated", "send", "standing", "starterLibrary1", "starterLibrary2",
+              "starterLibrary3", "sync", "timing", "translate", "uiActor", "viewfinder", "wireframe", "xray"]
+          },
           points: [
             "Icon design",
             "Motion animations",

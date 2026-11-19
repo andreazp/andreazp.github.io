@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="100%" height="100%" viewBox="0 0 64 64" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+    <g transform="matrix(1,0,0,1,-91.747129,-90.417876)">
+        <g id="Artboard9" transform="matrix(1,0,0,1,-208.473344,0)">
+            <rect x="300.22" y="90.418" width="64" height="64" style="fill:none;"/>
+            <clipPath id="_clip1">
+                <rect x="300.22" y="90.418" width="64" height="64"/>
+            </clipPath>
+            <g clip-path="url(#_clip1)">
+                <g transform="matrix(0.25,0,0,0.25,-3560.551253,-126.227736)">
+                    <g opacity="0.64">
+                        <g transform="matrix(0.15161,0,0,0.15161,14990.468694,1203.220606)">
+                            <rect x="2985.403" y="-2220.416" width="1688.538" height="1688.538" style="fill:none;"/>
+                        </g>
+                        <g transform="matrix(11.960215,0,0,11.960215,15427.564319,851.059862)">
+                            <path d="M16.702,8.201L19.797,5.106C20.116,4.788 20.549,4.609 21,4.609C21.933,4.609 22.701,5.376 22.702,6.309L22.702,6.31L22.702,17.69L22.702,17.691C22.701,18.624 21.933,19.391 21,19.391C20.549,19.391 20.116,19.212 19.797,18.894L16.702,15.799L16.702,16.5C16.702,18.257 15.257,19.702 13.5,19.702L4.5,19.702C2.743,19.702 1.298,18.257 1.298,16.5L1.298,7.5C1.298,5.743 2.743,4.298 4.5,4.298L13.5,4.298C15.257,4.298 16.702,5.743 16.702,7.5L16.702,8.201ZM16.702,13.106L20.798,17.201L20.798,6.799L16.702,10.894L16.702,13.106ZM4.5,17.798L13.5,17.798C14.212,17.798 14.798,17.212 14.798,16.5L14.798,7.5C14.798,6.788 14.212,6.202 13.5,6.202L4.5,6.202C3.788,6.202 3.202,6.788 3.202,7.5L3.202,16.5C3.202,17.212 3.788,17.798 4.5,17.798Z" style="fill:white;"/>
+                        </g>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

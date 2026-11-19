@@ -1167,3 +1167,59 @@ main { position: relative; min-height: 0; }
   .arcade-hud { gap: 12px; }
 }
 .ticker { flex: none; }
+
+/* ---------- Icon board (e.g. ArgentXR icon set) ---------- */
+.iconboard {
+  --ib-bg: #17181c; --ib-fg: #fff; --ib-tile: rgba(255, 255, 255, 0.05); --ib-tile-hover: rgba(255, 255, 255, 0.12); --ib-line: rgba(255, 255, 255, 0.1); --ib-text: rgba(255, 255, 255, 0.62);
+  margin: 6px 0 22px; padding: clamp(14px, 2vw, 22px); border-radius: 22px;
+  background: var(--ib-bg); color: var(--ib-fg);
+  box-shadow: 0 30px 70px -36px var(--shadow-color);
+  transition: background 0.4s var(--ease), color 0.4s var(--ease);
+}
+.iconboard[data-bg="light"] { --ib-bg: #fffdf9; --ib-fg: #1c1917; --ib-tile: rgba(40, 28, 16, 0.04); --ib-tile-hover: rgba(40, 28, 16, 0.09); --ib-line: rgba(40, 28, 16, 0.1); --ib-text: #57534e; border: 1px solid var(--line); }
+.iconboard[data-bg="brand"] { --ib-bg: linear-gradient(135deg, #e5532a, #c73d7a); --ib-fg: #fff; --ib-tile: rgba(255, 255, 255, 0.1); --ib-tile-hover: rgba(255, 255, 255, 0.2); --ib-line: rgba(255, 255, 255, 0.2); --ib-text: rgba(255, 255, 255, 0.8); }
+.ib-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; margin-bottom: 16px; }
+.ib-title { margin: 0 auto 0 4px; display: grid; }
+.ib-title span { font-family: var(--font-display); font-size: 18px; font-weight: 700; letter-spacing: -0.02em; }
+.ib-title small { font-size: 13px; color: var(--ib-text); }
+.ib-seg { display: flex; gap: 2px; padding: 3px; border-radius: 999px; background: var(--ib-tile); border: 1px solid var(--ib-line); }
+.ib-opt { min-height: 34px; padding: 0 14px; border: 0; border-radius: 999px; background: none; color: var(--ib-text); font-size: 13px; font-weight: 600; transition: background 0.2s, color 0.2s; }
+.ib-opt:hover, .ib-opt.selected { color: var(--ib-fg); }
+.ib-opt[aria-pressed="true"] { background: var(--ib-fg); color: #17181c; }
+.iconboard[data-bg="light"] .ib-opt[aria-pressed="true"] { color: #fff; }
+.iconboard[data-bg="brand"] .ib-opt[aria-pressed="true"] { color: #c73d7a; }
+.ib-body { display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 16px; align-items: start; }
+.ib-focus {
+  position: sticky; top: 12px; display: grid; justify-items: center; gap: 14px; padding: 26px 16px 18px;
+  border-radius: 16px; background: var(--ib-tile); border: 1px solid var(--ib-line); text-align: center;
+}
+.ib-focus-art { display: grid; place-items: center; width: 128px; height: 128px; }
+.ib-focus > span:last-child { display: grid; gap: 2px; }
+.ib-focus-name { font-family: var(--font-display); font-size: 18px; letter-spacing: -0.02em; }
+.ib-focus small { font-size: 12px; color: var(--ib-text); }
+.ib-glyph {
+  display: block; width: var(--size); height: var(--size); background: currentColor;
+  -webkit-mask: var(--src) center / contain no-repeat; mask: var(--src) center / contain no-repeat;
+  transition: width 0.35s var(--spring), height 0.35s var(--spring);
+}
+.ib-glyph.big { width: 128px; height: 128px; animation: ib-in 0.35s var(--spring); }
+@keyframes ib-in { from { scale: 0.8; opacity: 0.4; } }
+.ib-grid {
+  list-style: none; margin: 0; padding: 0; display: grid; gap: 8px;
+  grid-template-columns: repeat(auto-fill, minmax(calc(var(--size) + 28px), 1fr));
+}
+.ib-icon {
+  display: grid; place-items: center; width: 100%; aspect-ratio: 1; padding: 0; border: 0; border-radius: 14px;
+  background: var(--ib-tile); color: var(--ib-fg);
+  transition: background 0.2s, translate 0.35s var(--spring), rotate 0.35s var(--spring);
+  animation: deal 0.5s var(--spring) backwards; animation-delay: calc(var(--i) * 12ms);
+}
+.ib-icon:hover, .ib-icon.selected { background: var(--ib-tile-hover); translate: 0 -3px; rotate: -4deg; }
+.ib-grid li:nth-child(even) .ib-icon:hover { rotate: 4deg; }
+.ib-icon:focus-visible { outline: 2px solid var(--ib-fg); outline-offset: 2px; }
+.ib-icon.pop { animation: squish 0.5s var(--spring); }
+@media (max-width: 720px) {
+  .ib-body { grid-template-columns: minmax(0, 1fr); }
+  .ib-focus { position: static; grid-template-columns: auto 1fr; justify-items: start; text-align: left; padding: 14px; }
+  .ib-focus-art, .ib-glyph.big { width: 72px; height: 72px; }
+}
