@@ -94,27 +94,20 @@
       <!-- PROJECT PAGE -->
       <section class="screen" id="screen-project" data-screen="project" aria-labelledby="project-h">
         <a class="back-link" href="#projects" data-goto="projects" data-nav>← All projects</a>
-        <header class="project-hero">
-          <div class="hero-media" id="project-hero-media" aria-hidden="true"></div>
-          <div class="hero-content">
+        <header class="project-top">
+          <div class="project-top-text">
             <p class="eyebrow" id="project-kicker"></p>
             <h2 class="project-title" id="project-h"></h2>
-            <p class="hero-role" id="project-role"></p>
-            <div class="hero-actions">
-              <div class="project-cta" id="project-cta"></div>
-              <p class="badge" id="project-award" hidden></p>
-            </div>
+            <p class="project-summary" id="project-summary"></p>
+          </div>
+          <div class="project-top-actions">
+            <div class="project-cta" id="project-cta"></div>
+            <p class="badge" id="project-award" hidden></p>
           </div>
         </header>
-        <div class="project-facts">
-          <p class="project-summary" id="project-summary"></p>
-          <ul class="project-tags" id="project-meta" aria-label="Tools and year"></ul>
-        </div>
+        <div class="viewer-slot project-gallery" id="project-viewer"></div>
+        <ul class="project-info" id="project-meta" aria-label="Project details"></ul>
         <div class="project-body" id="project-desc"></div>
-        <section class="project-gallery" id="project-gallery" aria-label="Gallery">
-          <h3>Gallery</h3>
-          <div class="viewer-slot" id="project-viewer"></div>
-        </section>
         <nav class="project-pager" id="project-pager" aria-label="More projects"></nav>
       </section>
 

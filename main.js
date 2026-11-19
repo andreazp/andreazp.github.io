@@ -619,31 +619,52 @@
     return v;
   };
 
-  // Big background for the top of a project page:
-  // hero → first video file → cover / first image → YouTube thumbnail → generated art
-  function heroMedia(p) {
-    const media = p.media ?? [];
-    if (p.hero) return kindOf(p.hero) === "video" ? ambientVideo(p.hero) : h("img", { src: p.hero, alt: "" });
-    const vid = media.find(m => kindOf(m.src) === "video");
-    if (vid) return ambientVideo(vid.src, vid.poster);
-    const img = p.cover || media.find(m => kindOf(m.src) === "image")?.src;
-    if (img) return h("img", { src: img, alt: "" });
-    const yt = media.map(m => ytId(m.src)).find(Boolean);
-    if (yt) return h("img", { src: `https://i.ytimg.com/vi/${yt}/hqdefault.jpg`, alt: "" });
-    return h("div", { class: "hero-fallback", style: `--h:${p.hue ?? 200}` });
+  // --- Visual project info: icon tiles for role / studio / year, app-style tiles for tools ---
+  const INFO_ICONS = {
+    role: '<path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm-7 8a7 7 0 0 1 14 0" />',
+    studio: '<path d="M4 20V8l8-4 8 4v12M9 20v-5h6v5M4 20h16" />',
+    year: '<rect x="4" y="5.5" width="16" height="14.5" rx="3" /><path d="M8 3.5v4M16 3.5v4M4 10.5h16" />'
+  };
+  const TOOL_TILES = {
+    "unity": ["U", "#1d1d1f"], "unreal engine": ["UE", "#0e1128"], "c#": ["C#", "#68217a"], "ui toolkit": ["UI", "#3b6fd8"],
+    "blueprints": ["BP", "#2a62c9"], "firebase": ["Fb", "#f08c00"], "substance designer": ["Sd", "#d94f1f"],
+    "illustrator": ["Ai", "#c45a00"], "after effects": ["Ae", "#4b2fbf"], "premiere pro": ["Pr", "#5b23a8"],
+    "figma": ["Fi", "#a259ff"], "autodesk maya": ["M", "#127c80"], "maya": ["M", "#127c80"], "cavalry": ["Cv", "#2f2f37"]
+  };
+  const icon = name => {
+    const s = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    s.setAttribute("viewBox", "0 0 24 24"); s.setAttribute("aria-hidden", "true");
+    s.innerHTML = INFO_ICONS[name];
+    return s;
+  };
+  function toolTile(name) {
+    const key = name.toLowerCase();
+    const [mono, color] = TOOL_TILES[key] ?? [name.split(/\s+/).map(w => w[0]).join("").slice(0, 2).toUpperCase(),
+      `hsl(${[...key].reduce((a, c) => a + c.charCodeAt(0), 0) % 360} 45% 38%)`];
+    return h("li", { class: "tool", title: name },
+      h("span", { class: "tool-tile", style: `--c:${color}`, "aria-hidden": "true", text: mono }),
+      h("span", { class: "tool-name", text: name }));
+  }
+  function projectInfo(p) {
+    const facts = [["role", "Role", p.role], ["studio", "Studio", p.studio], ["year", "Year", p.year]]
+      .filter(([, , v]) => v)
+      .map(([k, label, v]) => h("li", { class: "info-fact" },
+        h("span", { class: "info-icon" }, icon(k)),
+        h("span", {}, h("small", { text: label }), h("strong", { text: v }))));
+    const tools = p.tools?.length
+      ? [h("li", { class: "info-tools" }, h("small", { text: "Tools" }), h("ul", {}, ...p.tools.map(toolTile)))] : [];
+    return [...facts, ...tools];
   }
 
   function renderProject(p) {
     currentProject = p;
     $("#project-kicker").textContent = labelFor(p.category) ?? "";
     $("#project-h").textContent = p.title;
-    $("#project-role").textContent = [p.role, p.studio].filter(Boolean).join(" · ");
     $("#project-summary").textContent = p.summary ?? "";
     const award = $("#project-award");
     award.textContent = p.award ? `✦ ${p.award}` : "";
     award.hidden = !p.award;
-    $("#project-hero-media").replaceChildren(heroMedia(p));
-    $("#project-meta").replaceChildren(...[...(p.tools ?? []), p.year].filter(Boolean).map(t => h("li", { text: t })));
+    $("#project-meta").replaceChildren(...projectInfo(p));
 
     const mainLink = p.links?.[0];
     $("#project-cta").replaceChildren(...(mainLink ? [linkBtn(mainLink, "btn cta-btn")] : []));
@@ -691,20 +712,19 @@
           linkBtn(mainLink, "btn cta-btn"),
           ...p.links.slice(1).map(l => linkBtn(l, "btn"))))] : []));
 
-    // Gallery at the end, only with real media
-    const media = (p.media ?? []).filter(m => m.src);
-    $("#project-gallery").hidden = !media.length;
-    if (media.length) {
-      const images = media.map((m, i) => ({ m, i })).filter(x => kindOf(x.m.src) === "image");
-      Viewer($("#project-viewer"), media, {
-        label: "Media",
-        placeholder: (item, i) => motionCanvas(`${p.id}-${i}`, (p.hue ?? 200) + i * 25),
-        zoom: i => openLightbox(images.map(x => ({
-          render: () => h("img", { src: x.m.src, alt: x.m.alt ?? x.m.caption ?? "" }),
-          kicker: p.title, title: x.m.caption ?? "", note: ""
-        })), Math.max(0, images.findIndex(x => x.i === i)))
-      });
-    } else $("#project-viewer").replaceChildren();
+    // Gallery at the top: the first thing people see is the work itself
+    const media = p.media?.length ? p.media : [{ src: p.cover, caption: p.title }];
+    const images = media.map((m, i) => ({ m, i })).filter(x => kindOf(x.m.src) === "image");
+    Viewer($("#project-viewer"), media, {
+      label: "Media",
+      placeholder: (item, i) => item.kind === "video"
+        ? motionCanvas(`${p.id}-${i}`, (p.hue ?? 200) + i * 25)
+        : coverCanvas(`${p.id}-${i}`, (p.hue ?? 200) + i * 25, "Image coming soon"),
+      zoom: i => openLightbox(images.map(x => ({
+        render: () => h("img", { src: x.m.src, alt: x.m.alt ?? x.m.caption ?? "" }),
+        kicker: p.title, title: x.m.caption ?? "", note: ""
+      })), Math.max(0, images.findIndex(x => x.i === i)))
+    });
 
     const k = D.projects.indexOf(p);
     const prevP = D.projects[(k - 1 + D.projects.length) % D.projects.length];
