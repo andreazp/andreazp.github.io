@@ -380,12 +380,13 @@
           // YouTube refuses embeds that don't say which site they're on (error 153),
           // so pass the origin and keep the referrer.
           const origin = /^https?:$/.test(location.protocol) ? `&origin=${encodeURIComponent(location.origin)}` : "";
-          const src = yt ? `https://www.youtube.com/embed/${yt}?autoplay=1&rel=0&playsinline=1${origin}`
+          const src = yt ? `https://www.youtube.com/embed/${yt}?autoplay=1&rel=0&playsinline=1&iv_load_policy=3${origin}`
                          : `https://player.vimeo.com/video/${vm}?autoplay=1`;
           const f = h("iframe", { src, title: alt || "Video", allow: "autoplay; encrypted-media; fullscreen; picture-in-picture; web-share",
             referrerpolicy: "strict-origin-when-cross-origin", allowfullscreen: true });
           b.replaceWith(f);
-          f.focus();
+          // Focusing the player makes YouTube keep its controls on screen, so only do it for keyboard/gamepad users
+          if (inputMode !== "pointer") f.focus();
         });
         return b;
       }
