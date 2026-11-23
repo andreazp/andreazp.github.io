@@ -689,7 +689,8 @@
     "unity": ["U", "#1d1d1f"], "unreal engine": ["UE", "#0e1128"], "c#": ["C#", "#68217a"], "ui toolkit": ["UI", "#3b6fd8"],
     "blueprints": ["BP", "#2a62c9"], "firebase": ["Fb", "#f08c00"], "substance designer": ["Sd", "#d94f1f"],
     "illustrator": ["Ai", "#c45a00"], "after effects": ["Ae", "#4b2fbf"], "premiere pro": ["Pr", "#5b23a8"],
-    "figma": ["Fi", "#a259ff"], "autodesk maya": ["M", "#127c80"], "maya": ["M", "#127c80"], "cavalry": ["Cv", "#2f2f37"]
+    "figma": ["Fi", "#a259ff"], "autodesk maya": ["M", "#127c80"], "maya": ["M", "#127c80"], "cavalry": ["Cv", "#2f2f37"],
+    "procreate": ["Pc", "#3a3a40"]
   };
   const icon = name => {
     const s = document.createElementNS("http://www.w3.org/2000/svg", "svg");
@@ -934,27 +935,37 @@
   }));
 
   /* ================= Skills ================= */
-  const rank = lv => lv >= 90 ? "Master" : lv >= 75 ? "Expert" : lv >= 60 ? "Adept" : "Apprentice";
-  function showSkill(g, s) {
-    $("#skill-group-name").textContent = g.group;
-    $("#skill-name").textContent = s.name;
-    $("#skill-level-fill").style.width = `${s.level}%`;
-    $("#skill-level-label").textContent = `Level ${Math.round(s.level / 10)} of 10 · ${rank(s.level)}`;
-    $("#skill-note").textContent = s.note;
-  }
-  $("#skill-groups").append(...D.skills.map(g =>
-    h("div", { class: "skill-group" },
-      h("h3", { text: g.group }),
-      h("div", { class: "skill-row" }, ...g.items.map(s => {
-        const pips = h("span", { class: "pips", "aria-hidden": "true" });
-        for (let i = 0; i < 10; i++) pips.append(h("i", { class: i < Math.round(s.level / 10) ? "on" : "" }));
-        const btn = h("button", { class: "skill", "data-nav": true, "aria-label": `${s.name}: ${rank(s.level)}. Show details.` },
-          h("span", { text: s.name }), pips);
-        btn.addEventListener("navselect", () => showSkill(g, s));
-        btn.addEventListener("click", () => showSkill(g, s));
-        return btn;
-      })))));
-  if (D.skills[0]?.items[0]) showSkill(D.skills[0], D.skills[0].items[0]);
+  // One card per skill area: each skill shows the proof behind it (no levels).
+  const SKILL_ICONS = {
+    ui: '<rect x="3.5" y="4.5" width="17" height="15" rx="3"/><path d="M3.5 9h17M7 6.8h.01M9.5 6.8h.01"/>',
+    motion: '<circle cx="12" cy="12" r="8.5"/><path d="m10 8.8 5 3.2-5 3.2z"/>',
+    art: '<path d="M4 20c1.5-4 4-6 6.5-6.5L17 7a2.1 2.1 0 0 1 3 3l-6.5 6.5C13 19 10 20.5 4 20Z"/><path d="m14.5 9.5 0 0"/>',
+    code: '<path d="m8.5 8-4 4 4 4M15.5 8l4 4-4 4M13.5 5.5l-3 13"/>'
+  };
+  const skillIcon = group => {
+    const g = group.toLowerCase();
+    const key = /program|code|dev/.test(g) ? "code" : /motion|anim/.test(g) ? "motion" : /illus|3d|art/.test(g) ? "art" : "ui";
+    const s = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    s.setAttribute("viewBox", "0 0 24 24"); s.setAttribute("aria-hidden", "true");
+    s.innerHTML = SKILL_ICONS[key];
+    return s;
+  };
+  $("#skill-groups").append(...D.skills.map((g, gi) =>
+    h("section", { class: "skill-card", style: `--i:${gi}` },
+      h("header", { class: "skill-card-head" },
+        h("span", { class: "skill-ico" }, skillIcon(g.group)),
+        h("h3", { text: g.group })),
+      h("ul", { class: "skill-list" }, ...g.items.map(s =>
+        h("li", {}, h("strong", { text: s.name }), s.note ? h("p", { text: s.note }) : null))))));
+
+  // Toolbox: every tool named in projects, motion pieces and `D.toolbox` (optional extras), as app-style tiles
+  const tools = [...new Set([
+    ...(D.toolbox ?? []),
+    ...D.projects.flatMap(p => p.tools ?? []),
+    ...(D.motion?.reel ?? []).flatMap(r => r.tools ?? [])
+  ])];
+  $("#toolbox").append(...tools.map(toolTile));
+  $(".toolbox").hidden = !tools.length;
 
   /* ================= Contact ================= */
   const toast = $("#contact-toast");

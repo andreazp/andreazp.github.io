@@ -1236,3 +1236,28 @@ body, .topbar, .panel { transition: background-color 0.4s var(--ease), color 0.4
 .ap-nav .ap-more ul { grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); }
 @media (min-width: 961px) { #screen-project .ap-nav { margin-right: 56px; } }
 @media (max-width: 720px) { .ap-nav { grid-template-columns: minmax(0, 1fr); } }
+
+/* ---------- Skills v2: toolbox + one card per skill area (no levels) ---------- */
+.toolbox { padding: 18px 20px; margin-bottom: 20px; }
+.toolbox[hidden] { display: none; }
+.toolbox .eyebrow { margin: 0 0 12px; }
+.toolbox-list { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 12px 22px; }
+.toolbox-list .tool-tile { width: 40px; height: 40px; border-radius: 11px; font-size: 15px; }
+.toolbox-list .tool-name { font-size: 15px; }
+.skill-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap: 16px; align-items: start; }
+.skill-card {
+  padding: 22px 22px 8px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--panel-solid);
+  box-shadow: 0 20px 44px -30px var(--shadow-color);
+  animation: deal 0.6s var(--spring) backwards; animation-delay: calc(var(--i) * 80ms);
+  transition: translate 0.4s var(--spring), box-shadow 0.3s;
+}
+.skill-card:hover { translate: 0 -4px; box-shadow: 0 28px 54px -30px var(--shadow-color); }
+.skill-card-head { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+.skill-ico { flex: none; width: 44px; height: 44px; display: grid; place-items: center; border-radius: 13px; background: var(--accent-soft); color: var(--accent-text); transition: rotate 0.4s var(--spring); }
+.skill-card:hover .skill-ico { rotate: -8deg; }
+.skill-ico svg { width: 23px; height: 23px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.skill-card-head h3 { margin: 0; font-size: clamp(20px, 1.8vw, 24px); letter-spacing: -0.03em; }
+.skill-list { list-style: none; margin: 0; padding: 0; }
+.skill-list li { padding: 13px 0 14px; border-top: 1px solid var(--line); }
+.skill-list strong { display: block; font-size: 16px; font-weight: 600; letter-spacing: -0.01em; }
+.skill-list p { margin: 3px 0 0; font-size: 14px; line-height: 1.5; color: var(--muted); }
