@@ -6,3 +6,6 @@ assets/CV_AndreaZamudio2026_original.pdf
 Thumbs.db
 desktop.ini
 .DS_Store
+
+# Full-size video originals stay local; the site uses the compressed copies
+assets/projects/*/originals/

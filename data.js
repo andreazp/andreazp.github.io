@@ -232,7 +232,7 @@ window.PORTFOLIO = {
       year: "2024 — 2025",
       category: "game",
       hue: 265,
-      cover: null,
+      cover: "assets/projects/ayna/vendor.jpg",
       studio: "Designmatic",
       role: "Associate Game Engineer",
       tools: ["Unity", "C#", "UI Toolkit"],
@@ -249,36 +249,38 @@ window.PORTFOLIO = {
         {
           title: "User interface",
           points: [
-            { title: "Vendor system", text: "Built the vendor system end to end, from data management to UI: player and vendor inventories, and purchasable items that unlock gameplay." },
-            { title: "NPC upgrader", text: "Created an upgrader system for specific NPCs that lets players buy and unlock upgrades, handling the full process." },
+            { title: "Vendor system", text: "Built the vendor system end to end, from data management to UI: player and vendor inventories, and purchasable items that unlock gameplay.", media: "assets/projects/ayna/vendor.mp4", poster: "assets/projects/ayna/vendor.jpg" },
+            { title: "NPC upgrader", text: "Created an upgrader system for specific NPCs that lets players buy and unlock upgrades, handling the full process.", media: "assets/projects/ayna/upgrader.mp4", poster: "assets/projects/ayna/upgrader.jpg" },
             { title: "Favourites", text: "Added a favourites system so players can keep track of vendor and upgrader items they want to buy." },
             { title: "Player inventory", text: "Developed the runtime player inventory with Unity’s UI Toolkit and data bindings." },
-            { title: "Dialog bubbles", text: "Built a dialog bubble system that plays dialog sequences in-game." },
-            { title: "Pick-up notifications", text: "Implemented item pick-up notifications on the HUD using a list view." },
+            { title: "Dialog bubbles", text: "Built a dialog bubble system that plays dialog sequences in-game.", media: "assets/projects/ayna/dialog-bubbles.mp4", poster: "assets/projects/ayna/dialog-bubbles.jpg" },
+            { title: "Pick-up notifications", text: "Implemented item pick-up notifications on the HUD using a list view.", media: "assets/projects/ayna/automatic-pickup-and-dialog.mp4", poster: "assets/projects/ayna/automatic-pickup-and-dialog.jpg" },
             { title: "Journal UI", text: "Created a tab-based journal UI that shows the player’s abilities and upgrades." },
-            { title: "Settings menu", text: "Extended the settings menu: VSync, FPS limiter, language, monitor resolution and display mode." },
+            { title: "Settings menu", text: "Extended the settings menu: VSync, FPS limiter, language, monitor resolution and display mode.", media: "assets/projects/ayna/settings-menu.mp4", poster: "assets/projects/ayna/settings-menu.jpg" },
             { title: "Narrative inspection", text: "Built a narrative inspection setup that shows an icon and story text when players interact with objects." }
           ]
         },
         {
           title: "Gameplay",
           points: [
-            { title: "Chest opening", text: "Chest opening: the player walks automatically into position while animations, VFX and SFX play in sync." },
+            { title: "Chest opening", text: "Chest opening: the player walks automatically into position while animations, VFX and SFX play in sync.", media: "assets/projects/ayna/chests.mp4", poster: "assets/projects/ayna/chests.jpg" },
+            { title: "Door unlocking", text: "Door unlocking: Once the player picks up the required items and on click, the door animates and plays SFX.", media: "assets/projects/ayna/door.mp4", poster: "assets/projects/ayna/door.jpg" },
             { title: "Map system", text: "A map system that unlocks map areas in the UI, plus map posts where players pick up maps." },
-            { title: "Rotating platforms", text: "A rotating platform system with smooth transitions between fixed steps, including looping and reverse looping." },
-            { title: "Collapsible platforms", text: "Collapsible platforms with animations, VFX and SFX synced to gameplay logic." },
-            { title: "Checkpoints", text: "Checkpoint interactions, including player animations for left and right triggers." },
-            { title: "Item pick-ups", text: "A new item pick-up system for automatic and manual pick-ups." },
-            { title: "Moving platforms", text: "Moving platforms that react to player projectiles, with game-feel touches like shader glow." },
-            { title: "Traps & hazards", text: "Breakable ground, bouncing mushrooms and falling block traps." }
+            { title: "Rotating platforms", text: "A rotating platform system with smooth transitions between fixed steps, including looping and reverse looping.", media: "assets/projects/ayna/rotating-platforms.mp4", poster: "assets/projects/ayna/rotating-platforms.jpg" },
+            { title: "Collapsible platforms", text: "Collapsible platforms with animations, VFX and SFX synced to gameplay logic.", media: "assets/projects/ayna/collapsible-platforms.mp4", poster: "assets/projects/ayna/collapsible-platforms.jpg" },
+            { title: "Checkpoints", text: "Checkpoint interactions, including player animations for left and right triggers.", media: "assets/projects/ayna/checkpoint.mp4", poster: "assets/projects/ayna/checkpoint.jpg" },
+            { title: "Item pick-ups", text: "A new item pick-up system for automatic and manual pick-ups.", media: "assets/projects/ayna/manual-pickup.mp4", poster: "assets/projects/ayna/manual-pickup.jpg" },
+            { title: "Moving platforms", text: "Moving platforms that react to player projectiles, with game-feel touches like shader glow.", media: "assets/projects/ayna/platforms.mp4", poster: "assets/projects/ayna/platforms.jpg" },
+            { title: "Traps & hazards", text: "Breakable ground and falling block traps.", media: "assets/projects/ayna/falling-traps.mp4", poster: "assets/projects/ayna/falling-traps.jpg" },
+            { title: "Bouncing Mushrooms", text: "Bouncing mushrooms for dynamic level design.", media: "assets/projects/ayna/mushrooms.mp4", poster: "assets/projects/ayna/mushrooms.jpg" }
           ]
         },
         {
           title: "Enemy behaviour",
           points: [
-            { title: "Flying enemies framework", text: "Built a flying enemies framework from scratch that can be used to create the behaviour and gameplay of all flying enemies in the game." },
-            { title: "Ground enemies", text: "Developed several ground enemies from the game design requirements, including behaviour, VFX and SFX." },
-            { title: "Smoke enemy", text: "Programmed a smoke enemy that triggers a fullscreen shader effect to block the player’s vision." },
+            { title: "Mosquito - Flying Enemy", text: "Built a flying enemies framework from scratch that can be used to create the behaviour and gameplay of all flying enemies in the game, with the mosquito as the primary example.", media: "assets/projects/ayna/mosquito.mp4", poster: "assets/projects/ayna/mosquito.jpg" },
+            { title: "Ground enemies", text: "Developed several ground enemies from the game design requirements, including behaviour, VFX and SFX.", media: "assets/projects/ayna/ground-enemies.mp4", poster: "assets/projects/ayna/ground-enemies.jpg" },
+            { title: "Smoke enemy", text: "Programmed a smoke enemy that triggers a fullscreen shader effect to block the player’s vision.", media: "assets/projects/ayna/smoke-enemy.mp4", poster: "assets/projects/ayna/smoke-enemy.jpg" },
             { title: "Snake trap", text: "Created a ground snake trap system that tracks player movement, shoots projectiles and switches tracking sides." }
           ]
         }
@@ -288,9 +290,10 @@ window.PORTFOLIO = {
         { label: "Play the demo on Steam", play: true, url: "https://store.steampowered.com/app/1742390/Ayna_Shattered_Truth/" }
       ],
       media: [
-        { src: null, caption: "Gameplay", kind: "video" },   // TODO
-        { src: null, caption: "UI systems" },                // TODO
-        { src: null, caption: "Menus" }                      // TODO
+        { src: "https://www.youtube.com/watch?v=nv50lLZvoJU", caption: "Official trailer" },
+        { src: "assets/projects/ayna/door-system.mp4", poster: "assets/projects/ayna/door-system.jpg", caption: "Door system · full sequence" },
+        { src: "assets/projects/ayna/platforms-2.mp4", poster: "assets/projects/ayna/platforms-2.jpg", caption: "Platforms" },
+        { src: "assets/projects/ayna/ground-enemies-2.mp4", poster: "assets/projects/ayna/ground-enemies-2.jpg", caption: "Ground enemies" }
       ]
     },
     {
