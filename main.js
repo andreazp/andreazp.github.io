@@ -102,7 +102,7 @@
   // Name: each word rises in on load (no per-letter effects — it stays calm).
   const titleName = $("#title-name");
   titleName.setAttribute("aria-label", D.name);
-  titleName.replaceChildren(...D.name.split(/s+/).flatMap((word, wi) => [
+  titleName.replaceChildren(...D.name.split(/\s+/).flatMap((word, wi) => [
     wi ? document.createTextNode(" ") : null,
     h("span", { class: "word", "aria-hidden": "true", style: `--i:${wi}`, text: word })
   ]).filter(Boolean));
