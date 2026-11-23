@@ -254,7 +254,7 @@ window.PORTFOLIO = {
             { title: "Favourites", text: "Added a favourites system so players can keep track of vendor and upgrader items they want to buy." },
             { title: "Player inventory", text: "Developed the runtime player inventory with Unity’s UI Toolkit and data bindings." },
             { title: "Dialog bubbles", text: "Built a dialog bubble system that plays dialog sequences in-game.", media: "assets/projects/ayna/dialog-bubbles.mp4", poster: "assets/projects/ayna/dialog-bubbles.jpg" },
-            { title: "Pick-up notifications", text: "Implemented item pick-up notifications on the HUD using a list view.", media: "assets/projects/ayna/automatic-pickup-and-dialog.mp4", poster: "assets/projects/ayna/automatic-pickup-and-dialog.jpg" },
+            { title: "Pick-up notifications", text: "Implemented item pick-up notifications on the HUD using a list view." },
             { title: "Journal UI", text: "Created a tab-based journal UI that shows the player’s abilities and upgrades." },
             { title: "Settings menu", text: "Extended the settings menu: VSync, FPS limiter, language, monitor resolution and display mode.", media: "assets/projects/ayna/settings-menu.mp4", poster: "assets/projects/ayna/settings-menu.jpg" },
             { title: "Narrative inspection", text: "Built a narrative inspection setup that shows an icon and story text when players interact with objects." }
@@ -269,7 +269,8 @@ window.PORTFOLIO = {
             { title: "Rotating platforms", text: "A rotating platform system with smooth transitions between fixed steps, including looping and reverse looping.", media: "assets/projects/ayna/rotating-platforms.mp4", poster: "assets/projects/ayna/rotating-platforms.jpg" },
             { title: "Collapsible platforms", text: "Collapsible platforms with animations, VFX and SFX synced to gameplay logic.", media: "assets/projects/ayna/collapsible-platforms.mp4", poster: "assets/projects/ayna/collapsible-platforms.jpg" },
             { title: "Checkpoints", text: "Checkpoint interactions, including player animations for left and right triggers.", media: "assets/projects/ayna/checkpoint.mp4", poster: "assets/projects/ayna/checkpoint.jpg" },
-            { title: "Item pick-ups", text: "A new item pick-up system for automatic and manual pick-ups.", media: "assets/projects/ayna/manual-pickup.mp4", poster: "assets/projects/ayna/manual-pickup.jpg" },
+            { title: "Automatic pick-ups", text: "A new item pick-up system: items the player collects automatically.", media: "assets/projects/ayna/automatic-pickup-and-dialog.mp4", poster: "assets/projects/ayna/automatic-pickup-and-dialog.jpg" },
+            { title: "Manual pick-ups", text: "A new item pick-up system: items the player picks up manually.", media: "assets/projects/ayna/manual-pickup.mp4", poster: "assets/projects/ayna/manual-pickup.jpg" },
             { title: "Moving platforms", text: "Moving platforms that react to player projectiles, with game-feel touches like shader glow.", media: "assets/projects/ayna/platforms.mp4", poster: "assets/projects/ayna/platforms.jpg" },
             { title: "Traps & hazards", text: "Breakable ground and falling block traps.", media: "assets/projects/ayna/falling-traps.mp4", poster: "assets/projects/ayna/falling-traps.jpg" },
             { title: "Bouncing Mushrooms", text: "Bouncing mushrooms for dynamic level design.", media: "assets/projects/ayna/mushrooms.mp4", poster: "assets/projects/ayna/mushrooms.jpg" }

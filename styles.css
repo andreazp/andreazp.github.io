@@ -1229,3 +1229,10 @@ body, .topbar, .panel { transition: background-color 0.4s var(--ease), color 0.4
   font-size: clamp(26px, 2.9vw, 42px); font-weight: 700; letter-spacing: -0.035em; line-height: 1.05;
   color: var(--text);
 }
+/* Next / More projects now sit after the highlight cards, side by side */
+.ap-nav { margin-top: clamp(40px, 7vh, 72px); grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); align-items: stretch; gap: 16px; }
+.ap-nav .ap-next { grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); min-height: 180px; }
+.ap-nav .ap-next-text strong { font-size: clamp(20px, 2vw, 26px); }
+.ap-nav .ap-more ul { grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); }
+@media (min-width: 961px) { #screen-project .ap-nav { margin-right: 56px; } }
+@media (max-width: 720px) { .ap-nav { grid-template-columns: minmax(0, 1fr); } }
