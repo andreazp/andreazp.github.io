@@ -68,6 +68,23 @@
   soundBtn.addEventListener("click", () => { Sound.init(); setSound(!Sound.on); Sound.select(); });
   setSound(Sound.on);
 
+  // Light / dark theme (light by default; the choice is remembered in this browser)
+  const themeBtn = $("#theme-toggle");
+  const themeMeta = $('meta[name="theme-color"]');
+  function setTheme(dark) {
+    document.documentElement.dataset.theme = dark ? "dark" : "light";
+    themeBtn.setAttribute("aria-pressed", String(dark));
+    themeBtn.title = dark ? "Switch to light mode" : "Switch to dark mode";
+    themeMeta?.setAttribute("content", dark ? "#141217" : "#f5f2ec");
+    document.dispatchEvent(new Event("themechange"));
+  }
+  themeBtn.addEventListener("click", () => {
+    const dark = document.documentElement.dataset.theme !== "dark";
+    setTheme(dark); storage.set("theme", dark ? "dark" : "light");
+    Sound.init(); Sound.tone(dark ? 520 : 780, 0.12, "sine", 0.05, dark ? 390 : 1040);
+  });
+  setTheme(document.documentElement.dataset.theme === "dark");
+
   /* ================= Basics ================= */
   $("#brand-name").textContent = D.name;
   $("#brand-role").textContent = D.role;
@@ -106,6 +123,35 @@
     }
     return h("span", { class: "w", "aria-hidden": "true", style, text: part });
   }));
+
+  // Headline letters get thinner near the cursor (Bricolage is a variable font, weight 200–800).
+  // Text only gets narrower than its resting width, so lines never re-wrap.
+  if (matchMedia("(hover: hover) and (pointer: fine)").matches && !reduceMotion) {
+    $$(".w", catchEl).forEach(w => {
+      const t = w.firstChild;
+      if (t?.nodeType !== 3) return;
+      t.replaceWith(...[...t.textContent].map(ch => h("span", { class: "ch", text: ch })));
+    });
+    const chars = $$(".ch", catchEl);
+    let mx = -1e4, my = -1e4, raf = 0, centres = [];
+    const measure = () => { centres = chars.map(c => { const r = c.getBoundingClientRect(); return [r.left + r.width / 2, r.top + r.height / 2]; }); };
+    const paint = () => {
+      raf = 0;
+      chars.forEach((c, i) => {
+        const d = Math.hypot(centres[i][0] - mx, centres[i][1] - my);
+        const k = Math.max(0, 1 - d / 220);
+        c.style.fontWeight = Math.round(800 - 560 * k * k);
+      });
+    };
+    $("#screen-title").addEventListener("pointermove", e => {
+      if (!centres.length) measure();
+      mx = e.clientX; my = e.clientY;
+      if (!raf) raf = requestAnimationFrame(paint);
+    });
+    $("#screen-title").addEventListener("pointerleave", () => { mx = my = -1e4; if (!raf) raf = requestAnimationFrame(paint); });
+    addEventListener("resize", () => { centres = []; });
+    $("#screen-title").addEventListener("scroll", () => { centres = []; });
+  }
 
   // Hide sections that have no content.
   if (!D.motion?.reel?.length) D.menu = D.menu.filter(m => m.id !== "motion");
@@ -1002,7 +1048,6 @@
     document.body.dataset.screen = id;
     current = id;
     currentRoute = route;
-    if (id === "title") Arcade.wake(); else Arcade.sleep();
 
     // Navigation state
     const navId = id === "project" ? "projects" : id;
@@ -1230,6 +1275,8 @@
       { x: 0.55, y: 0.9, r: 0.6, c: [20, 184, 166], a: 0.17, sx: 0.00007, sy: 0.0001, p: 4, d: 0.4 }
     ];
     let W = 0, H = 0;
+    let dark = document.documentElement.dataset.theme === "dark";
+    document.addEventListener("themechange", () => { dark = document.documentElement.dataset.theme === "dark"; if (reduceMotion) draw(0); });
     function resize() {
       const dpr = Math.min(devicePixelRatio || 1, 2);
       W = innerWidth; H = innerHeight;
@@ -1240,7 +1287,7 @@
     function draw(t) {
       mouse.x += (mouse.tx - mouse.x) * 0.05;
       mouse.y += (mouse.ty - mouse.y) * 0.05;
-      c.fillStyle = "#f5f2ec";
+      c.fillStyle = dark ? "#141217" : "#f5f2ec";
       c.fillRect(0, 0, W, H);
       const m = Math.max(W, H);
       const party = document.body.classList.contains("party");
@@ -1254,7 +1301,7 @@
           grad.addColorStop(1, `hsla(${hue}, 90%, 60%, 0)`);
         } else {
           const [r, g, bl] = b.c;
-          grad.addColorStop(0, `rgba(${r},${g},${bl},${b.a})`);
+          grad.addColorStop(0, `rgba(${r},${g},${bl},${dark ? b.a * 0.5 : b.a})`);
           grad.addColorStop(1, `rgba(${r},${g},${bl},0)`);
         }
         c.fillStyle = grad;
@@ -1354,227 +1401,6 @@
 
   const SCALE = [523.25, 587.33, 659.25, 783.99, 880, 1046.5, 1174.66, 1318.51];
 
-  // --- Home mini game: "Break the UI" — a tiny brick breaker made of interface pieces ---
-  // Runs in a fixed 800×500 logical space; the canvas is scaled with CSS (aspect-ratio 8/5).
-  const Arcade = (() => {
-    const box = $("#arcade");
-    if (!box) return { wake() {}, sleep() {} };
-    const cv = $("#arcade-canvas"), ctx = cv.getContext("2d");
-    const scoreEl = $("#arcade-score"), bestEl = $("#arcade-best"), livesEl = $("#arcade-lives");
-    const overlay = $("#arcade-overlay"), ovTitle = $("#arcade-ov-title"), ovText = $("#arcade-ov-text");
-    const playBtn = $("#arcade-play"), ovLink = $("#arcade-ov-link");
-    const W = 800, H = 500, COLS = 8, ROWS = 4, GAP = 10, SIDE = 40, TOP = 46, BH = 36;
-    const BW = (W - SIDE * 2 - GAP * (COLS - 1)) / COLS;
-    const COLORS = ["#e5532a", "#f08c00", "#7c6cf0", "#2a62c9"];
-    const LABELS = ["Play", "OK", "★", "Menu", "Back", "♥", "Save", "HP", "XP", "Map", "◀", "▶", "Quit", "Aa", "⚙", "Shop",
-      "Lvl 2", "✦", "Skip", "Go!", "Pause", "Yes", "No", "100%", "Inv", "★★", "Exit", "Load", "+1", "Start", "Help", "?"];
-    const NOTES = [523.25, 587.33, 659.25, 783.99, 880, 1046.5, 1174.66, 1318.51];
-    const SPEED0 = 430, SPEED_MAX = 720;
-
-    let bricks = [], floaters = [], ball, paddle, state = "idle", score = 0, lives = 3, combo = 0;
-    let raf = 0, last = 0, awake = false;
-    const keys = { l: false, r: false };
-    let best = 0;
-    try { best = Number(localStorage.getItem("arcade-best")) || 0; } catch { /* storage blocked */ }
-
-    function scaleCanvas() {
-      const dpr = Math.min(2, window.devicePixelRatio || 1);
-      const w = Math.round(cv.clientWidth * dpr), hh = Math.round(cv.clientHeight * dpr);
-      if (w && (cv.width !== w || cv.height !== hh)) { cv.width = w; cv.height = hh; }
-    }
-    function reset() {
-      bricks = [];
-      for (let r = 0; r < ROWS; r++) for (let c = 0; c < COLS; c++)
-        bricks.push({ x: SIDE + c * (BW + GAP), y: TOP + r * (BH + GAP), color: COLORS[r], label: LABELS[(r * COLS + c) % LABELS.length], dead: 0 });
-      paddle = { x: W / 2, w: 128, h: 14, y: H - 34 };
-      score = 0; lives = 3; combo = 0; floaters = [];
-      serve();
-      hud();
-    }
-    function serve() { ball = { x: paddle.x, y: paddle.y - 12, vx: 0, vy: 0, r: 9, speed: SPEED0 }; state = "serve"; combo = 0; }
-    function launch() {
-      const a = (Math.random() * 0.6 - 0.3) - Math.PI / 2;
-      ball.vx = Math.cos(a) * ball.speed; ball.vy = Math.sin(a) * ball.speed;
-      state = "play"; Sound.tone(660, 0.08, "sine", 0.04, 990);
-    }
-    function hud() {
-      scoreEl.textContent = score;
-      bestEl.textContent = best;
-      livesEl.replaceChildren(...[0, 1, 2].map(i => h("i", { class: i < lives ? "on" : "" })));
-    }
-    function showOverlay(title, text, { btn = "Play", link = false } = {}) {
-      ovTitle.textContent = title; ovText.textContent = text;
-      playBtn.querySelector("span").textContent = btn;
-      ovLink.hidden = !link;
-      overlay.hidden = false;
-    }
-    function toScreen(x, y) { // logical → viewport coordinates, for the page-wide confetti
-      const r = cv.getBoundingClientRect();
-      return [r.left + (x / W) * r.width, r.top + (y / H) * r.height];
-    }
-    function end(won) {
-      state = won ? "won" : "over";
-      if (score > best) { best = score; try { localStorage.setItem("arcade-best", String(best)); } catch { /* ignore */ } }
-      hud();
-      if (won) {
-        FX.rain(180); Sound.start();
-        showOverlay("You broke the whole UI!", `Score ${score}. Good thing I build interfaces for a living.`, { btn: "Play again", link: true });
-      } else {
-        Sound.tone(330, 0.3, "sine", 0.05, 160);
-        showOverlay("Game over", `Score ${score}${score && score === best ? " — new best!" : ""}. One more go?`, { btn: "Play again", link: true });
-      }
-      draw();
-    }
-
-    function step(dt) {
-      const move = 620 * dt;
-      if (keys.l) paddle.x -= move;
-      if (keys.r) paddle.x += move;
-      paddle.x = Math.max(paddle.w / 2, Math.min(W - paddle.w / 2, paddle.x));
-      for (const b of bricks) if (b.dead) b.dead = Math.min(1, b.dead + dt * 5);
-      floaters = floaters.filter(f => (f.t += dt) < 0.8);
-      if (state === "serve") { ball.x = paddle.x; ball.y = paddle.y - 12; return; }
-      if (state !== "play") return;
-
-      for (let s = 0; s < 3; s++) { // sub-steps so the ball can't skip through a brick
-        ball.x += ball.vx * dt / 3; ball.y += ball.vy * dt / 3;
-        if (ball.x < ball.r) { ball.x = ball.r; ball.vx = Math.abs(ball.vx); Sound.bump(); }
-        if (ball.x > W - ball.r) { ball.x = W - ball.r; ball.vx = -Math.abs(ball.vx); Sound.bump(); }
-        if (ball.y < ball.r) { ball.y = ball.r; ball.vy = Math.abs(ball.vy); Sound.bump(); }
-        // paddle: bounce angle depends on where it hits
-        if (ball.vy > 0 && ball.y + ball.r >= paddle.y && ball.y < paddle.y + paddle.h &&
-            Math.abs(ball.x - paddle.x) <= paddle.w / 2 + ball.r) {
-          const k = Math.max(-1, Math.min(1, (ball.x - paddle.x) / (paddle.w / 2)));
-          const a = k * (Math.PI / 3) - Math.PI / 2;
-          ball.vx = Math.cos(a) * ball.speed; ball.vy = Math.sin(a) * ball.speed;
-          ball.y = paddle.y - ball.r; combo = 0;
-          Sound.tone(440, 0.06, "sine", 0.04);
-        }
-        // bricks
-        for (const b of bricks) {
-          if (b.dead) continue;
-          const nx = Math.max(b.x, Math.min(ball.x, b.x + BW)), ny = Math.max(b.y, Math.min(ball.y, b.y + BH));
-          const dx = ball.x - nx, dy = ball.y - ny;
-          if (dx * dx + dy * dy > ball.r * ball.r) continue;
-          // reflect on the side with the smallest overlap
-          const ox = Math.min(ball.x + ball.r - b.x, b.x + BW - (ball.x - ball.r));
-          const oy = Math.min(ball.y + ball.r - b.y, b.y + BH - (ball.y - ball.r));
-          if (ox < oy) ball.vx = ball.x < b.x + BW / 2 ? -Math.abs(ball.vx) : Math.abs(ball.vx);
-          else ball.vy = ball.y < b.y + BH / 2 ? -Math.abs(ball.vy) : Math.abs(ball.vy);
-          b.dead = 0.01; combo++;
-          const pts = 10 * combo;
-          score += pts; hud();
-          floaters.push({ x: b.x + BW / 2, y: b.y + BH / 2, text: `+${pts}`, t: 0, color: b.color });
-          ball.speed = Math.min(SPEED_MAX, ball.speed + 7);
-          const sp = Math.hypot(ball.vx, ball.vy); ball.vx *= ball.speed / sp; ball.vy *= ball.speed / sp;
-          FX.burst(...toScreen(b.x + BW / 2, b.y + BH / 2), 12, { power: 5 });
-          Sound.tone(NOTES[Math.min(combo - 1, NOTES.length - 1)], 0.1, "triangle", 0.04);
-          if (bricks.every(q => q.dead)) { end(true); return; }
-          break;
-        }
-        if (ball.y - ball.r > H) {
-          lives--; hud();
-          if (lives <= 0) { end(false); return; }
-          Sound.tone(300, 0.15, "sine", 0.05, 200);
-          serve(); return;
-        }
-      }
-    }
-
-    function rr(x, y, w, hh, r) { ctx.beginPath(); ctx.roundRect(x, y, w, hh, r); }
-    function draw() {
-      scaleCanvas();
-      const s = cv.width / W;
-      ctx.setTransform(s, 0, 0, s, 0, 0);
-      ctx.clearRect(0, 0, W, H);
-      ctx.textAlign = "center"; ctx.textBaseline = "middle";
-      for (const b of bricks) {
-        if (b.dead >= 1) continue;
-        const k = 1 - b.dead, cx = b.x + BW / 2, cy = b.y + BH / 2;
-        ctx.save();
-        ctx.globalAlpha = k;
-        ctx.translate(cx, cy); ctx.scale(0.6 + 0.4 * k, 0.6 + 0.4 * k);
-        ctx.shadowColor = "rgba(80,50,20,.18)"; ctx.shadowBlur = 10; ctx.shadowOffsetY = 4;
-        rr(-BW / 2, -BH / 2, BW, BH, 10); ctx.fillStyle = b.color; ctx.fill();
-        ctx.shadowColor = "transparent";
-        rr(-BW / 2, -BH / 2, BW, BH / 2, [10, 10, 4, 4]); ctx.fillStyle = "rgba(255,255,255,.14)"; ctx.fill();
-        ctx.fillStyle = "#fff"; ctx.font = "600 14px Inter, system-ui, sans-serif";
-        ctx.fillText(b.label, 0, 1);
-        ctx.restore();
-      }
-      for (const f of floaters) {
-        ctx.globalAlpha = 1 - f.t / 0.8;
-        ctx.fillStyle = f.color; ctx.font = "800 18px 'Bricolage Grotesque', Inter, sans-serif";
-        ctx.fillText(f.text, f.x, f.y - f.t * 50);
-      }
-      ctx.globalAlpha = 1;
-      // paddle
-      ctx.shadowColor = "rgba(28,25,23,.25)"; ctx.shadowBlur = 12; ctx.shadowOffsetY = 4;
-      rr(paddle.x - paddle.w / 2, paddle.y, paddle.w, paddle.h, 7); ctx.fillStyle = "#1c1917"; ctx.fill();
-      // ball
-      ctx.beginPath(); ctx.arc(ball.x, ball.y, ball.r, 0, Math.PI * 2); ctx.fillStyle = "#e5532a"; ctx.fill();
-      ctx.shadowColor = "transparent";
-      if (state === "serve" && overlay.hidden) {
-        ctx.fillStyle = "rgba(28,25,23,.55)"; ctx.font = "500 15px Inter, system-ui, sans-serif";
-        ctx.fillText(matchMedia("(hover: none)").matches ? "Tap to launch" : "Click or press Space to launch", W / 2, H - 80);
-      }
-    }
-    function loop(t) {
-      const dt = Math.min(0.033, (t - last) / 1000 || 0); last = t;
-      step(dt); draw();
-      raf = (awake && (state === "play" || state === "serve")) ? requestAnimationFrame(loop) : 0;
-    }
-    function run() { if (!raf) { last = performance.now(); raf = requestAnimationFrame(loop); } }
-
-    function start() {
-      if (state === "idle" || state === "won" || state === "over") reset(); // otherwise: resuming a paused game
-      overlay.hidden = true; Sound.init(); Sound.select();
-      cv.focus({ preventScroll: true });
-      run();
-    }
-    playBtn.addEventListener("click", start);
-
-    // Mouse / finger moves the paddle
-    const aim = e => {
-      const r = cv.getBoundingClientRect();
-      paddle.x = ((e.clientX - r.left) / r.width) * W;
-      if (state === "serve" && !raf && overlay.hidden) run();
-    };
-    cv.addEventListener("pointermove", aim);
-    cv.addEventListener("pointerdown", e => {
-      aim(e);
-      if (!overlay.hidden) return;
-      if (state === "serve") { launch(); run(); }
-    });
-    // Keyboard, only while the game has focus — so the site's arrow-key navigation is left alone elsewhere
-    cv.addEventListener("keydown", e => {
-      const k = e.key;
-      if (k === "ArrowLeft" || k === "a") keys.l = true;
-      else if (k === "ArrowRight" || k === "d") keys.r = true;
-      else if (k === " " || k === "Enter") { if (state === "serve") launch(); else if (state !== "play") start(); }
-      else return;
-      e.preventDefault(); e.stopPropagation(); run();
-    });
-    cv.addEventListener("keyup", e => {
-      if (e.key === "ArrowLeft" || e.key === "a") keys.l = false;
-      if (e.key === "ArrowRight" || e.key === "d") keys.r = false;
-    });
-    cv.addEventListener("blur", () => { keys.l = keys.r = false; });
-    new ResizeObserver(() => draw()).observe(cv);
-
-    reset(); state = "idle"; hud();
-    showOverlay("Break the UI", "A tiny game, built by hand for this page. Move with your mouse, finger or ← →.");
-    document.fonts?.ready.then(draw);
-
-    return {
-      wake() { awake = true; draw(); },
-      sleep() {
-        awake = false;
-        if (state === "play") { state = "serve"; showOverlay("Paused", "Your game is waiting.", { btn: "Resume" }); }
-      }
-    };
-  })();
-
   // --- Project cards: 3D tilt with a glare that follows the cursor ---
   let tiltCard = null;
   function untilt(card) {
@@ -1635,7 +1461,7 @@
 
   // --- Sparkles when clicking empty space (mouse only, not on touch screens) ---
   document.addEventListener("pointerdown", e => {
-    if (e.pointerType !== "mouse" || modalOpen || e.target.closest("a, button, video, iframe, .panel, .level, .skill, .tab-row, .topbar, .viewer, .arcade")) return;
+    if (e.pointerType !== "mouse" || modalOpen || e.target.closest("a, button, video, iframe, .panel, .level, .skill, .tab-row, .topbar, .viewer")) return;
     FX.burst(e.clientX, e.clientY, 16, { power: 5, size: 5, gravity: 0.12, decay: 0.025, shape: "dot" });
   });
 

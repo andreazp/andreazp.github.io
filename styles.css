@@ -1101,51 +1101,17 @@ main { position: relative; min-height: 0; }
 .ap-head .info-tools { padding: 12px 14px 14px; }
 .ap-next, .ap-next:hover, .ap-more-item { text-decoration: none; color: inherit; }
 
-/* ---------- Home v2: big headline + "Break the UI" mini game + ticker ---------- */
-.home { grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.2fr); }
-#screen-title .title { font-size: clamp(20px, 1.8vw, 26px); font-weight: 600; letter-spacing: -0.02em; }
+/* ---------- Home v3: one huge headline, two buttons, credits ticker ---------- */
+.home { display: flex; flex-direction: column; align-items: flex-start; }
+#screen-title .eyebrow { margin-bottom: 18px; }
+#screen-title .title { font-size: clamp(18px, 1.6vw, 22px); font-weight: 600; letter-spacing: -0.02em; color: var(--muted); }
 #screen-title .catchphrase {
-  margin: 12px 0 0; max-width: 13ch;
-  font-size: clamp(44px, 6vw, 92px); font-weight: 800; line-height: 0.95; letter-spacing: -0.05em;
+  margin: 14px 0 0; max-width: 15ch;
+  font-size: clamp(52px, 9.2vw, 156px); font-weight: 800; line-height: 0.9; letter-spacing: -0.055em;
   color: var(--text);
 }
 #screen-title .catchphrase .hl { color: var(--accent); font-weight: 800; }
-
-.arcade {
-  display: grid; gap: 10px; padding: 12px; min-width: 0;
-  border: 1px solid var(--line); border-radius: 26px; background: var(--panel);
-  box-shadow: 0 40px 90px -40px var(--shadow-color), 0 1px 0 var(--inset) inset;
-  backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-  animation: deal 0.8s var(--spring) 0.3s backwards;
-}
-.arcade-hud {
-  display: flex; align-items: center; gap: 18px; padding: 4px 8px 0;
-  font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums;
-}
-.arcade-name { margin-right: auto; font-family: var(--font-display); font-size: 15px; font-weight: 700; color: var(--text); letter-spacing: -0.02em; }
-.arcade-stat b { margin-left: 4px; font-family: var(--font-display); font-size: 17px; color: var(--text); }
-.arcade-lives { display: flex; gap: 5px; }
-.arcade-lives i { width: 11px; height: 11px; border-radius: 50%; background: var(--line-strong); transition: background 0.3s, scale 0.4s var(--spring); }
-.arcade-lives i.on { background: var(--accent); }
-.arcade-screen {
-  position: relative; overflow: hidden; border-radius: 18px;
-  background: radial-gradient(circle, var(--line) 1px, transparent 1.2px) 0 0 / 22px 22px, var(--panel-solid);
-  border: 1px solid var(--line);
-}
-#arcade-canvas { display: block; width: 100%; aspect-ratio: 8 / 5; touch-action: none; cursor: none; }
-#arcade-canvas:focus-visible { outline: 3px solid var(--focus); outline-offset: -3px; }
-.arcade-overlay {
-  position: absolute; inset: 0; display: grid; place-content: center; justify-items: center; gap: 10px;
-  padding: 24px; text-align: center;
-  background: rgba(255, 253, 249, 0.72); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
-  animation: fade 0.3s both;
-}
-.arcade-overlay[hidden] { display: none; }
-.arcade-ov-title { margin: 0; font-family: var(--font-display); font-size: clamp(30px, 3.6vw, 48px); font-weight: 800; letter-spacing: -0.045em; line-height: 1; }
-.arcade-ov-text { margin: 0 0 8px; max-width: 34ch; color: var(--muted); }
-.arcade-ov-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
-.arcade-ov-actions .btn { min-height: 52px; padding: 0 22px; }
-.arcade-ov-actions .btn[hidden] { display: none; }
+#screen-title .catchphrase .ch { transition: font-weight 0.3s var(--ease); }
 
 .ticker {
   margin-top: clamp(28px, 6vh, 56px); overflow: hidden; padding: 14px 0;
@@ -1161,11 +1127,6 @@ main { position: relative; min-height: 0; }
 @keyframes ticker { to { transform: translateX(-50%); } }
 @media (prefers-reduced-motion: reduce) { .ticker-track { animation: none; } }
 
-@media (max-width: 860px) {
-  .home { grid-template-columns: minmax(0, 1fr); }
-  .arcade { padding: 8px; border-radius: 20px; }
-  .arcade-hud { gap: 12px; }
-}
 .ticker { flex: none; }
 
 /* ---------- Icon board (e.g. ArgentXR icon set) ---------- */
@@ -1223,3 +1184,43 @@ main { position: relative; min-height: 0; }
   .ib-focus { position: static; grid-template-columns: auto 1fr; justify-items: start; text-align: left; padding: 14px; }
   .ib-focus-art, .ib-glyph.big { width: 72px; height: 72px; }
 }
+
+/* ---------- Dark mode (toggle in the top bar; saved per browser) ---------- */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #141217;
+  --bg-2: #1e1b22;
+  --panel: rgba(255, 255, 255, 0.05);
+  --panel-solid: #1f1c23;
+  --panel-hover: rgba(255, 255, 255, 0.1);
+  --line: rgba(255, 255, 255, 0.1);
+  --line-strong: rgba(255, 255, 255, 0.2);
+  --text: #f4efe8;
+  --muted: #bab2a9;
+  --faint: #978e85;
+  --accent: #ff6a3d;
+  --accent-text: #ff8c66;
+  --accent-soft: rgba(255, 106, 61, 0.15);
+  --shadow-color: rgba(0, 0, 0, 0.55);
+  --inset: rgba(255, 255, 255, 0.06);
+  --glow: rgba(0, 0, 0, 0.5);
+  --backdrop: rgba(20, 18, 23, 0.75);
+  --chip-bg: rgba(255, 255, 255, 0.08);
+  --glare: rgba(255, 255, 255, 0.1);
+  --focus: #f4efe8;
+}
+:root[data-theme="dark"] .grain { opacity: 0.08; }
+:root[data-theme="dark"] .cta-btn, :root[data-theme="dark"] .level-ribbon { background: #c9441b; border-color: #c9441b; color: #fff; }
+:root[data-theme="dark"] .cta-btn:hover, :root[data-theme="dark"] .cta-btn.selected { background: #e5532a; border-color: #e5532a; }
+:root[data-theme="dark"] .iconboard[data-bg="dark"] { box-shadow: 0 0 0 1px var(--line), 0 30px 70px -36px var(--shadow-color); }
+
+.theme-icon { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; transition: rotate 0.5s var(--spring); }
+.theme-icon.sun, :root[data-theme="dark"] .theme-icon.moon { display: none; }
+:root[data-theme="dark"] .theme-icon.sun { display: block; }
+#theme-toggle:hover .theme-icon { rotate: -20deg; }
+body, .topbar, .panel { transition: background-color 0.4s var(--ease), color 0.4s var(--ease), border-color 0.4s var(--ease); }
+/* home: tighter stack; headline sized by both width and height so the buttons stay above the fold */
+.home { gap: 0; }
+#screen-title .eyebrow { margin-bottom: 14px; }
+#screen-title .catchphrase { margin-top: 10px; font-size: clamp(46px, min(8.6vw, 12.5vh), 150px); }
+#screen-title .title-actions { margin-top: clamp(24px, 4.5vh, 44px); }

@@ -11,6 +11,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,200..800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
+  <script>try { if (localStorage.getItem("theme") === "dark") document.documentElement.dataset.theme = "dark"; } catch (e) {}</script>
 </head>
 <body data-input="pointer">
   <a class="skip-link" href="#main">Skip to content</a>
@@ -20,7 +21,7 @@
 
   <div class="frame">
     <header class="topbar" id="topbar">
-      <a class="brand" href="#menu" data-goto="menu" data-nav>
+      <a class="brand" href="#title" data-goto="title" data-nav>
         <img class="brand-logo" src="assets/logo.png" alt="" width="44" height="24">
         <span class="brand-text"><strong id="brand-name"></strong><small id="brand-role"></small></span>
       </a>
@@ -31,6 +32,11 @@
 
       <div class="topbar-actions">
         <span class="status-chip"><i class="dot" aria-hidden="true"></i><span id="availability"></span></span>
+        <button class="icon-btn" id="theme-toggle" aria-pressed="false">
+          <svg class="theme-icon sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M4.6 4.6 6 6M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4 6 18M18 6l1.4-1.4"/></svg>
+          <svg class="theme-icon moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z"/></svg>
+          <span class="sr-only">Dark mode</span>
+        </button>
         <button class="icon-btn" id="sound-toggle" aria-pressed="true">
           <span class="sound-icon" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
           <span class="sr-only">Sound effects</span>
@@ -46,37 +52,14 @@
       <!-- TITLE -->
       <section class="screen" id="screen-title" data-screen="title" aria-labelledby="title-name">
         <div class="home">
-          <div class="title-wrap">
-            <p class="eyebrow" id="title-eyebrow"></p>
-            <h1 class="title" id="title-name"></h1>
-            <p class="catchphrase" id="title-catch"></p>
-            <div class="title-actions">
-              <a class="press-start" href="#menu" data-goto="menu" data-nav>Explore my work</a>
-              <a class="btn" href="#cv" data-goto="cv" data-nav>Read my CV</a>
-            </div>
-            <p class="title-hint" aria-hidden="true">or press <kbd>Enter</kbd></p>
+          <p class="eyebrow" id="title-eyebrow"></p>
+          <h1 class="title" id="title-name"></h1>
+          <p class="catchphrase" id="title-catch"></p>
+          <div class="title-actions">
+            <a class="press-start" href="#menu" data-goto="menu" data-nav>Explore my work</a>
+            <a class="btn" href="#cv" data-goto="cv" data-nav>Read my CV</a>
           </div>
-
-          <!-- Mini game: "Break the UI" -->
-          <div class="arcade" id="arcade">
-            <div class="arcade-hud" aria-hidden="true">
-              <span class="arcade-name">Break the UI</span>
-              <span class="arcade-stat">Score <b id="arcade-score">0</b></span>
-              <span class="arcade-lives" id="arcade-lives"></span>
-              <span class="arcade-stat">Best <b id="arcade-best">0</b></span>
-            </div>
-            <div class="arcade-screen">
-              <canvas id="arcade-canvas" tabindex="0" aria-label="Break the UI, a small brick breaker game. Left and right arrows move, Space launches the ball."></canvas>
-              <div class="arcade-overlay" id="arcade-overlay">
-                <p class="arcade-ov-title" id="arcade-ov-title"></p>
-                <p class="arcade-ov-text" id="arcade-ov-text"></p>
-                <div class="arcade-ov-actions">
-                  <button class="press-start" id="arcade-play" data-nav><span>Play</span></button>
-                  <a class="btn" id="arcade-ov-link" href="#projects" data-goto="projects" data-nav hidden>See my projects</a>
-                </div>
-              </div>
-            </div>
-          </div>
+          <p class="title-hint" aria-hidden="true">or press <kbd>Enter</kbd></p>
         </div>
         <div class="ticker" id="ticker" aria-hidden="true"></div>
         <p class="title-foot">© <span id="year"></span> · Built by hand — HTML, CSS, JS</p>
