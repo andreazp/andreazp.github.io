@@ -107,12 +107,12 @@
     h("span", { class: "word", "aria-hidden": "true", style: `--i:${wi}`, text: word })
   ]).filter(Boolean));
 
-  // Catchphrase: words rise in after the name; *word* gets the accent + a drawn underline.
+  // Catchphrase: words rise in after the name; *word* gets the accent + a drawn underline; \n forces a line break.
   const catchEl = $("#title-catch");
   const phrase = D.catchphrase ?? "";
-  catchEl.setAttribute("aria-label", phrase.replace(/\*/g, ""));
+  catchEl.setAttribute("aria-label", phrase.replace(/\*/g, "").replace(/\s*\n\s*/g, " "));
   catchEl.replaceChildren(...phrase.split(/(\*[^*]+\*|\s+)/).filter(Boolean).map((part, i, all) => {
-    if (/^\s+$/.test(part)) return document.createTextNode(" ");
+    if (/^\s+$/.test(part)) return part.includes("\n") ? h("br") : document.createTextNode(" ");
     const wi = all.slice(0, i).filter(p => !/^\s+$/.test(p)).length;
     const style = `--i:${wi}; --n:${D.name.length}`;
     if (part.startsWith("*")) {

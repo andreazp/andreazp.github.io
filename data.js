@@ -18,8 +18,8 @@ window.PORTFOLIO = {
 
   name: "Andrea Zamudio",
   role: "UI Artist & Programmer",
-  // Shown big on the title screen. Wrap one word in *asterisks* to highlight it.
-  catchphrase: "Interfaces you can *feel* — designed and coded by hand.", // PLACEHOLDER
+  // Shown big on the title screen. Wrap one word in *asterisks* to highlight it; \n starts a new line.
+  catchphrase: "UI that looks good,\nand *feels* good.\nFrom design to code.",
   availability: "Open to work",         // shown in the top HUD
   // Scrolling strip at the bottom of the home page — clients, highlights and awards.
   ticker: [
