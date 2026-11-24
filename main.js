@@ -734,7 +734,10 @@
 
     // Highlights: each point becomes a card with a short title and optional image/video.
     // A point is a string, or { title, text, media }. Cards with details open in the lightbox.
-    const sections = (p.sections ?? []).map((s, si) => ({
+    // A project can be split into `parts` (e.g. the Grayscale page: ClinicVET, ArgentXR…), each with its own sections.
+    const parts = p.parts?.length ? p.parts : null;
+    const rawSections = parts ? parts.flatMap(pt => (pt.sections ?? []).map(s => ({ ...s, part: pt.id }))) : (p.sections ?? []);
+    const sections = rawSections.map((s, si) => ({
       ...s, hue: (p.hue ?? 200) + si * 28,
       points: (s.points ?? []).map(pt => ({ ...(typeof pt === "string" ? { text: pt } : pt), hue: (p.hue ?? 200) + si * 28, section: s.title }))
     }));
@@ -761,12 +764,51 @@
       return h("li", {}, b);
     };
 
+    const renderSection = s => h("section", { class: s.featured ? "project-section featured" : "project-section" },
+      h("h3", {}, h("span", { text: s.title }), h("small", { text: String(s.points.length) })),
+      s.intro ? h("p", { class: "section-intro", text: s.intro }) : null,
+      s.icons?.files?.length ? iconBoard(s.icons) : null,
+      h("ul", { class: "highlights" }, ...s.points.map(card)));
+
+    // Media inside a part: images zoom in the lightbox, videos play in place
+    const partMedia = (m, list) => {
+      if (kindOf(m.src) === "image") {
+        const b = h("button", { class: "stack-img", "data-nav": true, "aria-label": `View full size: ${m.caption || p.title}` },
+          h("img", { src: m.src, alt: m.alt ?? m.caption ?? "", loading: "lazy" }));
+        const imgs = list.filter(x => kindOf(x.src) === "image");
+        b.addEventListener("click", () => openLightbox(imgs.map(x => ({
+          render: () => h("img", { src: x.src, alt: x.alt ?? x.caption ?? "" }), kicker: p.title, title: x.caption ?? "", note: x.note ?? ""
+        })), imgs.indexOf(m)));
+        return h("figure", { class: "stack-item" }, b, m.caption ? h("figcaption", { text: m.caption }) : null);
+      }
+      return h("figure", { class: "stack-item" }, h("div", { class: "stack-media" }, mediaEl(m, 0)),
+        m.caption ? h("figcaption", { text: m.caption }) : null);
+    };
+    const renderPart = (pt, i) => {
+      const own = sections.filter(s => s.part === pt.id);
+      const empty = !own.length && !pt.media?.length && !pt.icons?.files?.length;
+      return h("section", { class: "part", id: `part-${pt.id}`, style: `--i:${i}` },
+        h("header", { class: "part-head" },
+          h("span", { class: "part-num", "aria-hidden": "true", text: String(i + 1).padStart(2, "0") }),
+          h("div", {},
+            pt.tag ? h("p", { class: "eyebrow", text: pt.tag }) : null,
+            h("h2", { class: "part-title", text: pt.title }))),
+        pt.intro ? h("p", { class: "part-intro", text: pt.intro }) : null,
+        pt.media?.length ? h("div", { class: "part-media" }, ...pt.media.map(m => partMedia(m, pt.media))) : null,
+        pt.icons?.files?.length ? iconBoard(pt.icons) : null,
+        ...own.map(renderSection),
+        empty ? h("p", { class: "part-empty", text: "More coming soon." }) : null);
+    };
+    const partNav = parts && h("nav", { class: "part-nav", "aria-label": "Projects on this page" },
+      ...parts.map((pt, i) => {
+        const b = h("button", { class: "part-chip", "data-nav": true },
+          h("small", { text: String(i + 1).padStart(2, "0") }), h("span", { text: pt.title }));
+        b.addEventListener("click", () => $(`#part-${pt.id}`)?.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "start" }));
+        return b;
+      }));
+
     $("#project-desc").replaceChildren(
-      ...sections.map(s => h("section", { class: s.featured ? "project-section featured" : "project-section" },
-        h("h3", {}, h("span", { text: s.title }), h("small", { text: String(s.points.length) })),
-        s.intro ? h("p", { class: "section-intro", text: s.intro }) : null,
-        s.icons?.files?.length ? iconBoard(s.icons) : null,
-        h("ul", { class: "highlights" }, ...s.points.map(card)))),
+      ...(parts ? [partNav, ...parts.map(renderPart)] : sections.map(renderSection)),
       ...(mainLink ? [h("aside", { class: "cta-banner" },
         h("div", {},
           h("p", { class: "cta-banner-title", text: p.ctaTitle ?? "Try it yourself" }),
