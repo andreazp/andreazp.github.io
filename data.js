@@ -300,7 +300,7 @@ window.PORTFOLIO = {
     {
       id: "grayscale",
       title: "ClinicVET & more at Grayscale Interactive",
-      year: "2023 — Present",
+      year: "2023 — 2026",
       category: "ui",
       hue: 200,
       cover: "assets/projects/clinicvet/hero.webp",
@@ -312,28 +312,37 @@ window.PORTFOLIO = {
       description: [
         "Grayscale Interactive is a studio in Querétaro, Mexico, that builds VR training, AR and interactive 3D experiences for clients across North America. I work as part of its team on UI/UX design and programming in Unity and Unreal Engine."
       ],
-      sections: [
+      // The page is split into parts, each with its own header, intro, media, icons and card sections.
+      parts: [
         {
-          title: "ClinicVET · 3D veterinary app for NUPEC", featured: true,
+          id: "clinicvet", title: "ClinicVET", tag: "3D veterinary app · for NUPEC",
           intro: "ClinicVET gives veterinarians interactive 3D anatomy, side-by-side condition comparisons and annotations to help them explain a dog’s health to its owner. It works as a visual communication aid, not a diagnostic tool, and runs on desktop, tablet and mobile. The app was built by the Grayscale Interactive team, and I was responsible for all of its UI.",
-          points: [
-            { title: "Complete UI design", text: "Designed the complete user interface.", media: "assets/projects/clinicvet/devices.webp" },
-            { title: "UI programming in Unreal", text: "Programmed all of the UI in Unreal Engine, including custom Blueprints." },
-            { title: "Firebase integration", text: "Connected parts of the UI to Firebase." }
+          sections: [
+            {
+              title: "My part", featured: true,
+              points: [
+                { title: "Complete UI design", text: "Designed the complete user interface.", media: "assets/projects/clinicvet/devices.webp" },
+                { title: "UI programming in Unreal", text: "Programmed all of the UI in Unreal Engine, including custom Blueprints." },
+                { title: "Firebase integration", text: "Connected parts of the UI to Firebase." }
+              ]
+            },
+            {
+              title: "What ClinicVET does",
+              points: [
+                { title: "Male & female anatomy", text: "Starts from a dog model that can switch between male and female anatomy.", media: "assets/projects/clinicvet/hero.webp" },
+                { title: "Exterior to organs", text: "Moves from the exterior to the skeleton and organ systems, with rotate, zoom and pan." },
+                { title: "Condition comparisons", text: "Shows common clinical conditions with the affected organ next to a healthy reference." },
+                { title: "Draw & save notes", text: "Lets the vet write or draw directly over the model and save the annotated images for later consultations." }
+              ]
+            }
           ]
         },
         {
-          title: "What ClinicVET does",
-          points: [
-            { title: "Male & female anatomy", text: "Starts from a dog model that can switch between male and female anatomy.", media: "assets/projects/clinicvet/hero.webp" },
-            { title: "Exterior to organs", text: "Moves from the exterior to the skeleton and organ systems, with rotate, zoom and pan." },
-            { title: "Condition comparisons", text: "Shows common clinical conditions with the affected organ next to a healthy reference." },
-            { title: "Draw & save notes", text: "Lets the vet write or draw directly over the model and save the annotated images for later consultations." }
-          ]
-        },
-        {
-          title: "ArgentXR",
-          intro: "Grayscale’s browser-based platform for turning 3D and CAD models into interactive web and augmented reality experiences, with no coding and no app downloads. Free public beta, November 2026. My part:",
+          id: "argentxr", title: "ArgentXR", tag: "Web & AR platform · Grayscale Interactive",
+          intro: "Grayscale’s browser-based platform for turning 3D and CAD models into interactive web and augmented reality experiences, with no coding and no app downloads. Free public beta, November 2026.",
+          media: [
+            { src: "assets/projects/argent-xr/editor.webp", caption: "ArgentXR editor" }
+          ],
           // Interactive icon board. Files are `${path}${prefix}${name}.svg` — remove a name to hide that icon.
           icons: {
             title: "ArgentXR icon set",
@@ -341,30 +350,52 @@ window.PORTFOLIO = {
             files: ["actions", "actionsSquare", "actionsSquare2", "animation1", "animation2", "cam", "camSpeed", "camSquare",
               "component", "cube", "cursor", "cut", "cutSquare", "directionalLight", "enterFullscreen", "exitFullscreen",
               "explode", "explodeSquare", "farClipping", "focus", "fov", "fovSquare", "gizmo", "library1", "library2",
-              "library3", "library4", "lightning", "materials", "nearClipping", "newPalette", "newPalette2", "palette1",
-              "palette2", "palette3", "rotate", "running", "seated", "send", "standing", "starterLibrary1", "starterLibrary2",
+              "library3", "library4", "lightning", "materials", "nearClipping", "newPalette", "newPalette2",
+              "rotate", "running", "seated", "send", "standing", "starterLibrary1", "starterLibrary2",
               "starterLibrary3", "sync", "timing", "translate", "uiActor", "viewfinder", "wireframe", "xray"]
           },
-          points: [
-            "Icon design",
-            { title: "Motion animations", text: "Motion graphics I animated for the ArgentXR page.", media: "assets/projects/argent-xr/join.gif" },
-            "Splash screens",
-            "UI proposals"
-            // TODO: add media, e.g. { text: "Icon design", media: "assets/projects/argent-xr/icons.png" }
+          sections: [
+            {
+              title: "My part",
+              points: [
+                "Icon design",
+                { title: "Motion animations", text: "Motion graphics I animated for the ArgentXR page.", media: "assets/projects/argent-xr/join.gif" },
+                "Splash screens",
+                "UI proposals"
+                // TODO: add media, e.g. { text: "Icon design", media: "assets/projects/argent-xr/icons.png" }
+              ]
+            }
           ]
         },
         {
+          id: "the-explant", title: "The Explant",
+          tag: "",        // TODO: what it is / who it's for, e.g. "VR training · for …"
+          intro: "",      // TODO: one or two sentences about the project
+          media: [],      // TODO: e.g. { src: "assets/projects/the-explant/01.mp4", caption: "…" }
+          sections: [
+            // { title: "My part", points: [ { title: "…", text: "…", media: "…" } ] }
+          ]
+        },
+        {
+          id: "unreal-ui", title: "Custom UI for Unreal Engine", tag: "Widgets, Blueprints & tools",
+          intro: "",      // TODO: e.g. "Reusable UI widgets and Blueprint tools I built for the studio's Unreal projects."
+          media: [],
+          sections: [
+            // { title: "Widgets", points: [ { title: "…", text: "…", media: "assets/projects/unreal-ui/….mp4" } ] }
+          ]
+        }
+        /* {
           title: "Other projects",
           points: [
             { title: "Ford · UI assets", text: "Ford: UI assets for EV Cooling System Diagnostics." }   // TODO: confirm project
             // TODO: add the other projects you worked on
           ]
-        }
+        }*/
       ],
       media: [
-        { src: "assets/projects/clinicvet/preview.mp4", poster: "assets/projects/clinicvet/preview-poster.webp", caption: "ClinicVET · app preview" },
-        { src: "assets/projects/argent-xr/join.gif", caption: "ArgentXR · motion graphics for the page" },
-        { src: "assets/projects/grayscale/ford.webp", caption: "Ford" }
+        { src: "assets/projects/clinicvet/preview.mp4", poster: "assets/projects/clinicvet/preview-poster.webp", caption: "ClinicVET · App preview" },
+        { src: "assets/projects/argent-xr/intro.mp4", caption: "ArgentXR · Motion graphics for the page" }
+        /*{ src: "assets/projects/grayscale/ford.webp", caption: "Ford" }*/
       ]
     },
     {
@@ -444,7 +475,11 @@ window.PORTFOLIO = {
     }
   ],
 
-  // level: 0–100 — PLACEHOLDER levels, adjust to taste. Notes come from the CV.
+  // Toolbox on the Skills screen: every tool listed in your projects and motion pieces is added
+  // automatically; put any extra tools here.
+  toolbox: ["Figma", "Procreate", "Autodesk Maya"],
+
+  // Skills screen: one card per group. `note` is the proof shown under each skill. (`level` is no longer shown.)
   skills: [
     {
       group: "UI & UX",
@@ -482,7 +517,7 @@ window.PORTFOLIO = {
   ],
 
   contact: {
-    lead: "Got a game that needs an interface? Send a message — I usually reply within a day.",
+    lead: "Got a game, a website, or a project that needs an interface? Send a message.",
     email: "andrea.zpalafox@gmail.com",
     links: [
       { label: "LinkedIn", url: "https://www.linkedin.com/in/andreazpalafox" },
