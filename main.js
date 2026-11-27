@@ -164,6 +164,49 @@
   const menuBtn = $("#menu-btn");
   $("#site-nav-list").append(...D.menu.map(m =>
     h("li", {}, h("a", { href: `#${m.id}`, "data-goto": m.id, "data-nav": true, class: "nav-link", text: m.label }))));
+  // Home has no top menu: the same sections are big buttons next to the catchphrase.
+  const HOME_ICONS = {
+    projects: '<rect x="4" y="4" width="7" height="7" rx="2"/><rect x="13" y="4" width="7" height="7" rx="2"/><rect x="4" y="13" width="7" height="7" rx="2"/><rect x="13" y="13" width="7" height="7" rx="2"/>',
+    ui: '<rect x="3" y="4.5" width="18" height="15" rx="3"/><path d="M3 9h18M8.5 9v10.5"/>',
+    motion: '<circle cx="12" cy="12" r="9"/><path d="M10 8.5v7l6-3.5z"/>',
+    illustration: '<path d="M4 20l4.5-1 10-10a2.1 2.1 0 0 0-3-3l-10 10zM14 7l3 3"/>',
+    skills: '<path d="M12 3l2.2 5.6 5.8.9-4.5 3.8L17 19l-5-3-5 3 1.5-5.7L4 9.5l5.8-.9z"/>',
+    cv: '<path d="M7 3h7l5 5v13H7zM14 3v5h5M10 13h6M10 17h6"/>',
+    contact: '<rect x="3" y="5" width="18" height="14" rx="3"/><path d="m4 7 8 6 8-6"/>'
+  };
+  const HUES = [14, 265, 330, 40, 160, 200, 95];
+  $("#home-links").append(...D.menu.map((m, i) => {
+    const ico = h("span", { class: "home-link-icon", "aria-hidden": "true" });
+    ico.innerHTML = `<svg viewBox="0 0 24 24">${HOME_ICONS[m.id] ?? '<circle cx="12" cy="12" r="8"/>'}</svg>`;
+    const a = h("a", { href: `#${m.id}`, "data-goto": m.id, "data-nav": true, class: i ? "home-link" : "home-link primary", style: `--h:${HUES[i % HUES.length]}` },
+      ico,
+      h("span", { class: "home-link-text" }, h("strong", { text: m.label }), m.short ? h("small", { text: m.short }) : null),
+      h("span", { class: "home-link-arrow", "aria-hidden": "true" }, h("span", { text: "→" })));
+    if (m.preview) a.dataset.preview = m.preview;
+    return h("li", { style: `--i:${i}` }, a);
+  }));
+  // Hovering a button with a `preview` shows that image next to the cursor.
+  if (matchMedia("(hover: hover) and (pointer: fine)").matches) {
+    const peek = h("div", { class: "home-peek", "aria-hidden": "true" }, h("img", { alt: "" }));
+    $("#screen-title").append(peek);
+    let px = 0, py = 0, tx = 0, ty = 0, peekRaf = 0;
+    const follow = () => {
+      px += (tx - px) * 0.18; py += (ty - py) * 0.18;
+      peek.style.translate = `${px}px ${py}px`;
+      peekRaf = Math.abs(tx - px) + Math.abs(ty - py) > 0.5 ? requestAnimationFrame(follow) : 0;
+    };
+    $("#home-links").addEventListener("pointermove", e => {
+      const src = e.target.closest(".home-link")?.dataset.preview;
+      if (!src) { peek.classList.remove("on"); return; }
+      if (peek.firstChild.getAttribute("src") !== src) peek.firstChild.src = src;
+      // sits just left of the buttons and follows the cursor up and down — never over a button
+      const col = $("#home-links").getBoundingClientRect();
+      tx = col.left - peek.offsetWidth - 28; ty = Math.min(Math.max(e.clientY - peek.offsetHeight / 2, 12), innerHeight - peek.offsetHeight - 12);
+      if (!peek.classList.contains("on")) { px = tx; py = ty; peek.classList.add("on"); }
+      if (!peekRaf) peekRaf = requestAnimationFrame(follow);
+    });
+    $("#home-links").addEventListener("pointerleave", () => peek.classList.remove("on"));
+  }
 
   let navOpen = false;
   function setNavOpen(open, { focus = true } = {}) {
@@ -645,22 +688,24 @@
     return coverCanvas(p.id, p.hue);
   }
 
+  // A project belongs to a category through `category` or any of its `tags` (e.g. a game with tags: ["ui"]).
+  const inCategory = (p, id) => p.category === id || (p.tags ?? []).includes(id);
   function renderGrid() {
-    const list = D.projects.filter(p => filter === "all" || p.category === filter);
-    grid.replaceChildren(...list.map((p, i) => {
-      const card = h("a", { class: "level", href: `#projects/${p.id}`, "data-goto": `projects/${p.id}`, "data-nav": true },
-        h("span", { class: "level-art" }, projectCover(p),
-          p.media?.length ? h("span", { class: "level-num", text: `${p.media.length} ${p.media.length === 1 ? "item" : "items"}` }) : null,
-          p.ribbon ? h("span", { class: "level-ribbon", text: p.ribbon }) : null),
-        h("span", { class: "level-info" },
-          h("h3", { text: p.title }),
-          h("span", { class: "level-summary", text: p.summary }),
-          h("span", { class: "level-meta" },
-            h("span", { text: [labelFor(p.category), p.year].filter(Boolean).join(" · ") }),
-            h("span", { class: "level-cta", "aria-hidden": "true", text: "Open →" }))));
-      card.style.animationDelay = `${i * 60}ms`;
-      return card;
-    }));
+    grid.replaceChildren(...D.projects.filter(p => filter === "all" || inCategory(p, filter)).map(projectCard));
+  }
+  function projectCard(p, i) {
+    const card = h("a", { class: "level", href: `#projects/${p.id}`, "data-goto": `projects/${p.id}`, "data-nav": true },
+      h("span", { class: "level-art" }, projectCover(p),
+        p.media?.length ? h("span", { class: "level-num", text: `${p.media.length} ${p.media.length === 1 ? "item" : "items"}` }) : null,
+        p.ribbon ? h("span", { class: "level-ribbon", text: p.ribbon }) : null),
+      h("span", { class: "level-info" },
+        h("h3", { text: p.title }),
+        h("span", { class: "level-summary", text: p.summary }),
+        h("span", { class: "level-meta" },
+          h("span", { text: [labelFor(p.category), p.year].filter(Boolean).join(" · ") }),
+          h("span", { class: "level-cta", "aria-hidden": "true", text: "Open →" }))));
+    card.style.animationDelay = `${i * 60}ms`;
+    return card;
   }
 
   // --- Project page ---
@@ -717,6 +762,60 @@
     return [...facts, ...tools];
   }
 
+  // A project's highlight sections, with every point normalised to { title?, text, media?, hue, section, kicker, tags }.
+  // A project can be split into `parts` (each with its own sections).
+  function projectSections(p) {
+    const raw = p.parts?.length ? p.parts.flatMap(pt => (pt.sections ?? []).map(s => ({ ...s, part: pt.id }))) : (p.sections ?? []);
+    return raw.map((s, si) => {
+      const hue = (p.hue ?? 200) + si * 28;
+      return { ...s, hue, points: (s.points ?? []).map(pt => {
+        const c = typeof pt === "string" ? { text: pt } : pt;
+        return { ...c, hue, section: s.title, kicker: `${p.title} · ${s.title}`, project: p, portrait: c.portrait ?? s.portrait, screens: c.screens ?? s.screens, tags: [...(s.tags ?? []), ...(c.tags ?? [])] };
+      }) };
+    });
+  }
+
+  // Highlight cards: a short title and optional image/video. Cards with details open in the lightbox,
+  // which steps through every detailed card of the same deck. Returns card(point, number?) → <li>.
+  function cardDeck(points) {
+    const detailed = points.filter(c => c.media || (c.title && c.text));
+    const openCard = c => openLightbox(detailed.map(d => ({
+      render: () => !d.media ? coverCanvas(d.title ?? d.text, d.hue)
+        : kindOf(d.media) === "video"
+          ? Object.assign(h("video", { src: d.media, controls: true, autoplay: true, loop: true, playsinline: true }), { muted: true })
+          : h("img", { src: d.media, alt: d.alt ?? d.title ?? d.text }),
+      kicker: d.kicker, title: d.title ?? "", note: d.text ?? ""
+    })), detailed.indexOf(c));
+    let n = 0;
+    return (c, num) => {
+      n++;
+      const title = c.title ?? c.text;
+      const art = c.media
+        ? (kindOf(c.media) === "video" ? ambientVideo(c.media, c.poster) : h("img", { src: c.media, alt: "", loading: "lazy" }))
+        : h("span", { class: "hl-num", "aria-hidden": "true", text: String(typeof num === "number" ? num : n).padStart(2, "0") });
+      const artBox = h("span", { class: `hl-art${c.media ? " has-media" : ""}` }, art);
+      const inner = [artBox, h("span", { class: "hl-title", text: title })];
+      // screenshots: the card takes the image's own shape (tall for phone screens, wide for landscape)
+      if (c.screens && art.tagName === "IMG") {
+        const fit = () => {
+          if (!art.naturalWidth) return;
+          artBox.style.aspectRatio = `${art.naturalWidth} / ${art.naturalHeight}`;
+          // the row layout sizes each card by its screenshot's width / height
+          const li = artBox.closest("li");
+          li?.style.setProperty("--r", (art.naturalWidth / art.naturalHeight).toFixed(4));
+          li?.classList.toggle("wide", art.naturalWidth > art.naturalHeight);
+        };
+        art.loading = "eager";
+        if (art.complete) requestAnimationFrame(fit); else art.addEventListener("load", fit, { once: true });
+      }
+      if (!detailed.includes(c)) return h("li", {}, h("div", { class: c.portrait ? "hl-card tall" : "hl-card", style: `--h:${c.hue}` }, ...inner));
+      const b = h("button", { class: c.portrait ? "hl-card is-open tall" : "hl-card is-open", style: `--h:${c.hue}`, "data-nav": true, "aria-label": `${title}: show details` },
+        ...inner, h("span", { class: "hl-more", "aria-hidden": "true", text: "+" }));
+      b.addEventListener("click", () => openCard(c));
+      return h("li", {}, b);
+    };
+  }
+
   function renderProject(p) {
     currentProject = p;
     $("#project-kicker").textContent = labelFor(p.category) ?? "";
@@ -734,41 +833,16 @@
 
     // Highlights: each point becomes a card with a short title and optional image/video.
     // A point is a string, or { title, text, media }. Cards with details open in the lightbox.
-    // A project can be split into `parts` (e.g. the Grayscale page: ClinicVET, ArgentXR…), each with its own sections.
     const parts = p.parts?.length ? p.parts : null;
-    const rawSections = parts ? parts.flatMap(pt => (pt.sections ?? []).map(s => ({ ...s, part: pt.id }))) : (p.sections ?? []);
-    const sections = rawSections.map((s, si) => ({
-      ...s, hue: (p.hue ?? 200) + si * 28,
-      points: (s.points ?? []).map(pt => ({ ...(typeof pt === "string" ? { text: pt } : pt), hue: (p.hue ?? 200) + si * 28, section: s.title }))
-    }));
-    const detailed = sections.flatMap(s => s.points).filter(c => c.media || (c.title && c.text));
-    const openCard = c => openLightbox(detailed.map(d => ({
-      render: () => !d.media ? coverCanvas(d.title ?? d.text, d.hue)
-        : kindOf(d.media) === "video"
-          ? Object.assign(h("video", { src: d.media, controls: true, autoplay: true, loop: true, playsinline: true }), { muted: true })
-          : h("img", { src: d.media, alt: d.alt ?? d.title ?? d.text }),
-      kicker: `${p.title} · ${d.section}`, title: d.title ?? "", note: d.text ?? ""
-    })), detailed.indexOf(c));
-    let n = 0;
-    const card = c => {
-      n++;
-      const title = c.title ?? c.text;
-      const art = c.media
-        ? (kindOf(c.media) === "video" ? ambientVideo(c.media, c.poster) : h("img", { src: c.media, alt: "", loading: "lazy" }))
-        : h("span", { class: "hl-num", "aria-hidden": "true", text: String(n).padStart(2, "0") });
-      const inner = [h("span", { class: `hl-art${c.media ? " has-media" : ""}` }, art), h("span", { class: "hl-title", text: title })];
-      if (!detailed.includes(c)) return h("li", {}, h("div", { class: "hl-card", style: `--h:${c.hue}` }, ...inner));
-      const b = h("button", { class: "hl-card is-open", style: `--h:${c.hue}`, "data-nav": true, "aria-label": `${title}: show details` },
-        ...inner, h("span", { class: "hl-more", "aria-hidden": "true", text: "+" }));
-      b.addEventListener("click", () => openCard(c));
-      return h("li", {}, b);
-    };
+    const sections = projectSections(p);
+    const card = cardDeck(sections.flatMap(s => s.points));
 
     const renderSection = s => h("section", { class: s.featured ? "project-section featured" : "project-section" },
-      h("h3", {}, h("span", { text: s.title }), h("small", { text: String(s.points.length) })),
+      h("h3", {}, h("span", { text: s.title }), s.points.length ? h("small", { text: String(s.points.length) }) : null),
       s.intro ? h("p", { class: "section-intro", text: s.intro }) : null,
       s.icons?.files?.length ? iconBoard(s.icons) : null,
-      h("ul", { class: "highlights" }, ...s.points.map(card)));
+      s.flipbooks?.length ? flipbookPlayer(s.flipbooks) : null,
+      s.points.length ? h("ul", { class: s.screens ? "highlights screens" : "highlights" }, ...s.points.map(c => card(c))) : null);
 
     // Media inside a part: images zoom in the lightbox, videos play in place
     const partMedia = (m, list) => {
@@ -835,7 +909,7 @@
           kicker: p.title, title: x.caption ?? "", note: x.note ?? ""
         })), images.indexOf(m)));
       } else {
-        el = h("div", { class: "stack-media" }, mediaEl(m, 0, { placeholder }));
+        el = h("div", { class: m.portrait ? "stack-media portrait" : "stack-media" }, mediaEl(m, 0, { placeholder }));
       }
       return h("figure", { class: "stack-item" }, el, m.caption ? h("figcaption", { text: m.caption }) : null);
     }));
@@ -848,6 +922,10 @@
     next.replaceChildren(
       h("span", { class: "ap-next-text" }, h("small", { text: "Next →" }), h("strong", { text: nextP.title })),
       h("span", { class: "ap-next-art" }, projectCover(nextP)));
+    const prevP = D.projects[(k - 1 + D.projects.length) % D.projects.length];
+    const prevArrow = $("#project-prev");
+    toProject(prevArrow, prevP);
+    prevArrow.setAttribute("aria-label", `Previous project: ${prevP.title}`);
     const arrow = $("#project-arrow");
     toProject(arrow, nextP);
     arrow.setAttribute("aria-label", `Next project: ${nextP.title}`);
@@ -858,6 +936,182 @@
     }));
     $(".ap-more").hidden = !$("#project-more").children.length;
     $("#screen-project").scrollTop = 0;
+  }
+
+  /* ================= UI screen: every highlight card tagged UI, grouped by project ================= */
+  {
+    // per project: normal highlight cards first, then screenshots (shown in the same screenshot layout as on project pages)
+    const groups = D.projects.map(p => {
+      const ui = projectSections(p).flatMap(s => s.points).filter(c => c.tags.includes("ui"));
+      const normal = ui.filter(c => !c.screens), screens = ui.filter(c => c.screens);
+      return { p, normal, screens, cards: [...normal, ...screens] };
+    }).filter(g => g.cards.length);
+    const card = cardDeck(groups.flatMap(g => g.cards)); // one deck: the lightbox steps through all UI cards
+    $("#ui-grid").replaceChildren(...groups.map((g, gi) => h("section", { class: "ui-group", style: `--i:${gi}` },
+      h("a", { class: "ui-group-head", href: `#projects/${g.p.id}`, "data-goto": `projects/${g.p.id}`, "data-nav": true },
+        h("span", { class: "ui-group-thumb" }, projectCover(g.p)),
+        h("span", { class: "ui-group-text" },
+          h("small", { text: [g.p.studio, g.p.year].filter(Boolean).join(" · ") }),
+          h("strong", { text: g.p.title })),
+        h("span", { class: "ui-group-cta", text: "Open project →" })),
+      g.normal.length ? h("ul", { class: "highlights" }, ...g.normal.map((c, i) => card(c, i + 1))) : null,
+      g.screens.length ? h("ul", { class: "highlights screens" }, ...g.screens.map(c => card(c))) : null)));
+  }
+
+  /* ================= Home: selected work ================= */
+  {
+    const tiles = (D.homeGallery ?? []).map(t => ({ ...t, p: D.projects.find(p => p.id === t.project) })).filter(t => t.src);
+    $("#home-work").hidden = !tiles.length;
+    $("#home-work-grid").replaceChildren(...tiles.map((t, i) => {
+      const media = kindOf(t.src) === "video" ? ambientVideo(t.src, t.poster) : h("img", { src: t.src, alt: "", loading: "lazy" });
+      const label = [t.p?.title, t.caption].filter(Boolean).join(" · ");
+      const attrs = t.p ? { href: `#projects/${t.p.id}`, "data-goto": `projects/${t.p.id}`, "data-nav": true } : {};
+      return h(t.p ? "a" : "div", { class: `work-tile${i === 0 ? " big" : ""}${t.wide ? " wide" : ""}`, style: `--i:${i}`, "aria-label": label, ...attrs },
+        media,
+        h("span", { class: "work-tile-label", "aria-hidden": "true" },
+          h("span", {}, t.p ? h("small", { text: t.p.title }) : null, h("strong", { text: t.caption ?? "" })),
+          t.p ? h("span", { class: "work-tile-go", text: "→" }) : null));
+    }));
+  }
+
+  /* ================= Flipbook player: step-by-step sprite animations (like The Explant's Unreal timeline) ================= */
+  // Each animation is split into steps (one Unreal flipbook each). The slider snaps to steps; picking a step plays
+  // that step's frames. "Keep playing" loops the current step, otherwise it stops on the step's last frame.
+  function flipbookPlayer(raw) {
+    const list = raw.map(fb => ({
+      cols: 4, rows: 4, fps: 16, steps: [0], labels: [], ...fb,
+      sheets: typeof fb.sheets === "number" ? Array.from({ length: fb.sheets }, (_, i) => `${fb.path}-${i + 1}.webp`) : fb.sheets
+    }));
+    const per = fb => fb.cols * fb.rows;
+    const total = fb => fb.frames ?? fb.sheets.length * per(fb);
+    const paint = (el, fb, f) => {
+      const cell = f % per(fb), col = cell % fb.cols, row = Math.floor(cell / fb.cols);
+      el.style.backgroundImage = `url("${fb.sheets[Math.floor(f / per(fb))]}")`;
+      el.style.backgroundSize = `${fb.cols * 100}% ${fb.rows * 100}%`;
+      el.style.backgroundPosition = `${fb.cols > 1 ? (col / (fb.cols - 1)) * 100 : 0}% ${fb.rows > 1 ? (row / (fb.rows - 1)) * 100 : 0}%`;
+    };
+
+    // frames are drawn on a canvas from fully decoded sheets, so switching sheets never flashes blank
+    const frameEl = h("canvas", { class: "fb-frame", width: "320", height: "320" });
+    const ctx = frameEl.getContext("2d");
+    const sheetsOf = item => item._imgs ??= item.sheets.map(src => Object.assign(new Image(), { src, decoding: "async" }));
+    const readyOf = item => item._ready ??= Promise.all(sheetsOf(item).map(im => im.decode().catch(() => {})));
+    const stage = h("div", { class: "fb-stage", role: "img" }, frameEl);
+    const caption = h("p", { class: "fb-caption", "aria-live": "polite" });
+    const slider = h("input", { class: "fb-slider", type: "range", min: "0", value: "0", step: "1", "data-nav": true, "aria-label": "Step" });
+    const dots = h("div", { class: "fb-dots", "aria-hidden": "true" });
+    const prevBtn = h("button", { class: "fb-btn", "data-nav": true, text: "Previous" });
+    const nextBtn = h("button", { class: "fb-btn", "data-nav": true, text: "Next" });
+    const keep = h("input", { type: "checkbox", class: "fb-keep-box", "data-nav": true });
+    keep.checked = false;
+    const stepCount = h("span", { class: "fb-count" });
+    const title = h("strong", { class: "fb-title" });
+    const stepRow = h("div", { class: "fb-steps" }, prevBtn, h("div", { class: "fb-track" }, dots, slider), nextBtn);
+    // whole: playing the full process once (on open), with the slider following along step by step
+    let fb, step = 0, frame = 0, from = 0, to = 0, playing = false, whole = false, last = 0, visible = false, raf = 0;
+
+    const range = k => [fb.steps[k], (fb.steps[k + 1] ?? total(fb)) - 1];
+    const stepOf = f => fb.steps.filter(st => st <= f).length - 1;
+    const show = f => {
+      frame = f;
+      const im = sheetsOf(fb)[Math.floor(f / per(fb))];
+      if (!im?.complete || !im.naturalWidth) return; // not loaded yet: keep the last frame on screen
+      const cell = f % per(fb), cw = im.naturalWidth / fb.cols, ch = im.naturalHeight / fb.rows;
+      ctx.clearRect(0, 0, frameEl.width, frameEl.height);
+      ctx.drawImage(im, (cell % fb.cols) * cw, Math.floor(cell / fb.cols) * ch, cw, ch, 0, 0, frameEl.width, frameEl.height);
+    };
+    function loop(t) {
+      raf = 0;
+      if (!root.isConnected || !playing) return;
+      if (visible && t - last >= 1000 / fb.fps) {
+        last = t;
+        if (frame < to) {
+          show(frame + 1);
+          if (whole && stepOf(frame) !== step) setStep(stepOf(frame));
+        } else if (keep.checked && !whole) show(from);
+        else { playing = whole = false; return; }
+      }
+      raf = requestAnimationFrame(loop);
+    }
+    const play = () => { playing = !reduceMotion; if (playing && !raf) raf = requestAnimationFrame(loop); };
+    // a step chosen by the visitor: plays that step (looping if "Keep playing" is ticked)
+    function goStep(k) {
+      whole = false;
+      setStep(k);
+      [from, to] = range(step);
+      show(from);
+      play();
+    }
+    // the whole process from the first frame, once; it starts when the player scrolls into view
+    function playAll() {
+      setStep(0);
+      whole = true;
+      from = 0; to = total(fb) - 1;
+      show(0);
+      play();
+    }
+    function setStep(k) {
+      const n = fb.steps.length;
+      step = Math.max(0, Math.min(n - 1, k));
+      slider.value = String(step);
+      slider.parentNode.style.setProperty("--p", n > 1 ? step / (n - 1) : 0);
+      [...dots.children].forEach((d, i) => d.classList.toggle("done", i <= step));
+      prevBtn.disabled = step === 0;
+      nextBtn.disabled = step === n - 1;
+      stepCount.textContent = n > 1 ? `Step ${step + 1} of ${n}` : "";
+      caption.textContent = fb.labels[step] ?? "";
+      caption.hidden = !caption.textContent;
+    }
+
+    const tabs = list.map((item, i) => {
+      const thumb = h("span", { class: "fb-thumb", "aria-hidden": "true" });
+      paint(thumb, item, Math.min(total(item) - 1, Math.floor(total(item) * 0.6)));
+      const b = h("button", { class: "fb-tab", "data-nav": true, "aria-pressed": "false" }, thumb,
+        h("span", { class: "fb-tab-text" }, h("span", { text: item.title }),
+          item.steps.length > 1 ? h("small", { text: `${item.steps.length} steps` }) : null));
+      b.addEventListener("click", () => { pick(i); Sound.tone(700 + i * 50, 0.07, "triangle", 0.03); });
+      return b;
+    });
+    function pick(i) {
+      fb = list[i];
+      const n = fb.steps.length;
+      slider.max = String(n - 1);
+      stepRow.hidden = n < 2;
+      dots.replaceChildren(...fb.steps.map((_, k) => {
+        const d = h("span", { class: "fb-dot", style: `--x:${n > 1 ? k / (n - 1) : 0}` });
+        return d;
+      }));
+      title.textContent = fb.title;
+      stage.setAttribute("aria-label", `${fb.title} animation`);
+      tabs.forEach((t, k) => t.setAttribute("aria-pressed", String(k === i)));
+      const picked = fb;
+      ctx.clearRect(0, 0, frameEl.width, frameEl.height);
+      setStep(0);
+      // start once every sheet of this process is loaded and decoded
+      readyOf(fb).then(() => { if (fb === picked) playAll(); });
+    }
+    slider.addEventListener("input", () => goStep(Number(slider.value)));
+    prevBtn.addEventListener("click", () => goStep(step - 1));
+    nextBtn.addEventListener("click", () => goStep(step + 1));
+    keep.addEventListener("change", () => { if (keep.checked && !playing) goStep(step); });
+    // clicking the animation replays the current step
+    stage.addEventListener("click", () => goStep(step));
+
+    const root = h("div", { class: "flipbook" },
+      h("div", { class: "fb-main" },
+        h("div", { class: "fb-head" },
+          h("p", { class: "fb-label" }, h("small", { text: "Slide to see the process happen" }), title),
+          stepCount),
+        stepRow,
+        stage,
+        caption,
+        h("label", { class: "fb-keep" }, keep, h("span", { text: "Keep playing animation" }))),
+      h("div", { class: "fb-side" },
+        h("p", { class: "fb-side-title", text: "Processes" }),
+        h("div", { class: "fb-tabs", role: "group", "aria-label": "Animations" }, ...tabs)));
+    new IntersectionObserver(es => es.forEach(e => { visible = e.isIntersecting; })).observe(root);
+    pick(0);
+    return root;
   }
 
   /* ================= Icon board: a set of single-colour SVG icons you can inspect ================= */
@@ -935,6 +1189,27 @@
       { autoplay: true, placeholder: (it, k, big) => motionCanvas(r.title, r.hue, big) })),
     kicker: reelCtx(r), title: r.title, award: r.award, note: r.description ?? ""
   })), i);
+  // Silent hover preview for a motion piece: a short local clip if there is one, otherwise the YouTube video (muted, no controls).
+  const hoverPreviews = matchMedia("(hover: hover) and (pointer: fine)").matches && !reduceMotion;
+  function motionPreview(r) {
+    const src = r.preview ?? (isVideoFile(r.video) ? r.video : null);
+    let el;
+    if (src) {
+      el = Object.assign(h("video", { src, loop: true, playsinline: true, autoplay: true, "aria-hidden": "true" }), { muted: true });
+      el.addEventListener("playing", () => el.classList.add("on"), { once: true });
+      el.play().catch(() => {});
+    } else {
+      const yt = ytId(r.video);
+      if (!yt) return null;
+      const origin = /^https?:$/.test(location.protocol) ? `&origin=${encodeURIComponent(location.origin)}` : "";
+      el = h("iframe", { tabindex: "-1", "aria-hidden": "true", allow: "autoplay; encrypted-media", referrerpolicy: "strict-origin-when-cross-origin",
+        src: `https://www.youtube.com/embed/${yt}?autoplay=1&mute=1&controls=0&loop=1&playlist=${yt}&playsinline=1&rel=0&iv_load_policy=3&disablekb=1&fs=0&start=${r.previewStart ?? 3}${origin}` });
+      // wait for the player to start before fading in, so YouTube's loading screen never shows
+      el.addEventListener("load", () => setTimeout(() => el.classList.add("on"), 700), { once: true });
+    }
+    el.classList.add("motion-preview");
+    return el;
+  }
   $("#motion-list").replaceChildren(...MOTION.reel.map((r, i) => {
     const yt = ytId(r.video);
     const art = r.poster ? h("img", { src: r.poster, alt: "", loading: "lazy" })
@@ -949,6 +1224,24 @@
         r.award ? h("span", { class: "badge", text: `✦ ${r.award}` }) : null));
     b.addEventListener("click", () => openReel(i));
     b.style.animationDelay = `${i * 70}ms`;
+    if (hoverPreviews) {
+      const slot = b.firstChild;
+      let timer = 0, el = null;
+      b.addEventListener("pointerenter", () => {
+        timer = setTimeout(() => {
+          el = motionPreview(r);
+          if (!el) return;
+          slot.insertBefore(el, slot.querySelector(".play-btn"));
+          b.classList.add("previewing");
+        }, 250);
+      });
+      b.addEventListener("pointerleave", () => {
+        clearTimeout(timer);
+        b.classList.remove("previewing");
+        const old = el; el = null;
+        if (old) setTimeout(() => old.remove(), 300);
+      });
+    }
     return h("li", {}, b);
   }));
 
@@ -960,19 +1253,25 @@
   const artFor = (item, big) => item.image
     ? h("img", { src: item.image, alt: item.alt ?? item.title, loading: big ? "eager" : "lazy" })
     : artCanvas(item, big ? 1100 : 600);
-  const illuList = ILLU.pieces.map(item => ({
-    render: () => artFor(item, true),
-    kicker: [item.medium, item.year].filter(Boolean).join(" · "),
-    title: item.title, award: item.award, note: item.note
-  }));
+  // A piece can have extra `images` (e.g. a series): the tile shows the first, the lightbox steps through all of them.
+  const illuList = [], illuStart = [];
+  ILLU.pieces.forEach(item => {
+    illuStart.push(illuList.length);
+    const extra = item.images ?? [];
+    [item.image, ...extra].forEach((src, k) => illuList.push({
+      render: () => artFor({ ...item, image: src }, true),
+      kicker: [item.medium, item.year, extra.length ? `${k + 1} / ${extra.length + 1}` : ""].filter(Boolean).join(" · "),
+      title: item.title, award: item.award, note: item.note
+    }));
+  });
   $("#gallery").append(...ILLU.pieces.map((item, i) => {
     const b = h("button", { class: "art", "data-nav": true, style: `--i:${i}; --r:${item.ratio || 1}`, "aria-label": `${item.title}${item.award ? `, ${item.award}` : ""}. View larger.` },
       artFor(item),
       item.award ? h("span", { class: "art-award", "aria-hidden": "true", text: `✦ ${item.award}` }) : null,
       h("span", { class: "art-caption", "aria-hidden": "true" },
         h("strong", { text: item.title }),
-        h("small", { text: [item.medium, item.year].filter(Boolean).join(" · ") })));
-    b.addEventListener("click", () => openLightbox(illuList, i));
+        h("small", { text: [item.medium, item.year, item.images?.length ? `${item.images.length + 1} images` : ""].filter(Boolean).join(" · ") })));
+    b.addEventListener("click", () => openLightbox(illuList, illuStart[i]));
     return b;
   }));
 
@@ -1059,9 +1358,11 @@
   }
 
   /* ================= Routing ================= */
-  const SCREENS = ["title", "menu", "projects", "project", "motion", "illustration", "skills", "cv", "contact"];
+  const SCREENS = ["title", "menu", "projects", "ui", "project", "motion", "illustration", "skills", "cv", "contact"];
   let current = null;      // screen id
   let currentRoute = null; // full route, e.g. "projects/ayna"
+  let listScreen = "projects"; // the grid a project was opened from (Projects or UI), for the back link
+  const OLD_IDS = { grayscale: "clinicvet" }; // old links keep working after the Grayscale page was split
   let selected = null;
   let booted = false;
 
@@ -1076,6 +1377,7 @@
     route = String(route || "title").replace(/^#/, "");
     let [id, sub] = route.split("/");
     if (id === "projects" && sub) {
+      if (OLD_IDS[sub]) route = `projects/${sub = OLD_IDS[sub]}`;
       const p = D.projects.find(x => x.id === sub);
       if (p) { id = "project"; if (currentProject !== p || currentRoute !== route) renderProject(p); }
       else route = id = "projects";
@@ -1103,7 +1405,12 @@
     currentRoute = route;
 
     // Navigation state
-    const navId = id === "project" ? "projects" : id;
+    if (id === "projects" || id === "ui") listScreen = id;
+    const navId = id === "project" ? listScreen : id;
+    const backLink = $("#screen-project .back-link");
+    backLink.href = `#${listScreen}`;
+    backLink.dataset.goto = listScreen;
+    backLink.textContent = listScreen === "ui" ? "← All UI work" : "← All projects";
     $$(".nav-link").forEach(a => {
       if (a.dataset.goto === navId) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current");
     });
@@ -1137,7 +1444,7 @@
     if (navOpen) return setNavOpen(false);
     if (current === "title") return;
     Sound.back();
-    go(current === "project" ? "projects" : current === "menu" ? "title" : "menu");
+    go(current === "project" ? listScreen : current === "menu" ? "title" : "menu");
   }
 
   function start() {
@@ -1245,7 +1552,7 @@
       // Enter/Space anywhere that isn't a control starts; arrows move onto the buttons.
       const onControl = e.target.closest?.("a, button");
       if ((e.key === "Enter" || e.key === " ") && !onControl) { e.preventDefault(); start(); return; }
-      if (DIRS[e.key] && !onControl) { e.preventDefault(); select($(".press-start")); return; }
+      if (DIRS[e.key] && !onControl) { e.preventDefault(); select($(".home-link")); return; }
     }
 
     if (DIRS[e.key] && !isNative(e.target)) { e.preventDefault(); move(...DIRS[e.key]); }

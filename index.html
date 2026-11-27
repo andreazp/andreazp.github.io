@@ -7,6 +7,9 @@
   <title>Portfolio</title>
   <meta name="description" content="Portfolio — game UI/UX, motion graphics and illustration.">
   <meta name="theme-color" content="#f5f2ec">
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="64x64" href="assets/favicon-64.png">
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,200..800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
@@ -51,17 +54,25 @@
     <main id="main" tabindex="-1">
       <!-- TITLE -->
       <section class="screen" id="screen-title" data-screen="title" aria-labelledby="title-name">
+        <!-- No top menu on the home page: the catchphrase sits next to buttons for every section -->
         <div class="home">
-          <p class="eyebrow" id="title-eyebrow"></p>
-          <h1 class="title" id="title-name"></h1>
-          <p class="catchphrase" id="title-catch"></p>
-          <div class="title-actions">
-            <a class="press-start" href="#menu" data-goto="menu" data-nav>Explore my work</a>
-            <a class="btn" href="#cv" data-goto="cv" data-nav>Read my CV</a>
+          <div class="home-intro">
+            <p class="eyebrow" id="title-eyebrow"></p>
+            <h1 class="title" id="title-name"></h1>
+            <p class="catchphrase" id="title-catch"></p>
           </div>
-          <p class="title-hint" aria-hidden="true">or press <kbd>Enter</kbd></p>
+          <nav class="home-links" aria-label="Sections">
+            <ul id="home-links"></ul>
+          </nav>
         </div>
         <div class="ticker" id="ticker" aria-hidden="true"></div>
+        <section class="home-work" id="home-work" aria-labelledby="home-work-h">
+          <div class="home-work-head">
+            <h2 id="home-work-h">Selected work</h2>
+            <a class="btn" href="#projects" data-goto="projects" data-nav>All projects →</a>
+          </div>
+          <div class="work-grid" id="home-work-grid"></div>
+        </section>
         <p class="title-foot">© <span id="year"></span> · Built by hand — HTML, CSS, JS</p>
       </section>
 
@@ -91,6 +102,16 @@
         <div class="level-grid" id="project-grid"></div>
       </section>
 
+      <!-- UI: every project tagged UI -->
+      <section class="screen" id="screen-ui" data-screen="ui" aria-labelledby="ui-h">
+        <div class="screen-head">
+          <h2 class="screen-title" id="ui-h">UI</h2>
+          <p class="muted screen-sub">Interfaces I designed and built, from game HUDs and menus to apps.</p>
+        </div>
+        <div class="ui-groups" id="ui-grid"></div>
+        <footer class="site-footer" data-footer></footer>
+      </section>
+
       <!-- PROJECT PAGE -->
       <section class="screen" id="screen-project" data-screen="project" aria-labelledby="project-h">
         <!-- Big media column on the left, project info on the right (ArtStation-style) -->
@@ -117,6 +138,7 @@
             <ul id="project-more"></ul>
           </div>
         </nav>
+        <a class="ap-arrow prev" id="project-prev" data-nav aria-label="Previous project"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 5-7 7 7 7"/></svg></a>
         <a class="ap-arrow" id="project-arrow" data-nav aria-label="Next project"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg></a>
         <footer class="site-footer" data-footer></footer>
       </section>

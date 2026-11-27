@@ -28,6 +28,18 @@ window.PORTFOLIO = {
     "National Illustration Award · 3rd place", "Unity · Unreal · C#"
   ],
 
+  // "Selected work" grid at the bottom of the home page. The first tile is big; `wide: true` makes a tile
+  // two columns wide. `project` is the project id the tile opens. Videos play silently on a loop.
+  homeGallery: [
+    { src: "assets/projects/ayna/vendor.mp4", poster: "assets/projects/ayna/vendor.jpg", project: "ayna", caption: "Vendor system" },
+    { src: "assets/projects/clinicvet/devices.webp", project: "clinicvet", caption: "Complete UI design" },
+    { src: "assets/projects/argent-xr/intro.mp4", project: "argent-xr", caption: "Motion graphics" },
+    { src: "assets/projects/ayna/settings-menu.mp4", poster: "assets/projects/ayna/settings-menu.jpg", project: "ayna", caption: "Settings menu" },
+    { src: "assets/projects/clinicvet/3dview.jpeg", project: "clinicvet", caption: "3D view" },
+    { src: "assets/projects/ayna/dialog-bubbles.mp4", poster: "assets/projects/ayna/dialog-bubbles.jpg", project: "ayna", caption: "Dialog bubbles", wide: true },
+    { src: "assets/projects/argent-xr/editor.webp", project: "argent-xr", caption: "ArgentXR editor", wide: true }
+  ],
+
   // Your CV — shown on the CV screen. The PDF lives in /assets; `file` powers the
   // "Download PDF" buttons (set `file: null` to hide them).
   // Any section can be removed or left as an empty list.
@@ -186,28 +198,45 @@ window.PORTFOLIO = {
     ],
     intro: "Drawing is where my UI work starts — shape language, colour and character carry into every icon and screen.", // PLACEHOLDER
     pieces: [
-      { title: "Creando Sabor Con Mis Monstruos", medium: "Digital illustration", year: "2019",
-        award: "National award · 3rd place", note: "Contest curated by Guillermo del Toro & La Costeña.", image: null, ratio: 0.8, hue: 15 },
+      // From Instagram (@boeroart). TODO: check titles, mediums and notes.
+      { title: "Let them eat cake", medium: "Digital illustration", year: "2023",
+        note: "Illustration selected for MUMA’s Expo Postre.", image: "assets/illustration/let-them-eat-cake.webp", ratio: 0.8, hue: 330 },
+      { title: "Just Like Heaven", medium: "Sketchbook", year: "2026",
+        note: "", image: "assets/illustration/just-like-heaven.webp", ratio: 1, hue: 340 },   // TODO: swap for the GIF (still frame for now)
+      { title: "Gruss vom Krampus", medium: "Digital illustration", year: "2023",
+        note: "", image: "assets/illustration/gruss-vom-krampus.webp", ratio: 1, hue: 0 },
+      { title: "LAD", medium: "Digital illustration", year: "2024",
+        note: "A badge for my B.A. in Digital Art (LAD), made in the countdown to graduation.", image: "assets/illustration/lad-badge.webp", ratio: 1, hue: 300 },
+      { title: "Lantli & Oni", medium: "Character design", year: "2020",
+        note: "Mascot characters for Pilot Pen México.", image: "assets/illustration/lantli-and-oni.webp", ratio: 1, hue: 45 },
+      { title: "Digital Art", medium: "Digital illustration", year: "2021",
+        note: "A love letter to my degree.", image: "assets/illustration/lad-digital-art.webp", ratio: 1.13, hue: 200 },
+      // Awarded pieces
+      { title: "Creando Sabor Con Mis Monstruos", medium: "Coloured pencil", year: "2019",
+        award: "National award · 3rd place", note: "Guillermo del Toro and his creatures. Contest curated by Guillermo del Toro & La Costeña.", image: "assets/illustration/creando-sabor.webp", ratio: 1, hue: 15 },
       { title: "Creajolote", medium: "Urban art intervention", year: "2023",
-        award: "Selected artist", note: "Commissioned by the Secretary of Youth (SEJUVE).", image: null, ratio: 1.4, hue: 190 },
+        award: "Selected artist", image: "assets/illustration/creajolote-axolotls.webp", ratio: 0.707, hue: 190,
+        images: ["assets/illustration/creajolote-moth.webp", "assets/illustration/creajolote-intervention.webp"],
+        note: "“Bajo la aguja y las escamas”: an axolotl sculpture painted with talavera-inspired tattoo designs, gold piercing-style jewellery and papier-mâché wings, about how young people express their identity through tattoos and body art. Commissioned by the Secretary of Youth (SEJUVE)." },
       { title: "Distrito Sejuve", medium: "Urban art & design", year: "2022",
-        award: "Finalist", note: "", image: null, ratio: 1, hue: 280 },
-      { title: "Character study", medium: "Procreate", year: "2025", note: "", image: null, ratio: 0.75, hue: 340 },  // PLACEHOLDER
-      { title: "Environment sketch", medium: "Procreate", year: "2025", note: "", image: null, ratio: 1.3, hue: 100 }, // PLACEHOLDER
-      { title: "Poster series", medium: "Adobe Illustrator", year: "2024", note: "", image: null, ratio: 0.7, hue: 45 } // PLACEHOLDER
+        award: "Finalist", note: "", image: "assets/illustration/distrito-sejuve.webp", ratio: 1, hue: 280 }
     ]
   },
 
+  // Sections. `short` is the line under each button on the home page; `preview` (optional) is the image
+  // that follows the cursor when hovering that button.
   menu: [
-    { id: "projects", label: "Projects", kicker: "Level select", body: "Games, client UI and apps — each with its own gallery of photos and video." },
-    { id: "motion",   label: "Motion",   kicker: "Cutscenes", body: "Award-winning motion graphics and short films." },
-    { id: "illustration", label: "Illustration", kicker: "Concept art", body: "Award-winning illustration, urban art and sketchbook pieces." },
-    { id: "skills",   label: "Skills",   kicker: "Skill tree", body: "Art and engineering abilities, levelled up over the years." },
-    { id: "cv",       label: "CV",       kicker: "Quest log", body: "Where I've worked, what I studied, and a PDF copy to keep." },
-    { id: "contact",  label: "Contact",  kicker: "Multiplayer", body: "Looking for a UI artist who can also ship the code? Let's talk." }
+    { id: "projects", label: "Projects", short: "Games, apps & client work", preview: "assets/projects/ayna/vendor.jpg", kicker: "Level select", body: "Games, client UI and apps — each with its own gallery of photos and video." },
+    { id: "ui",       label: "UI", short: "Interfaces, HUDs & menus", preview: "assets/projects/clinicvet/devices.webp",       kicker: "HUD & menus", body: "Every project where I designed or built the interface." },
+    { id: "motion",   label: "Motion", short: "Motion graphics & short film", preview: "https://i.ytimg.com/vi/KNDuetcXZGM/hqdefault.jpg",   kicker: "Cutscenes", body: "Award-winning motion graphics and short films." },
+    { id: "illustration", label: "Illustration", short: "Drawings & urban art", kicker: "Concept art", body: "Award-winning illustration, urban art and sketchbook pieces." },
+    { id: "skills",   label: "Skills", short: "Tools & what I do",   kicker: "Skill tree", body: "Art and engineering abilities, levelled up over the years." },
+    { id: "cv",       label: "CV", short: "Experience, studies & awards",       kicker: "Quest log", body: "Where I've worked, what I studied, and a PDF copy to keep." },
+    { id: "contact",  label: "Contact", short: "Let’s work together",  kicker: "Multiplayer", body: "Looking for a UI artist who can also ship the code? Let's talk." }
   ],
 
-  // Filter tabs on the Projects screen. `id` matches a project's `category`.
+  // Filter tabs on the Projects screen. `id` matches a project's `category` (or one of its `tags`).
+  // The UI screen shows every highlight card whose section (or the card itself) has tags: ["ui"].
   categories: [
     { id: "all",  label: "All" },
     { id: "ui",   label: "UI/UX" },
@@ -223,6 +252,9 @@ window.PORTFOLIO = {
    *           an image ("assets/projects/ayna/01.jpg"), a video file (".mp4"),
    *           a YouTube or Vimeo link (plays inside the page), or null for a placeholder.
    *           `kind: "video"` only changes how an empty placeholder looks.
+ *           `portrait: true` on a media item shows it in a tall, phone-shaped frame.
+ *   tags:   extra categories, e.g. tags: ["ui"] also lists a game under the UI/UX filter.
+ *           On a section (or a single card) tags: ["ui"] puts those cards on the UI screen.
    * Put each project's files in its own folder: assets/projects/<id>/
    */
   projects: [
@@ -231,6 +263,7 @@ window.PORTFOLIO = {
       title: "Ayna: Shattered Truth",
       year: "2024 — 2025",
       category: "game",
+      tags: ["ui"],
       hue: 265,
       cover: "assets/projects/ayna/vendor.jpg",
       studio: "Designmatic",
@@ -247,7 +280,7 @@ window.PORTFOLIO = {
       // Optional: headed lists shown under the description
       sections: [
         {
-          title: "User interface",
+          title: "User interface", tags: ["ui"],
           points: [
             { title: "Vendor system", text: "Built the vendor system end to end, from data management to UI: player and vendor inventories, and purchasable items that unlock gameplay.", media: "assets/projects/ayna/vendor.mp4", poster: "assets/projects/ayna/vendor.jpg" },
             { title: "NPC upgrader", text: "Created an upgrader system for specific NPCs that lets players buy and unlock upgrades, handling the full process.", media: "assets/projects/ayna/upgrader.mp4", poster: "assets/projects/ayna/upgrader.jpg" },
@@ -297,52 +330,76 @@ window.PORTFOLIO = {
         { src: "assets/projects/ayna/ground-enemies-2.mp4", poster: "assets/projects/ayna/ground-enemies-2.jpg", caption: "Ground enemies" }
       ]
     },
+    /* ----- Grayscale Interactive: one project per piece of work ----- */
     {
-      id: "grayscale",
-      title: "ClinicVET & more at Grayscale Interactive",
-      year: "2023 — 2026",
+      id: "clinicvet",
+      title: "ClinicVET",
+      year: null,                                           // TODO: year(s) you worked on it
       category: "ui",
       hue: 200,
       cover: "assets/projects/clinicvet/hero.webp",
-      hero: "assets/projects/clinicvet/hero.webp",          // big image at the top of the page (image or .mp4)
-      studio: "Grayscale Interactive",
+      studio: "Grayscale Interactive · for NUPEC",
       role: "UI/UX Artist & Programmer",
-      tools: ["Unreal Engine", "Unity", "Blueprints", "Firebase"],
-      summary: "At Grayscale Interactive I was responsible for all of the UI of ClinicVET, a 3D veterinary app for NUPEC, and I contribute to the studio’s other projects, including ArgentXR and Ford.",
+      tools: ["Unreal Engine", "Blueprints"],
+      summary: "A 3D veterinary app for NUPEC. The app was built by the Grayscale Interactive team, and I was responsible for all of its UI.",
       description: [
-        "Grayscale Interactive is a studio in Querétaro, Mexico, that builds VR training, AR and interactive 3D experiences for clients across North America. I work as part of its team on UI/UX design and programming in Unity and Unreal Engine."
+        "ClinicVET gives veterinarians interactive 3D anatomy, side-by-side condition comparisons and annotations to help them explain a dog’s health to its owner. It works as a visual communication aid, not a diagnostic tool, and runs on desktop, tablet and mobile."
       ],
-      // The page is split into parts, each with its own header, intro, media, icons and card sections.
-      parts: [
+      sections: [
         {
-          id: "clinicvet", title: "ClinicVET", tag: "3D veterinary app · for NUPEC",
-          intro: "ClinicVET gives veterinarians interactive 3D anatomy, side-by-side condition comparisons and annotations to help them explain a dog’s health to its owner. It works as a visual communication aid, not a diagnostic tool, and runs on desktop, tablet and mobile. The app was built by the Grayscale Interactive team, and I was responsible for all of its UI.",
-          sections: [
-            {
-              title: "My part", featured: true,
-              points: [
-                { title: "Complete UI design", text: "Designed the complete user interface.", media: "assets/projects/clinicvet/devices.webp" },
-                { title: "UI programming in Unreal", text: "Programmed all of the UI in Unreal Engine, including custom Blueprints." },
-                { title: "Firebase integration", text: "Connected parts of the UI to Firebase." }
-              ]
-            },
-            {
-              title: "What ClinicVET does",
-              points: [
-                { title: "Male & female anatomy", text: "Starts from a dog model that can switch between male and female anatomy.", media: "assets/projects/clinicvet/hero.webp" },
-                { title: "Exterior to organs", text: "Moves from the exterior to the skeleton and organ systems, with rotate, zoom and pan." },
-                { title: "Condition comparisons", text: "Shows common clinical conditions with the affected organ next to a healthy reference." },
-                { title: "Draw & save notes", text: "Lets the vet write or draw directly over the model and save the annotated images for later consultations." }
-              ]
-            }
+          title: "My part", featured: true, tags: ["ui"],
+          points: [
+            { title: "Complete UI design", text: "Designed the complete user interface.", media: "assets/projects/clinicvet/devices.webp" },
+            { title: "UI programming in Unreal", text: "Programmed all of the UI in Unreal Engine, including custom Blueprints." }
           ]
         },
         {
-          id: "argentxr", title: "ArgentXR", tag: "Web & AR platform · Grayscale Interactive",
-          intro: "Grayscale’s browser-based platform for turning 3D and CAD models into interactive web and augmented reality experiences, with no coding and no app downloads. Free public beta, November 2026.",
-          media: [
-            { src: "assets/projects/argent-xr/editor.webp", caption: "ArgentXR editor" }
-          ],
+          title: "ClinicVET UI features", tags: ["ui"],
+          points: [
+            { title: "Male & female anatomy", text: "Starts from a dog model that can switch between male and female anatomy.", media: "assets/projects/clinicvet/hero.webp" },
+            { title: "Exterior to organs", text: "Moves from the exterior to the skeleton and organ systems, with rotate, zoom and pan." },
+            { title: "Condition comparisons", text: "Shows common clinical conditions with the affected organ next to a healthy reference." },
+            { title: "Draw & save notes", text: "Lets the vet write or draw directly over the model and save the annotated images for later consultations." }
+          ]
+        },
+        {
+          // screens: cards take each screenshot's shape (tall phone screens, wide landscape ones), same-height rows
+          title: "Screens", tags: ["ui"], screens: true,   // TODO: the card texts are placeholders, rewrite them
+          points: [
+            { title: "Home", text: "The vet’s home screen: their profile, plan and registered tutors, with a button to register a new tutor.", media: "assets/projects/clinicvet/home.jpeg" },
+            { title: "Register a patient", text: "A short form to register a new patient: name, size and age.", media: "assets/projects/clinicvet/registerPatient.jpeg" },
+            { title: "Patient card", text: "The patient card: photo, name, age and size, with the patient’s 3D model below.", media: "assets/projects/clinicvet/card.jpeg" },
+            { title: "Saved annotation", text: "After drawing on the model, the vet can add a written note to the annotation.", media: "assets/projects/clinicvet/anotateEntry.jpeg" },
+            { title: "Plans", text: "The current subscription plan and everything it includes.", media: "assets/projects/clinicvet/plans.jpeg" },
+            { title: "Edit profile", text: "Edit the vet’s profile: name, phone, country, state and clinic details.", media: "assets/projects/clinicvet/editProfile.jpeg" },
+            { title: "Settings", text: "Settings: language (Spanish / English), profile, subscription, privacy notice and log out.", media: "assets/projects/clinicvet/settings.jpeg" },
+            { title: "Log out", text: "A confirmation before logging out.", media: "assets/projects/clinicvet/logout.jpeg" },
+            { title: "3D view", text: "The 3D view: switch between male and female, show or hide the skin, and explore the dog’s anatomy.", media: "assets/projects/clinicvet/3dview.jpeg" },
+            { title: "Annotations", text: "Annotation mode: draw over an organ with different colours, then save or share the image.", media: "assets/projects/clinicvet/anotate.jpeg" }
+          ]
+        }
+      ],
+      media: [
+        { src: "assets/projects/clinicvet/preview.mp4", poster: "assets/projects/clinicvet/preview-poster.webp", caption: "App preview" }
+      ]
+    },
+    {
+      id: "argent-xr",
+      title: "ArgentXR",
+      year: "2026",
+      category: "ui",
+      hue: 225,
+      cover: "assets/projects/argent-xr/editor.webp",
+      studio: "Grayscale Interactive",
+      role: "UI/UX Artist",
+      tools: [],                                            // TODO: e.g. ["Figma", "After Effects", "Illustrator"]
+      summary: "Grayscale’s browser-based platform for turning 3D and CAD models into interactive web and AR experiences. I designed its icons, motion graphics, splash screens and UI proposals.",
+      description: [
+        "ArgentXR turns 3D and CAD models into interactive web and augmented reality experiences, with no coding and no app downloads. Free public beta, November 2026."
+      ],
+      sections: [
+        {
+          title: "My part", tags: ["ui"],
           // Interactive icon board. Files are `${path}${prefix}${name}.svg` — remove a name to hide that icon.
           icons: {
             title: "ArgentXR icon set",
@@ -354,55 +411,105 @@ window.PORTFOLIO = {
               "rotate", "running", "seated", "send", "standing", "starterLibrary1", "starterLibrary2",
               "starterLibrary3", "sync", "timing", "translate", "uiActor", "viewfinder", "wireframe", "xray"]
           },
-          sections: [
-            {
-              title: "My part",
-              points: [
-                "Icon design",
-                { title: "Motion animations", text: "Motion graphics I animated for the ArgentXR page.", media: "assets/projects/argent-xr/join.gif" },
-                "Splash screens",
-                "UI proposals"
-                // TODO: add media, e.g. { text: "Icon design", media: "assets/projects/argent-xr/icons.png" }
-              ]
-            }
-          ]
-        },
-        {
-          id: "the-explant", title: "The Explant",
-          tag: "",        // TODO: what it is / who it's for, e.g. "VR training · for …"
-          intro: "",      // TODO: one or two sentences about the project
-          media: [],      // TODO: e.g. { src: "assets/projects/the-explant/01.mp4", caption: "…" }
-          sections: [
-            // { title: "My part", points: [ { title: "…", text: "…", media: "…" } ] }
-          ]
-        },
-        {
-          id: "unreal-ui", title: "Custom UI for Unreal Engine", tag: "Widgets, Blueprints & tools",
-          intro: "",      // TODO: e.g. "Reusable UI widgets and Blueprint tools I built for the studio's Unreal projects."
-          media: [],
-          sections: [
-            // { title: "Widgets", points: [ { title: "…", text: "…", media: "assets/projects/unreal-ui/….mp4" } ] }
+          points: [
+            "Icon design",
+            { title: "Motion animations", text: "Motion graphics I animated for the ArgentXR page.", media: "assets/projects/argent-xr/join.gif" },
+            "Splash screens",
+            "UI proposals"
+            // TODO: add media, e.g. { title: "Splash screens", text: "…", media: "assets/projects/argent-xr/splash.png" }
           ]
         }
-        /* {
-          title: "Other projects",
-          points: [
-            { title: "Ford · UI assets", text: "Ford: UI assets for EV Cooling System Diagnostics." }   // TODO: confirm project
-            // TODO: add the other projects you worked on
-          ]
-        }*/
       ],
       media: [
-        { src: "assets/projects/clinicvet/preview.mp4", poster: "assets/projects/clinicvet/preview-poster.webp", caption: "ClinicVET · App preview" },
-        { src: "assets/projects/argent-xr/intro.mp4", caption: "ArgentXR · Motion graphics for the page" }
-        /*{ src: "assets/projects/grayscale/ford.webp", caption: "Ford" }*/
+        { src: "assets/projects/argent-xr/intro.mp4", caption: "Motion graphics for the ArgentXR page" },
+        { src: "assets/projects/argent-xr/editor.webp", caption: "ArgentXR editor" }
       ]
     },
+    {
+      id: "the-explant",
+      title: "The Explant",
+      year: "2026",
+      category: "ui",
+      hue: 160,
+      cover: "assets/projects/the-explant/cover.webp",
+      studio: "Grayscale Interactive",
+      role: "UI & motion graphics",                        // TODO: confirm
+      tools: ["After Effects", "Unreal Engine"],
+      summary: "Motion graphics animations for The Explant, played in the app as sprite sheets you scrub with a slider.",   // TODO: confirm / rewrite
+      description: [
+        // TODO: confirm / rewrite — drafted from the app recording
+        "The Explant is an educational app for Plant Innovation Lab about plant tissue culture: the parts of a plant, phytohormones, and processes like callogenesis, organogenesis and embryogenesis, explained with step-by-step animations, AR, theory and a quiz."
+      ],
+      sections: [
+        {
+          title: "Screens", tags: ["ui"], screens: true,     // screens: cards take each screenshot's shape, same-height rows
+          points: [
+            { title: "Parts of the plant", text: "Tap the (i) on each part of the plant to learn what it does.", media: "assets/projects/the-explant/screen-parts.webp" },
+            { title: "Phytohormones", text: "Labels for the key plant hormones that regulate growth and development.", media: "assets/projects/the-explant/screen-hormones.webp" },
+            { title: "Process menu", text: "Pick a plant tissue culture process to explore.", media: "assets/projects/the-explant/screen-menu.webp" },
+            { title: "Process timeline", text: "Slide, or use Previous and Next, to step through a process. Each step plays its animation and shows how long it takes.", media: "assets/projects/the-explant/screen-timeline.webp" },
+            { title: "Theory", text: "Each process has its documentation, a diagram and external info.", media: "assets/projects/the-explant/screen-theory.webp" },
+            { title: "Quiz", text: "A quiz with a progress bar; answers turn green or red when you submit.", media: "assets/projects/the-explant/screen-quiz.webp" }
+          ]
+        },
+        {
+          title: "Animations",
+          intro: "I animated these in After Effects and exported them as sprite sheets. In the Unreal app each process plays step by step: move the slider, or use Previous and Next, and that step’s animation plays.",
+          // Sprite sheet players, rebuilt from the Unreal flipbooks: one continuous sequence per process, in sprite-sheet order.
+          // Sheets are `${path}-1.webp`, `${path}-2.webp`… — 4×4 grids of frames, read left to right, top to bottom.
+          // `frames` is the real frame count; `steps` are the frames where each Unreal step (flipbook) starts.
+          // `labels` are the captions shown for each step (from the Unreal timeline widget).
+          // `fps` sets the speed (default 24). Remove a line to hide that animation.
+          flipbooks: [
+            { title: "Cells in suspension", path: "assets/projects/the-explant/suspension", sheets: 2, frames: 32, steps: [0, 16, 21] },
+            { title: "Bioreactor", path: "assets/projects/the-explant/bioreactor", sheets: 8, frames: 128, steps: [0, 32, 64, 96] },
+            { title: "Seeds in vitro", path: "assets/projects/the-explant/in-vitro", sheets: 5, frames: 69, steps: [0, 3, 16, 32, 49] },
+            { title: "Callogenesis", path: "assets/projects/the-explant/callogenesis", sheets: 3, frames: 46, steps: [0, 30, 39],
+              labels: ["Plant cleaning and explant obtention: 2 – 5 h*", "Callus induction: 15 – 30 days", "Callus regeneration: 15 – 45 days"] },
+            { title: "Direct organogenesis", path: "assets/projects/the-explant/organo-direct", sheets: 8, frames: 123, steps: [0, 21, 32, 67],
+              labels: ["Plant cleaning and axillary bud isolation: 2 – 5 h*, formation of axillary buds with axillary meristems", "Formation of shoots in the axillary area", "Root induction", "Greenhouse or open field conditions: 15 to 30 days for adaptation"] },
+            { title: "Indirect organogenesis", path: "assets/projects/the-explant/organo-indirect", sheets: 1, frames: 16, steps: [0],
+              labels: ["Indirect organogenesis: after callus induction (callogenesis), the callus can regenerate to produce new shoots. * It depends on the plant’s species, age, tissue source, morphology and complexity."] },
+            { title: "Direct embryogenesis", path: "assets/projects/the-explant/embryo-direct", sheets: 4, frames: 57, steps: [0, 3, 10, 26, 48],
+              labels: ["Plant cleaning and explant obtention: 2 – 5 h*", "Induction of pre-globular structures, 1 – 3 months", "Maturation of globular structures, 1 – 3 months", "Maturation to heart structures, 3 – 6 months", "Somatic seed germination, 3 – 7 months"] },
+            { title: "Indirect embryogenesis", path: "assets/projects/the-explant/embryo-indirect", sheets: 5, frames: 68, steps: [0, 32, 58] },
+            { title: "Medal", path: "assets/projects/the-explant/medal", sheets: 2, frames: 28, steps: [0, 16] }
+          ],
+          points: []
+        }
+      ],
+      media: [
+        { src: "assets/projects/the-explant/app-recording.mp4", poster: "assets/projects/the-explant/app-recording.jpg", caption: "App walkthrough", portrait: true }
+      ]
+    },
+    {
+      id: "unreal-ui",
+      title: "Custom UI for Unreal Engine",
+      year: null,                                           // TODO
+      category: "ui",
+      hue: 250,
+      cover: null,                                          // TODO
+      studio: "Grayscale Interactive",
+      role: "UI Programmer",                                // TODO: confirm
+      tools: ["Unreal Engine", "Blueprints"],
+      summary: "Custom UI widgets and Blueprint tools for the studio’s Unreal Engine projects.",   // TODO: confirm / rewrite
+      description: [
+        // TODO: e.g. "Reusable UI widgets and Blueprint tools I built for the studio's Unreal projects."
+      ],
+      sections: [
+        // { title: "Widgets", points: [ { title: "…", text: "…", media: "assets/projects/unreal-ui/….mp4" } ] }
+      ],
+      media: [
+        // TODO: e.g. { src: "assets/projects/unreal-ui/01.mp4", caption: "…" }
+      ]
+    },
+    // TODO: Ford — "some UI assets" for EV Cooling System Diagnostics (image was assets/projects/grayscale/ford.webp)
     {
       id: "brewmasters-remedies",
       title: "Brewmaster’s Remedies",
       year: "2023",
       category: "game",
+      tags: ["ui"],
       hue: 100,
       cover: "https://i.ytimg.com/vi/7uF-FRlBHMY/hqdefault.jpg",
       studio: "Tecnológico de Monterrey · school project",
@@ -418,7 +525,7 @@ window.PORTFOLIO = {
         {
           title: "My work",
           points: [
-            "Full UI design",
+            { text: "Full UI design", tags: ["ui"] },
             "Art direction",
             "3D assets",
             "Textures"
@@ -434,6 +541,7 @@ window.PORTFOLIO = {
       title: "Trayecto Q",
       year: "2022",
       category: "app",
+      tags: ["ui"],
       hue: 190,
       cover: null,
       studio: "1st Querétaro Digital Hackathon",
