@@ -23,21 +23,26 @@ window.PORTFOLIO = {
   availability: "Open to work",         // shown in the top HUD
   // Scrolling strip at the bottom of the home page — clients, highlights and awards.
   ticker: [
-    "Ford", "ClinicVET for NUPEC", "Tec de Monterrey", "Ayna — pitched to PlayStation at GDC",
-    "Best VR Game Project 2023", "1st place · Transparencia en Corto", "American Eagle motion contest winner",
-    "National Illustration Award · 3rd place", "Unity · Unreal · C#"
+    "B.A. Digital Art and Videogame Development", "Ayna — pitched to PlayStation at GDC",
+    "Best VR Game, Best Illustration, Best AR Game, Best 3D Game @ Tec de Monterrey", "2 times winner of state short film contest",
+    "National Illustration Award by Guillermo del Toro · 3rd place", "Unity · Unreal · C# · HTML · Adobe Creative Suite"
   ],
 
   // "Selected work" grid at the bottom of the home page. The first tile is big; `wide: true` makes a tile
-  // two columns wide. `project` is the project id the tile opens. Videos play silently on a loop.
+  // two columns wide. `project` is the project id the tile opens; for work that isn't a project, use
+  // `goto` (a screen id, e.g. "motion") and `from` (the small label). Videos play silently on a loop;
+  // a YouTube link shows the video's thumbnail.
+  // Layout: 4 columns. The big tile fills 4 cells, a `wide` tile 2, the rest 1 — keep the total a multiple
+  // of 4 so the grid has no gaps (now: 1 big + 6 single + 1 wide = 12 cells, three full rows).
   homeGallery: [
-    { src: "assets/projects/ayna/vendor.mp4", poster: "assets/projects/ayna/vendor.jpg", project: "ayna", caption: "Vendor system" },
-    { src: "assets/projects/clinicvet/devices.webp", project: "clinicvet", caption: "Complete UI design" },
-    { src: "assets/projects/argent-xr/intro.mp4", project: "argent-xr", caption: "Motion graphics" },
-    { src: "assets/projects/ayna/settings-menu.mp4", poster: "assets/projects/ayna/settings-menu.jpg", project: "ayna", caption: "Settings menu" },
-    { src: "assets/projects/clinicvet/3dview.jpeg", project: "clinicvet", caption: "3D view" },
-    { src: "assets/projects/ayna/dialog-bubbles.mp4", poster: "assets/projects/ayna/dialog-bubbles.jpg", project: "ayna", caption: "Dialog bubbles", wide: true },
-    { src: "assets/projects/argent-xr/editor.webp", project: "argent-xr", caption: "ArgentXR editor", wide: true }
+    { src: "assets/projects/ayna/vendor.mp4", poster: "assets/projects/ayna/vendor.jpg", project: "ayna", caption: "Videogame UI programming" },
+    { src: "assets/projects/ayna/platforms.mp4", poster: "assets/projects/ayna/platforms.jpg", project: "ayna", caption: "Videogame Gameplay programming" },
+    { src: "assets/projects/clinicvet/organs.mp4", project: "clinicvet", caption: "Medical app UI design" },
+    { src: "assets/projects/clinicvet/draw.mp4", project: "clinicvet", caption: "Medical app UI programming" },
+    { src: "assets/projects/argent-xr/join.gif", project: "argent-xr", caption: "Motion animations" },
+    { src: "assets/projects/unreal-ui/custom.mp4", project: "unreal-ui", caption: "Custom UI for Unreal Engine" },
+    { src: "https://youtu.be/KNDuetcXZGM", goto: "motion", from: "Short film", caption: "Award Winning Short Film", wide: true },
+    { src: "assets/illustration/creando-sabor.webp", goto: "illustration", from: "Contest by Guillermo del Toro", caption: "Award Winning Illustration" }
   ],
 
   // Your CV — shown on the CV screen. The PDF lives in /assets; `file` powers the
@@ -126,7 +131,7 @@ window.PORTFOLIO = {
       { title: "Selected Artist", by: "“Creajolote” Urban Art Intervention", year: "2023", detail: "Commissioned by the Secretary of Youth (SEJUVE).", goto: "illustration", cta: "See the art" },
       { title: "3rd Place", by: "1st Querétaro Digital Hackathon", year: "2022", detail: "Built “Trayecto Q”, a mobile app prototype and fully interactive demo." },
       { title: "Finalist", by: "“Distrito Sejuve” Urban Art & Design Contest", year: "2022" },
-      { title: "National Illustration Award, 3rd Place", by: "“Creando Sabor Con Mis Monstruos”", year: "2019", detail: "Curated by Guillermo del Toro & La Costeña.", goto: "illustration", cta: "See the art" }
+      { title: "National Illustration Award, 3rd Place", by: "“Creando Sabor Con Mis Monstruos”", year: "2019", detail: "National contest held in conjunction with Guillermo del Toro's 'At Home with My Monsters' exhibition in Guadalajara, Mexico.", cta: "See the art" }
     ],
 
     // Short lists shown as chips in the side column.
@@ -148,13 +153,16 @@ window.PORTFOLIO = {
    * `poster` (optional) is an image shown before the video plays.
    */
   motion: {
+    intro: "Motion graphics assets and animations created for multiple projects. Award-winning short films", // PLACEHOLDER
     reel: [
       {
         title: "Falsa Alarma",
         context: "Short film · “Transparencia en Corto”", year: "2026",
         award: "3rd place, state level",
-        description: "Short film entry for the state-level “Transparencia en Corto” contest.",
-        video: "https://youtu.be/KNDuetcXZGM", poster: null, hue: 330, tools: ["Illustrator", "After Effects", "Premiere Pro"]
+        description: "Short film entry for the state-level “Transparencia en Corto” contest. Created assets in illustrator as original characters, animated in After Effects and Premiere Pro.", // TODO: a line about the idea
+        video: "https://youtu.be/KNDuetcXZGM", poster: null, hue: 330, tools: ["Illustrator", "After Effects", "Premiere Pro"],
+        // `storyboard`: page images shown as thumbnails when the piece is open (click one to view it big)
+        storyboard: ["assets/motion/FalsaAlarma_GuionStoryboard_page-0005.jpg", "assets/motion/FalsaAlarma_GuionStoryboard_page-0006.jpg"]
       },
       /*{
         title: "American Eagle — winning video",
@@ -167,22 +175,22 @@ window.PORTFOLIO = {
         title: "Verdad y Justicia",
         context: "Short film · “Transparencia en Corto”", year: "2023",
         award: "1st place, state level",
-        description: "Short film entry for the state-level “Transparencia en Corto” contest.",
+        description: "Short film entry for the state-level “Transparencia en Corto” contest. Created assets in illustrator as original characters, animated in After Effects and Premiere Pro.",
         video: "https://youtu.be/V969WK2lWOY", poster: null, hue: 30, tools: ["Illustrator", "After Effects", "Premiere Pro"]
       },
-      {
+     /* {
         title: "Brewmaster’s Remedies",
         context: "VR game demo", year: "2023",
-        award: "Best VR Game Project 2023",
+        award: "Best VR Game Project 2023 @ Tec de Monterrey",
         description: "A VR game demo made in Unreal Engine. Designer of full UI and art direction. Also worked on 3D assets and textures.",
         video: "https://youtu.be/7uF-FRlBHMY", poster: null, hue: 100, tools: ["Unreal Engine", "Substance Designer", "Illustrator"]
       },
-      {
+       {
         title: "UI motion studies",              // PLACEHOLDER — swap for real UI animation clips
         context: "Interface animation", year: "2025",
         description: "Menu transitions, button feedback and HUD reveals, animated in After Effects and Cavalry, then rebuilt in-engine.",
         video: null, poster: null, hue: 160, tools: ["After Effects", "Cavalry", "Unity"]
-      }
+      } */
     ]
   },
 
@@ -200,9 +208,10 @@ window.PORTFOLIO = {
     pieces: [
       // From Instagram (@boeroart). TODO: check titles, mediums and notes.
       { title: "Let them eat cake", medium: "Digital illustration", year: "2023",
-        note: "Illustration selected for MUMA’s Expo Postre.", image: "assets/illustration/let-them-eat-cake.webp", ratio: 0.8, hue: 330 },
-      { title: "Just Like Heaven", medium: "Sketchbook", year: "2026",
-        note: "", image: "assets/illustration/just-like-heaven.webp", ratio: 1, hue: 340 },   // TODO: swap for the GIF (still frame for now)
+        note: "Illustration selected for MUMA’s Expo Postre.", image: "assets/illustration/let-them-eat-cake.webp", ratio: 0.8, hue: 330,
+        sticker: "Personal fav ♥" },   // `sticker`: optional tilted label on the piece
+      { title: "Just Like Heaven", medium: "Mixed media", year: "2026",
+        note: "Mixed media, combining digital and traditional techniques.", image: "assets/illustration/just-like-heaven.webp", ratio: 1, hue: 340 },   // TODO: swap for the GIF (still frame for now)
       { title: "Gruss vom Krampus", medium: "Digital illustration", year: "2023",
         note: "", image: "assets/illustration/gruss-vom-krampus.webp", ratio: 1, hue: 0 },
       { title: "LAD", medium: "Digital illustration", year: "2024",
@@ -213,7 +222,7 @@ window.PORTFOLIO = {
         note: "A love letter to my degree.", image: "assets/illustration/lad-digital-art.webp", ratio: 1.13, hue: 200 },
       // Awarded pieces
       { title: "Creando Sabor Con Mis Monstruos", medium: "Coloured pencil", year: "2019",
-        award: "National award · 3rd place", note: "Guillermo del Toro and his creatures. Contest curated by Guillermo del Toro & La Costeña.", image: "assets/illustration/creando-sabor.webp", ratio: 1, hue: 15 },
+        award: "National award · 3rd place", note: "Selected as a national winner in the contest held in conjunction with Guillermo del Toro's \"At Home with My Monsters\" exhibition in Guadalajara, Mexico.", image: "assets/illustration/creando-sabor.webp", ratio: 1, hue: 15 },
       { title: "Creajolote", medium: "Urban art intervention", year: "2023",
         award: "Selected artist", image: "assets/illustration/creajolote-axolotls.webp", ratio: 0.707, hue: 190,
         images: ["assets/illustration/creajolote-moth.webp", "assets/illustration/creajolote-intervention.webp"],
@@ -226,10 +235,10 @@ window.PORTFOLIO = {
   // Sections. `short` is the line under each button on the home page; `preview` (optional) is the image
   // that follows the cursor when hovering that button.
   menu: [
-    { id: "projects", label: "Projects", short: "Games, apps & client work", preview: "assets/projects/ayna/vendor.jpg", kicker: "Level select", body: "Games, client UI and apps — each with its own gallery of photos and video." },
+    { id: "projects", label: "Projects", short: "Games, apps & client work", preview: "assets/projects/ayna/cover.jpeg", kicker: "Level select", body: "Games, client UI and apps — each with its own gallery of photos and video." },
     { id: "ui",       label: "UI", short: "Interfaces, HUDs & menus", preview: "assets/projects/clinicvet/devices.webp",       kicker: "HUD & menus", body: "Every project where I designed or built the interface." },
-    { id: "motion",   label: "Motion", short: "Motion graphics & short film", preview: "https://i.ytimg.com/vi/KNDuetcXZGM/hqdefault.jpg",   kicker: "Cutscenes", body: "Award-winning motion graphics and short films." },
-    { id: "illustration", label: "Illustration", short: "Drawings & urban art", kicker: "Concept art", body: "Award-winning illustration, urban art and sketchbook pieces." },
+    { id: "motion",   label: "Motion", short: "Motion graphics & short films", preview: "https://i.ytimg.com/vi/KNDuetcXZGM/hqdefault.jpg",   kicker: "Cutscenes", body: "Award-winning motion graphics and short films." },
+    { id: "illustration", label: "Illustration", short: "Drawings & urban art", preview: "assets/illustration/lad-digital-art.webp", kicker: "Concept art", body: "Award-winning illustration, urban art and sketchbook pieces." },
     { id: "skills",   label: "Skills", short: "Tools & what I do",   kicker: "Skill tree", body: "Art and engineering abilities, levelled up over the years." },
     { id: "cv",       label: "CV", short: "Experience, studies & awards",       kicker: "Quest log", body: "Where I've worked, what I studied, and a PDF copy to keep." },
     { id: "contact",  label: "Contact", short: "Let’s work together",  kicker: "Multiplayer", body: "Looking for a UI artist who can also ship the code? Let's talk." }
@@ -253,6 +262,7 @@ window.PORTFOLIO = {
    *           a YouTube or Vimeo link (plays inside the page), or null for a placeholder.
    *           `kind: "video"` only changes how an empty placeholder looks.
  *           `portrait: true` on a media item shows it in a tall, phone-shaped frame.
+ *   sub:    on a section, a short one-line description shown next to its title.
  *   tags:   extra categories, e.g. tags: ["ui"] also lists a game under the UI/UX filter.
  *           On a section (or a single card) tags: ["ui"] puts those cards on the UI screen.
    * Put each project's files in its own folder: assets/projects/<id>/
@@ -265,12 +275,13 @@ window.PORTFOLIO = {
       category: "game",
       tags: ["ui"],
       hue: 265,
-      cover: "assets/projects/ayna/vendor.jpg",
+      cover: "assets/projects/ayna/cover.jpg",
       studio: "Designmatic",
       role: "Associate Game Engineer",
       tools: ["Unity", "C#", "UI Toolkit"],
       award: "Pitched to PlayStation at GDC",
       ribbon: "▶ Playable demo on Steam",               // optional label on the project card
+      sticker: "Pitched to PlayStation!",               // optional tilted sticker on the project card's corner
       ctaTitle: "Play the demo on Steam",
       ctaText: "Ayna: Shattered Truth has a playable demo on Steam. Try the systems above in the game.",
       summary: "UI, gameplay and enemy systems for a Unity game with a playable demo on Steam, pitched to PlayStation at GDC.",
@@ -280,42 +291,43 @@ window.PORTFOLIO = {
       // Optional: headed lists shown under the description
       sections: [
         {
-          title: "User interface", tags: ["ui"],
+          title: "User interface", sub: "Programming of the game's UI, done with C#, UI Toolkit and data bindings. None of the UI elements were designed by me.", tags: ["ui"],
           points: [
-            { title: "Vendor system", text: "Built the vendor system end to end, from data management to UI: player and vendor inventories, and purchasable items that unlock gameplay.", media: "assets/projects/ayna/vendor.mp4", poster: "assets/projects/ayna/vendor.jpg" },
-            { title: "NPC upgrader", text: "Created an upgrader system for specific NPCs that lets players buy and unlock upgrades, handling the full process.", media: "assets/projects/ayna/upgrader.mp4", poster: "assets/projects/ayna/upgrader.jpg" },
-            { title: "Favourites", text: "Added a favourites system so players can keep track of vendor and upgrader items they want to buy." },
-            { title: "Player inventory", text: "Developed the runtime player inventory with Unity’s UI Toolkit and data bindings." },
-            { title: "Dialog bubbles", text: "Built a dialog bubble system that plays dialog sequences in-game.", media: "assets/projects/ayna/dialog-bubbles.mp4", poster: "assets/projects/ayna/dialog-bubbles.jpg" },
-            { title: "Pick-up notifications", text: "Implemented item pick-up notifications on the HUD using a list view." },
-            { title: "Journal UI", text: "Created a tab-based journal UI that shows the player’s abilities and upgrades." },
+            { title: "Vendor system", text: "Built the vendor system end to end, from data management to UI: player and vendor inventories, and purchasable items that unlock gameplay with working currency. Built using Unity’s UI Toolkit and Data Bindings.", media: "assets/projects/ayna/vendor.mp4", poster: "assets/projects/ayna/vendor.jpg" },
+            { title: "NPC upgrader", text: "Created an upgrader system for specific NPCs that lets players buy and unlock upgrades, handling the full process. Built using Unity’s UI Toolkit and Data Bindings", media: "assets/projects/ayna/upgrader.mp4", poster: "assets/projects/ayna/upgrader.jpg" },
+            { title: "Favourites", text: "Added a favourites system so players can keep track of vendor and upgrader items they want to buy.", media: "assets/projects/ayna/favourites.jpg", poster: "assets/projects/ayna/favourites.jpg" },
+            { title: "Player inventory", text: "Developed the runtime player inventory with Unity’s UI Toolkit and data bindings.", media: "assets/projects/ayna/inventory.jpg", poster: "assets/projects/ayna/inventory.jpg" },
+            { title: "Dialog bubbles", text: "Built a dialog bubble system that plays dialog sequences in-game with custom timing and transitions.", media: "assets/projects/ayna/dialog-bubbles.mp4", poster: "assets/projects/ayna/dialog-bubbles.jpg" },
+            { title: "Pick-up notifications", text: "Implemented item pick-up notifications on the HUD using a list view.", media: "assets/projects/ayna/pickupNotification.jpg", poster: "assets/projects/ayna/pickupNotification.jpg" },
+           // { title: "Journal UI", text: "Created a tab-based journal UI that shows the player’s abilities and upgrades." },
             { title: "Settings menu", text: "Extended the settings menu: VSync, FPS limiter, language, monitor resolution and display mode.", media: "assets/projects/ayna/settings-menu.mp4", poster: "assets/projects/ayna/settings-menu.jpg" },
-            { title: "Narrative inspection", text: "Built a narrative inspection setup that shows an icon and story text when players interact with objects." }
+           // { title: "Narrative inspection", text: "Built a narrative inspection setup that shows an icon and story text when players interact with objects." }
           ]
         },
         {
-          title: "Gameplay",
+          title: "Gameplay", sub: "Interactive objects, platforms and level mechanics programmed using C# in Unity. This assets were created to work as customizable prefabs and are used throughout the game.", tags: ["game"],
           points: [
             { title: "Chest opening", text: "Chest opening: the player walks automatically into position while animations, VFX and SFX play in sync.", media: "assets/projects/ayna/chests.mp4", poster: "assets/projects/ayna/chests.jpg" },
             { title: "Door unlocking", text: "Door unlocking: Once the player picks up the required items and on click, the door animates and plays SFX.", media: "assets/projects/ayna/door.mp4", poster: "assets/projects/ayna/door.jpg" },
-            { title: "Map system", text: "A map system that unlocks map areas in the UI, plus map posts where players pick up maps." },
+            // { title: "Map system", text: "A map system that unlocks map areas in the UI, plus map posts where players pick up maps." },
             { title: "Rotating platforms", text: "A rotating platform system with smooth transitions between fixed steps, including looping and reverse looping.", media: "assets/projects/ayna/rotating-platforms.mp4", poster: "assets/projects/ayna/rotating-platforms.jpg" },
-            { title: "Collapsible platforms", text: "Collapsible platforms with animations, VFX and SFX synced to gameplay logic.", media: "assets/projects/ayna/collapsible-platforms.mp4", poster: "assets/projects/ayna/collapsible-platforms.jpg" },
-            { title: "Checkpoints", text: "Checkpoint interactions, including player animations for left and right triggers.", media: "assets/projects/ayna/checkpoint.mp4", poster: "assets/projects/ayna/checkpoint.jpg" },
+            { title: "Flower Elevators", text: "Timed flower elevators with setup by phases, VFX and SFX synced to gameplay logic.", media: "assets/projects/ayna/collapsible-platforms.mp4", poster: "assets/projects/ayna/collapsible-platforms.jpg" },
+            { title: "Collapsible platforms", text: "Collapsible platforms that react on contact, with animations, VFX and SFX synced to gameplay logic.", media: "assets/projects/ayna/platforms.mp4", poster: "assets/projects/ayna/platforms.jpg" },
+            { title: "Checkpoints", text: "Saved checkpoint interactions, including player animations for left and right triggers.", media: "assets/projects/ayna/checkpoint.mp4", poster: "assets/projects/ayna/checkpoint.jpg" },
             { title: "Automatic pick-ups", text: "A new item pick-up system: items the player collects automatically.", media: "assets/projects/ayna/automatic-pickup-and-dialog.mp4", poster: "assets/projects/ayna/automatic-pickup-and-dialog.jpg" },
             { title: "Manual pick-ups", text: "A new item pick-up system: items the player picks up manually.", media: "assets/projects/ayna/manual-pickup.mp4", poster: "assets/projects/ayna/manual-pickup.jpg" },
-            { title: "Moving platforms", text: "Moving platforms that react to player projectiles, with game-feel touches like shader glow.", media: "assets/projects/ayna/platforms.mp4", poster: "assets/projects/ayna/platforms.jpg" },
+            { title: "Moving platforms", text: "Moving platforms that react to player projectiles, with game-feel touches like shader glow.", media: "assets/projects/ayna/platformsShoot.mp4", poster: "assets/projects/ayna/platforms.jpg" },
             { title: "Traps & hazards", text: "Breakable ground and falling block traps.", media: "assets/projects/ayna/falling-traps.mp4", poster: "assets/projects/ayna/falling-traps.jpg" },
             { title: "Bouncing Mushrooms", text: "Bouncing mushrooms for dynamic level design.", media: "assets/projects/ayna/mushrooms.mp4", poster: "assets/projects/ayna/mushrooms.jpg" }
           ]
         },
         {
-          title: "Enemy behaviour",
+          title: "Enemy behaviour", sub: "Enemy AI, attacks and traps programmed in C# in Unity", tags: ["game"],
           points: [
             { title: "Mosquito - Flying Enemy", text: "Built a flying enemies framework from scratch that can be used to create the behaviour and gameplay of all flying enemies in the game, with the mosquito as the primary example.", media: "assets/projects/ayna/mosquito.mp4", poster: "assets/projects/ayna/mosquito.jpg" },
             { title: "Ground enemies", text: "Developed several ground enemies from the game design requirements, including behaviour, VFX and SFX.", media: "assets/projects/ayna/ground-enemies.mp4", poster: "assets/projects/ayna/ground-enemies.jpg" },
             { title: "Smoke enemy", text: "Programmed a smoke enemy that triggers a fullscreen shader effect to block the player’s vision.", media: "assets/projects/ayna/smoke-enemy.mp4", poster: "assets/projects/ayna/smoke-enemy.jpg" },
-            { title: "Snake trap", text: "Created a ground snake trap system that tracks player movement, shoots projectiles and switches tracking sides." }
+            { title: "Snake trap", text: "Created a ground snake trap system that tracks player movement, shoots projectiles and switches tracking sides.", media: "assets/projects/ayna/snakes.mp4", poster: "assets/projects/ayna/snakes.jpg" }
           ]
         }
       ],
@@ -325,57 +337,54 @@ window.PORTFOLIO = {
       ],
       media: [
         { src: "https://www.youtube.com/watch?v=nv50lLZvoJU", caption: "Official trailer" },
-        { src: "assets/projects/ayna/door-system.mp4", poster: "assets/projects/ayna/door-system.jpg", caption: "Door system · full sequence" },
-        { src: "assets/projects/ayna/platforms-2.mp4", poster: "assets/projects/ayna/platforms-2.jpg", caption: "Platforms" },
-        { src: "assets/projects/ayna/ground-enemies-2.mp4", poster: "assets/projects/ayna/ground-enemies-2.jpg", caption: "Ground enemies" }
+        { src: "assets/projects/ayna/mosquito.mp4", poster: "assets/projects/ayna/mosquito.jpg", caption: "Mosquito · First flying enemy" },
+        { src: "assets/projects/ayna/falling-traps.mp4", poster: "assets/projects/ayna/falling-traps.jpg", caption: "Falling traps for environmental hazards" }
       ]
     },
     /* ----- Grayscale Interactive: one project per piece of work ----- */
     {
       id: "clinicvet",
       title: "ClinicVET",
-      year: null,                                           // TODO: year(s) you worked on it
+      year: 2023-2026,                                           // TODO: year(s) you worked on it
       category: "ui",
       hue: 200,
       cover: "assets/projects/clinicvet/hero.webp",
       studio: "Grayscale Interactive · for NUPEC",
       role: "UI/UX Artist & Programmer",
-      tools: ["Unreal Engine", "Blueprints"],
+      tools: ["Unreal Engine", "Blueprint Programming", "C++", "Illustrator", "Affinity"],
       summary: "A 3D veterinary app for NUPEC. The app was built by the Grayscale Interactive team, and I was responsible for all of its UI.",
       description: [
         "ClinicVET gives veterinarians interactive 3D anatomy, side-by-side condition comparisons and annotations to help them explain a dog’s health to its owner. It works as a visual communication aid, not a diagnostic tool, and runs on desktop, tablet and mobile."
       ],
       sections: [
         {
-          title: "My part", featured: true, tags: ["ui"],
+          title: "My part", sub: "UI design and Unreal implementation", featured: true, tags: ["ui"],
           points: [
-            { title: "Complete UI design", text: "Designed the complete user interface.", media: "assets/projects/clinicvet/devices.webp" },
-            { title: "UI programming in Unreal", text: "Programmed all of the UI in Unreal Engine, including custom Blueprints." }
+            { title: "Complete UI design", text: "Designed the complete user interface, from screen layouts to interactive elements, buttons, color palettes, and icons. The project's admin panel was not designed by me.", media: "assets/projects/clinicvet/devices.webp" },
+            { title: "UI programming in Unreal", text: "Programmed all of the UI and screens in Unreal Engine, ensuring responsiveness, proper sizing and animations, as well as custom widgets for blueprints.", media: "assets/projects/clinicvet/blueprint.png" }
           ]
         },
         {
-          title: "ClinicVET UI features", tags: ["ui"],
+          title: "ClinicVET UI features", sub: "What the vet can do with the app and some of the features I worked on", tags: ["ui"],
           points: [
-            { title: "Male & female anatomy", text: "Starts from a dog model that can switch between male and female anatomy.", media: "assets/projects/clinicvet/hero.webp" },
-            { title: "Exterior to organs", text: "Moves from the exterior to the skeleton and organ systems, with rotate, zoom and pan." },
-            { title: "Condition comparisons", text: "Shows common clinical conditions with the affected organ next to a healthy reference." },
-            { title: "Draw & save notes", text: "Lets the vet write or draw directly over the model and save the annotated images for later consultations." }
+            { title: "Dog anatomy in 3d view", text: "Starts from a dog model that can switch between male and female anatomy. Implementation of custom toggle button connected to this feature.", media: "assets/projects/clinicvet/hero.webp" },
+            { title: "Exterior to organs and condition comparisons", text: "Moves from the exterior to the skeleton and organ systems, with rotate, zoom and pan. Implementation of custom controls and widget instantiation in real time for these functions. Shows common clinical conditions with the affected organ next to a healthy reference. I designed and programmed the second camera rendering the healthy organ", media: "assets/projects/clinicvet/organs.mp4" },
+            { title: "Draw & save notes", text: "Lets the vet write or draw directly over the model and save the annotated images for later consultations. I designed and programmed the annotation system's UI.", media: "assets/projects/clinicvet/draw.mp4" }
           ]
         },
         {
           // screens: cards take each screenshot's shape (tall phone screens, wide landscape ones), same-height rows
-          title: "Screens", tags: ["ui"], screens: true,   // TODO: the card texts are placeholders, rewrite them
+          title: "Screens", sub: "The app, screen by screen. All UI was done to use Unreal Engine's UMG and localization system", tags: ["ui"], screens: true,   // TODO: the card texts are placeholders, rewrite them
           points: [
-            { title: "Home", text: "The vet’s home screen: their profile, plan and registered tutors, with a button to register a new tutor.", media: "assets/projects/clinicvet/home.jpeg" },
-            { title: "Register a patient", text: "A short form to register a new patient: name, size and age.", media: "assets/projects/clinicvet/registerPatient.jpeg" },
-            { title: "Patient card", text: "The patient card: photo, name, age and size, with the patient’s 3D model below.", media: "assets/projects/clinicvet/card.jpeg" },
-            { title: "Saved annotation", text: "After drawing on the model, the vet can add a written note to the annotation.", media: "assets/projects/clinicvet/anotateEntry.jpeg" },
-            { title: "Plans", text: "The current subscription plan and everything it includes.", media: "assets/projects/clinicvet/plans.jpeg" },
-            { title: "Edit profile", text: "Edit the vet’s profile: name, phone, country, state and clinic details.", media: "assets/projects/clinicvet/editProfile.jpeg" },
-            { title: "Settings", text: "Settings: language (Spanish / English), profile, subscription, privacy notice and log out.", media: "assets/projects/clinicvet/settings.jpeg" },
-            { title: "Log out", text: "A confirmation before logging out.", media: "assets/projects/clinicvet/logout.jpeg" },
-            { title: "3D view", text: "The 3D view: switch between male and female, show or hide the skin, and explore the dog’s anatomy.", media: "assets/projects/clinicvet/3dview.jpeg" },
-            { title: "Annotations", text: "Annotation mode: draw over an organ with different colours, then save or share the image.", media: "assets/projects/clinicvet/anotate.jpeg" }
+            { title: "Home", text: "The vet’s home screen: their profile, plan and registered tutors, with a button to register a new tutor. All UI design and implementation for this screen was done by me.", media: "assets/projects/clinicvet/home.jpeg" },
+            { title: "Register a patient", text: "A short form to register a new patient with a text input for name and custom dropdown widget for size and age. All UI design and implementation for this screen was done by me.", media: "assets/projects/clinicvet/registerPatient.jpeg" },
+            { title: "Patient card", text: "The patient card information, with the patient’s annotations shown below.", media: "assets/projects/clinicvet/card.jpeg" },
+            //{ title: "Saved annotation", text: "After drawing on the model, the vet can add a written note to the annotation. Custom UI elements were designed and the logic was programmed by me for this feature.", media: "assets/projects/clinicvet/anotateEntry.jpeg" },
+            { title: "Drawer", text: "UI designed to adapt to the freemium plan, shown in a custom made responsive drawer, based on layout principles, accompanied by visual feedback and custom animations when purchased or failed. All UI design and implementation for this screen was done by me.", media: "assets/projects/clinicvet/drawer.mp4" },
+            { title: "Edit profile", text: "Edit the vet’s profile: name, phone, country, state and clinic details. All UI design and implementation for this screen was done by me.", media: "assets/projects/clinicvet/editProfile.jpeg" },
+            { title: "Settings", text: "Settings: language (Spanish / English), profile, subscription, privacy notice and log out. This screen works with a switcher to mantain consistency throughout sub screens. All UI design and implementation for this screen was done by me.", media: "assets/projects/clinicvet/settings.jpeg" },
+            { title: "Log out", text: "Confirmation before logging out or other actions shown throughout the app. All UI design and implementation for this screen was done by me.", media: "assets/projects/clinicvet/logout.jpeg" },
+           // { title: "3D view", text: "The 3D view: switch between male and female, show or hide the skin, and explore the dog’s anatomy. All UI design and implementation for this screen was done by me.", media: "assets/projects/clinicvet/3dview.jpeg" },
           ]
         }
       ],
@@ -389,17 +398,17 @@ window.PORTFOLIO = {
       year: "2026",
       category: "ui",
       hue: 225,
-      cover: "assets/projects/argent-xr/editor.webp",
+      cover: "assets/projects/argent-xr/argentHome.png",
       studio: "Grayscale Interactive",
       role: "UI/UX Artist",
-      tools: [],                                            // TODO: e.g. ["Figma", "After Effects", "Illustrator"]
-      summary: "Grayscale’s browser-based platform for turning 3D and CAD models into interactive web and AR experiences. I designed its icons, motion graphics, splash screens and UI proposals.",
+      tools: ["Affinity Designer", "Cavalry"],                                            // TODO: e.g. ["Figma", "After Effects", "Illustrator"]
+      summary: "Grayscale’s browser-based platform for turning 3D and CAD models into interactive web and AR experiences. I designed part of its icons, motion graphics, splash screens and visual assets for marketing.",
       description: [
         "ArgentXR turns 3D and CAD models into interactive web and augmented reality experiences, with no coding and no app downloads. Free public beta, November 2026."
       ],
       sections: [
         {
-          title: "My part", tags: ["ui"],
+          title: "My part", sub: "Icons, motion and UI proposals", tags: ["ui"],
           // Interactive icon board. Files are `${path}${prefix}${name}.svg` — remove a name to hide that icon.
           icons: {
             title: "ArgentXR icon set",
@@ -412,11 +421,10 @@ window.PORTFOLIO = {
               "starterLibrary3", "sync", "timing", "translate", "uiActor", "viewfinder", "wireframe", "xray"]
           },
           points: [
-            "Icon design",
-            { title: "Motion animations", text: "Motion graphics I animated for the ArgentXR page.", media: "assets/projects/argent-xr/join.gif" },
-            "Splash screens",
-            "UI proposals"
-            // TODO: add media, e.g. { title: "Splash screens", text: "…", media: "assets/projects/argent-xr/splash.png" }
+            { title: "Intro motion graphics", text: "Motion graphics I animated for the ArgentXR page.", media: "assets/projects/argent-xr/intro.mp4", tags: ["motion"] },
+            { title: "Motion animations", text: "Motion graphics I animated as proposals for the ArgentXR page.", media: "assets/projects/argent-xr/join.gif", tags: ["motion"] },
+            { title: "Social media assets", text: "Posts I designed and animated as proposals for the ArgentXR social media page.", media: "assets/projects/argent-xr/img.jpg" },
+            { title: "Social media assets", text: "Stories I designed and animated as proposals for the ArgentXR social media page.", media: "assets/projects/argent-xr/video.mp4", tags: ["motion"] },
           ]
         }
       ],
@@ -428,32 +436,32 @@ window.PORTFOLIO = {
     {
       id: "the-explant",
       title: "The Explant",
-      year: "2026",
+      year: "2023-2026",
       category: "ui",
       hue: 160,
-      cover: "assets/projects/the-explant/cover.webp",
+      cover: "assets/projects/the-explant/cover.jpg",
       studio: "Grayscale Interactive",
-      role: "UI & motion graphics",                        // TODO: confirm
+      role: "Programmer, UI & motion graphics designer and animator",                        // TODO: confirm
       tools: ["After Effects", "Unreal Engine"],
-      summary: "Motion graphics animations for The Explant, played in the app as sprite sheets you scrub with a slider.",   // TODO: confirm / rewrite
+      summary: "I was in charge of the complete programming of the mobile app on Unreal Engine, rebuilt from an Unity project. I also did the implementation of AR functionality and the creation of all educational graphics and animations seen in the app.",   // TODO: confirm / rewrite
       description: [
         // TODO: confirm / rewrite — drafted from the app recording
-        "The Explant is an educational app for Plant Innovation Lab about plant tissue culture: the parts of a plant, phytohormones, and processes like callogenesis, organogenesis and embryogenesis, explained with step-by-step animations, AR, theory and a quiz."
+        "The Explant is an educational app developed for Tec de Monterrey about plant tissue culture, explained with step-by-step animations, visualization of 3d models in AR, documentation in form of diagrams, embedded videos, links to external resources and an interactive quiz."
       ],
       sections: [
         {
-          title: "Screens", tags: ["ui"], screens: true,     // screens: cards take each screenshot's shape, same-height rows
+          title: "Screens", sub: "The app, screen by screen", tags: ["ui"], screens: true,     // screens: cards take each screenshot's shape, same-height rows
           points: [
-            { title: "Parts of the plant", text: "Tap the (i) on each part of the plant to learn what it does.", media: "assets/projects/the-explant/screen-parts.webp" },
-            { title: "Phytohormones", text: "Labels for the key plant hormones that regulate growth and development.", media: "assets/projects/the-explant/screen-hormones.webp" },
-            { title: "Process menu", text: "Pick a plant tissue culture process to explore.", media: "assets/projects/the-explant/screen-menu.webp" },
-            { title: "Process timeline", text: "Slide, or use Previous and Next, to step through a process. Each step plays its animation and shows how long it takes.", media: "assets/projects/the-explant/screen-timeline.webp" },
+            { title: "Parts of the plant", text: "Implementation of interactive elements for exploring different parts of the plant, adaptation of tweening in Unreal Engine.", media: "assets/projects/the-explant/screen-parts.webp" },
+            { title: "Phytohormones", text: "Implementation of interactive elements for exploring different parts of the plant, adaptation of tweening in Unreal Engine.", media: "assets/projects/the-explant/screen-hormones.webp" },
+            { title: "Process menu", text: "Main menu with custom built navigation.", media: "assets/projects/the-explant/screen-menu.webp" },
+            { title: "Process timeline", text: "Slide, or use Previous and Next, to step through a process. Each step plays its animation, created in After Effects and implemented as sprite sheets optimized for performance. This screen also opens the 3D model in AR.", media: "assets/projects/the-explant/screen-timeline.webp" },
             { title: "Theory", text: "Each process has its documentation, a diagram and external info.", media: "assets/projects/the-explant/screen-theory.webp" },
-            { title: "Quiz", text: "A quiz with a progress bar; answers turn green or red when you submit.", media: "assets/projects/the-explant/screen-quiz.webp" }
+            { title: "Quiz", text: "A quiz with a progress bar; answers turn green or red when you submit for immediate feedback. The quiz can be filled in through a data table, which can be modified at any time, and it supports real-time updates.", media: "assets/projects/the-explant/screen-quiz.webp" }
           ]
         },
         {
-          title: "Animations",
+          title: "Animations", sub: "Step-by-step process animations", tags: ["motion"],
           intro: "I animated these in After Effects and exported them as sprite sheets. In the Unreal app each process plays step by step: move the slider, or use Previous and Next, and that step’s animation plays.",
           // Sprite sheet players, rebuilt from the Unreal flipbooks: one continuous sequence per process, in sprite-sheet order.
           // Sheets are `${path}-1.webp`, `${path}-2.webp`… — 4×4 grids of frames, read left to right, top to bottom.
@@ -484,24 +492,35 @@ window.PORTFOLIO = {
     },
     {
       id: "unreal-ui",
-      title: "Custom UI for Unreal Engine",
-      year: null,                                           // TODO
+      title: "Custom panel and dropdown for Unreal Engine projects",
+      year: 2026,                                           // TODO
       category: "ui",
       hue: 250,
-      cover: null,                                          // TODO
+      cover: "assets/projects/unreal-ui/custom.jpg",                                          // TODO
       studio: "Grayscale Interactive",
       role: "UI Programmer",                                // TODO: confirm
-      tools: ["Unreal Engine", "Blueprints"],
+      tools: ["Unreal Engine", "Blueprints", "Illustrator"],          // TODO: confirm
       summary: "Custom UI widgets and Blueprint tools for the studio’s Unreal Engine projects.",   // TODO: confirm / rewrite
       description: [
-        // TODO: e.g. "Reusable UI widgets and Blueprint tools I built for the studio's Unreal projects."
+        "Reusable UI widgets and Blueprint tools I built for the studio's Unreal projects with UMG, no plug-ins."
       ],
+
       sections: [
-        // { title: "Widgets", points: [ { title: "…", text: "…", media: "assets/projects/unreal-ui/….mp4" } ] }
+        {
+          title: "Custom panel for Unreal Engine projects", sub: "Design and programming of reusable UI widget", tags: ["ui"],
+          points: [
+            { title: "Mix and match UI", text: "The custom panel allows for flexible UI composition, with a pre made list of modular assets to choose from. I designed all assets, exported game ready and created and programmed the widget. This widget uses assets created with a sci fi project in mind but it can be adapted to any other themes.", media: "assets/projects/unreal-ui/custom.mp4" },      
+            { title: "UI Shader creation", text: "I also worked on a custom shader that allows to tint the widget's border and fill, opacity, emissive properties, and other visual effects. WIP", media: "assets/projects/unreal-ui/colors.mp4" },
+            { title: "Size responsiveness", text: "The widget is designed to be responsive to desired sizes and aspect ratios, either adjusted manually or with specific measurements, which can all be edited as they are exposed in the editor's details panel.", media: "assets/projects/unreal-ui/sizing.mp4" },
+          ]
+        },
+        {
+          title: "Custom dropdown for Unreal Engine projects", sub: "Programming of reusable UI widget country and state dropdown, built for ClinicVet", tags: ["ui"],
+          points: [
+            { title: "Dropdown", text: "The custom dropdown widget is designed to be highly customizable, including the option to have picture per option. It is built to take data from a data source, like string tables, or to be filled manually and in real time. It has a fallback design to avoid errors with null options and is also size responsive. It was created for the ClinicVet project fill in forms, and the input data is handled through a custom data structure. It reacts in real time and the options change depending on the user's input in-app", media: "assets/projects/unreal-ui/dropdown.mp4" },      
+          ]
+        }
       ],
-      media: [
-        // TODO: e.g. { src: "assets/projects/unreal-ui/01.mp4", caption: "…" }
-      ]
     },
     // TODO: Ford — "some UI assets" for EV Cooling System Diagnostics (image was assets/projects/grayscale/ford.webp)
     {
@@ -511,10 +530,10 @@ window.PORTFOLIO = {
       category: "game",
       tags: ["ui"],
       hue: 100,
-      cover: "https://i.ytimg.com/vi/7uF-FRlBHMY/hqdefault.jpg",
+      cover: "assets/projects/brewmasters/cover.jpeg",
       studio: "Tecnológico de Monterrey · school project",
       role: "UI design & art direction",
-      tools: ["Unreal Engine", "Substance Designer", "Illustrator"],
+      tools: ["Unreal Engine", "Substance Designer", "Illustrator", "Autodesk Maya"],
       award: "Best VR Game Project 2023",
       summary: "A VR game demo made in Unreal Engine. I designed the full UI and the art direction, and also worked on 3D assets and textures.",
       description: [
@@ -523,12 +542,12 @@ window.PORTFOLIO = {
       ],
       sections: [
         {
-          title: "My work",
+          title: "My work", sub: "UI, art direction and collaborative 3D assets, textures and materials",
           points: [
-            { text: "Full UI design", tags: ["ui"] },
-            "Art direction",
-            "3D assets",
-            "Textures"
+            { title: "Visual identity", text: "Title card design for the game. Designed and rendered in Illustrator.s", media: "assets/projects/brewmasters/cover.jpeg" , tags: ["ui"] },      
+            { title: "UI design and assets", text: "Designed game ready UI elements for VR interaction.", media: "assets/projects/brewmasters/ui.png" , tags: ["ui"] },      
+            { title: "Art direction", text: "Worked on the visual style and color palette for the game, visual inspiration and overall aesthetic.", media: "assets/projects/brewmasters/art.png" },
+            { title: "3D assets and textures", text: "Worked on 3D assets, textures and materials for the game.", media: "assets/projects/brewmasters/models.png" }
           ]
         }
       ],
@@ -543,7 +562,7 @@ window.PORTFOLIO = {
       category: "app",
       tags: ["ui"],
       hue: 190,
-      cover: null,
+      cover: "assets/projects/trayecto-q/cover.png",
       studio: "1st Querétaro Digital Hackathon",
       role: "UI/UX & development",                          // TODO: confirm your role
       tools: [],                                            // TODO
@@ -553,12 +572,28 @@ window.PORTFOLIO = {
         "Development of “Trayecto Q”, a mobile app prototype and fully interactive demo.",
         "Won 3rd place at the 1st Querétaro Digital Hackathon (2022)."
       ],
+      sections: [
+        {
+          // screens: cards take each screenshot's shape (tall phone screens), same-height rows
+          title: "Screens", sub: "The prototype, screen by screen", tags: ["ui"], screens: true,   // TODO: card texts are drafts, rewrite them
+          points: [
+            { title: "App Animated intro", text: "Introduction video, a traditional doll from Querétaro welcomes the user and guides them through their new passport for discovering the state. Character was illustrated and animated by me.", media: "assets/projects/trayecto-q/01 Bienvenida Lele.png" },
+            { title: "Passport intro", text: "Passport cover, designed by me.", media: "assets/projects/trayecto-q/02 Pasaporte Intro.png" },
+            { title: "Passport type", text: "Account type selection, after creating a new user. Screen assets and layouts designed by me", media: "assets/projects/trayecto-q/04 Tipo de pasaporte.png" },
+            { title: "Small map", text: "A closer map view of nearby places. HUD and icons designed by me.", media: "assets/projects/trayecto-q/07 Mapa pequeño.png" },
+            { title: "Profile", text: "The user's profile, editable. Screen assets and layouts designed by me.", media: "assets/projects/trayecto-q/09 Perfil.png" },
+            { title: "Achievements", text: "The user's achievements, adquired by completing challenges that promote local tourism. Screen assets and layouts designed by me.", media: "assets/projects/trayecto-q/11 Perfil Copy.png" },
+            { title: "Calendar", text: "Upcoming events around the state implemented in an interactive way. Screen assets and layouts designed by me.", media: "assets/projects/trayecto-q/13 Calendario.png" },
+            { title: "Place description", text: "Information about a place. Screen assets and layouts designed by me.", media: "assets/projects/trayecto-q/15 Descripción.png" },
+            { title: "Passport stamp", text: "Each visit adds a page to the passport: the photo, the date, facts about the place and an official stamp.", media: "assets/projects/trayecto-q/17 Pasaporte.png" }
+          ]
+        }
+      ],
       media: [
-        { src: null, caption: "App screens" },               // TODO
-        { src: null, caption: "Interactive demo", kind: "video" } // TODO
+        { src: "assets/projects/trayecto-q/waltkhrough.mp4", poster: "assets/projects/trayecto-q/01 Bienvenida Lele.png", caption: "Interactive demo walkthrough" }
       ]
     },
-    {
+    /*{
       id: "tec-xr",
       title: "AR, VR & 3D game projects",
       year: "2022 — 2023",
@@ -580,46 +615,48 @@ window.PORTFOLIO = {
         { src: "https://youtu.be/7uF-FRlBHMY", caption: "VR game: Brewmaster’s Remedies" },
         { src: null, caption: "3D game" }                    // TODO
       ]
-    }
+    } */
   ],
 
   // Toolbox on the Skills screen: every tool listed in your projects and motion pieces is added
   // automatically; put any extra tools here.
-  toolbox: ["Figma", "Procreate", "Autodesk Maya"],
+  toolbox: ["Procreate", "Figma", "CapCut"],
 
   // Skills screen: one card per group. `note` is the proof shown under each skill. (`level` is no longer shown.)
   skills: [
     {
       group: "UI & UX",
       items: [
-        { name: "Game UI design", level: 90, note: "HUDs, menus and flows for Unity and Unreal projects — clients include Ford, NUPEC and Tec de Monterrey." },
-        { name: "UX & interaction", level: 85, note: "Interactive workflows, from custom VST audio plugins to game menus." },
-        { name: "Figma prototyping", level: 85, note: "Clickable flows and component libraries before anything hits the engine." }
-      ]
-    },
-    {
-      group: "Motion",
-      items: [
-        { name: "Motion graphics", level: 88, note: "Won American Eagle's motion graphics contest — prize: a trip to Barcelona." },
-        { name: "UI animation", level: 85, note: "Transitions and feedback in After Effects and Cavalry, rebuilt in-engine." },
-        { name: "Short film", level: 75, note: "“Transparencia en Corto”: 1st place in 2023, 3rd place in 2026 (state level)." }
-      ]
-    },
-    {
-      group: "Illustration & 3D",
-      items: [
-        { name: "Digital illustration", level: 88, note: "Procreate and Illustrator. National Illustration Award, 3rd place." },
-        { name: "Urban art", level: 75, note: "Selected artist for “Creajolote”; finalist in “Distrito Sejuve”." },
-        { name: "3D modelling", level: 65, note: "Autodesk Maya. Best 3D Game Project, Tec de Monterrey 2022." }
+        { name: "Interactive UI design and implementation", level: 90, note: "HUDs, menus and flows for projects, such as videogames, mobile, pc, and VR apps, websites, and more — clients include Ford, NUPEC and Tec de Monterrey." },
+        { name: "Visual development for UI", level: 85, note: "Creating visual assets, consistent design systems and mockups for user interfaces." },
+        { name: "Prototyping", level: 85, note: "Clickable flows and component libraries before anything hits the engine." },
+        { name: "Motion and Animation", level: 80, note: "Creation of 2D animations to enhance user experience, as well as tweens and transitions." }, 
+        { name: "UX research", level: 80, note: "Conducting user research to inform design decisions and improve overall user experience." }, 
       ]
     },
     {
       group: "Programming",
       items: [
         { name: "C# / Unity", level: 85, note: "Object-oriented gameplay mechanics and UI systems." },
-        { name: "C++ / Unreal", level: 70, note: "Specialization in C++ for Game Programming (U-Echo, 2024)." },
-        { name: "AR / VR", level: 70, note: "Best AR and Best VR Game Project, Tec de Monterrey 2023." },
+        { name: "C++ / Unreal", level: 70, note: "Notable experience on Unreal Engine's Motion Graphics System, completed with a specialization in C++ for Game Programming (U-Echo, 2024)." },
+        { name: "AR / VR", level: 70, note: "Developed augmented and virtual reality experiences for academic and commercial projects, as well as traspassing projects from one engine to another." },
         { name: "Web (HTML, CSS, JS)", level: 75, note: "Including this site, built by hand." }
+      ]
+      
+    },
+    {
+      group: "Illustration & 3D",
+      items: [
+        { name: "Digital illustration", level: 88, note: "Procreate, Photoshop and Illustrator." },
+        { name: "Murals and Street Art", level: 75, note: "Selected artist for “Creajolote”; finalist in “Distrito Sejuve”; Mural artist for project by Sobrevivientes, activist group based in Puebla." },
+        { name: "3D modelling", level: 65, note: "Basic hard surface modeling in Autodesk Maya." }
+      ]
+    },
+    {
+      group: "Motion",
+      items: [
+        { name: "Motion graphics", level: 88, note: "Creation of assets setup for animations with motion graphics for various media." },
+        { name: "UI animation", level: 85, note: "Transitions and feedback in After Effects and Cavalry, rebuilt in-engine." },
       ]
     }
   ],

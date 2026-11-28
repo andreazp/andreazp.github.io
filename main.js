@@ -557,6 +557,23 @@
     award.textContent = it.award ? `✦ ${it.award}` : "";
     award.hidden = !it.award;
     $("#lb-note").textContent = it.note ?? "";
+    // Extra pages for this item (e.g. storyboard pages): thumbnails that swap the big view between the main piece and each page.
+    const extras = $("#lb-extras");
+    const pages = it.pages ?? [];
+    if (pages.length) {
+      const tabs = [
+        h("button", { class: "lb-extra main", "data-nav": true, "aria-pressed": "true" }, h("span", { text: it.mainLabel ?? "▶ Film" })),
+        ...pages.map((src, k) => h("button", { class: "lb-extra", "data-nav": true, "aria-pressed": "false", "aria-label": `${it.pagesLabel ?? "Page"} ${k + 1}` },
+          h("img", { src, alt: "", loading: "lazy" })))
+      ];
+      tabs.forEach((b, k) => b.addEventListener("click", () => {
+        tabs.forEach(x => x.setAttribute("aria-pressed", String(x === b)));
+        $("#lb-media").replaceChildren(k ? h("img", { class: "lb-page", src: pages[k - 1], alt: `${it.pagesLabel ?? "Page"} ${k}` }) : it.render());
+        Sound.tone(880, 0.05, "sine", 0.03);
+      }));
+      extras.replaceChildren(h("p", { class: "lb-extras-label", text: it.pagesLabel ?? "Pages" }), h("div", { class: "lb-extras-row" }, ...tabs));
+    } else extras.replaceChildren();
+    extras.hidden = !pages.length;
     $("#lb-count").textContent = `${lbIdx + 1} / ${lbList.length}`;
     $$("[data-lb]", lightbox).forEach(b => { b.hidden = lbList.length < 2; });
     $("#lb-count").hidden = lbList.length < 2;
@@ -697,7 +714,8 @@
     const card = h("a", { class: "level", href: `#projects/${p.id}`, "data-goto": `projects/${p.id}`, "data-nav": true },
       h("span", { class: "level-art" }, projectCover(p),
         p.media?.length ? h("span", { class: "level-num", text: `${p.media.length} ${p.media.length === 1 ? "item" : "items"}` }) : null,
-        p.ribbon ? h("span", { class: "level-ribbon", text: p.ribbon }) : null),
+        p.ribbon ? h("span", { class: "level-ribbon", text: p.ribbon }) : null,
+        p.sticker ? h("span", { class: "sticker", text: p.sticker }) : null),
       h("span", { class: "level-info" },
         h("h3", { text: p.title }),
         h("span", { class: "level-summary", text: p.summary }),
@@ -838,7 +856,8 @@
     const card = cardDeck(sections.flatMap(s => s.points));
 
     const renderSection = s => h("section", { class: s.featured ? "project-section featured" : "project-section" },
-      h("h3", {}, h("span", { text: s.title }), s.points.length ? h("small", { text: String(s.points.length) }) : null),
+      h("h3", {}, h("span", { text: s.title }), s.points.length ? h("small", { text: String(s.points.length) }) : null,
+        s.sub ? h("span", { class: "section-sub", text: s.sub }) : null),
       s.intro ? h("p", { class: "section-intro", text: s.intro }) : null,
       s.icons?.files?.length ? iconBoard(s.icons) : null,
       s.flipbooks?.length ? flipbookPlayer(s.flipbooks) : null,
@@ -893,11 +912,12 @@
 
     // The work first: every photo and video stacked full width under the title, details after.
     const media = (p.media?.length ? p.media : [{ src: p.cover, caption: p.title }])
-      .map((m, i) => ({ ...m, hue: (p.hue ?? 200) + i * 25, seed: `${p.id}-${i}` }));
+      // With no media, the page cover uses the same seed as the Projects grid card, so both look identical.
+      .map((m, i) => ({ ...m, hue: (p.hue ?? 200) + i * 25, seed: p.media?.length ? `${p.id}-${i}` : p.id }));
     const isVid = m => ["video", "youtube", "vimeo"].includes(kindOf(m.src)) || (!m.src && m.kind === "video");
     const placeholder = (item, i, big = true) => isVid(item)
       ? motionCanvas(item.seed, item.hue, big)
-      : coverCanvas(item.seed, item.hue, "Image coming soon");
+      : coverCanvas(item.seed, item.hue);
     const images = media.filter(m => kindOf(m.src) === "image");
     $("#project-stack").replaceChildren(...media.map(m => {
       let el;
@@ -938,16 +958,19 @@
     $("#screen-project").scrollTop = 0;
   }
 
-  /* ================= UI screen: every highlight card tagged UI, grouped by project ================= */
-  {
-    // per project: normal highlight cards first, then screenshots (shown in the same screenshot layout as on project pages)
+  /* ================= Tagged work, grouped by project (UI screen, and "From projects" on the Motion screen) ================= */
+  // Every highlight card tagged `tag` (on its section or on the card itself), plus the flipbook players of sections
+  // tagged `tag`. Per project: normal cards first, then screenshots, then flipbooks. Returns the number of groups.
+  function renderTaggedGroups(tag, el) {
     const groups = D.projects.map(p => {
-      const ui = projectSections(p).flatMap(s => s.points).filter(c => c.tags.includes("ui"));
-      const normal = ui.filter(c => !c.screens), screens = ui.filter(c => c.screens);
-      return { p, normal, screens, cards: [...normal, ...screens] };
-    }).filter(g => g.cards.length);
-    const card = cardDeck(groups.flatMap(g => g.cards)); // one deck: the lightbox steps through all UI cards
-    $("#ui-grid").replaceChildren(...groups.map((g, gi) => h("section", { class: "ui-group", style: `--i:${gi}` },
+      const secs = projectSections(p);
+      const cards = secs.flatMap(s => s.points).filter(c => c.tags.includes(tag));
+      const normal = cards.filter(c => !c.screens), screens = cards.filter(c => c.screens);
+      const flipbooks = secs.filter(s => (s.tags ?? []).includes(tag)).flatMap(s => s.flipbooks ?? []);
+      return { p, normal, screens, flipbooks, cards: [...normal, ...screens] };
+    }).filter(g => g.cards.length || g.flipbooks.length);
+    const card = cardDeck(groups.flatMap(g => g.cards)); // one deck: the lightbox steps through all of them
+    el.replaceChildren(...groups.map((g, gi) => h("section", { class: "ui-group", style: `--i:${gi}` },
       h("a", { class: "ui-group-head", href: `#projects/${g.p.id}`, "data-goto": `projects/${g.p.id}`, "data-nav": true },
         h("span", { class: "ui-group-thumb" }, projectCover(g.p)),
         h("span", { class: "ui-group-text" },
@@ -955,22 +978,39 @@
           h("strong", { text: g.p.title })),
         h("span", { class: "ui-group-cta", text: "Open project →" })),
       g.normal.length ? h("ul", { class: "highlights" }, ...g.normal.map((c, i) => card(c, i + 1))) : null,
-      g.screens.length ? h("ul", { class: "highlights screens" }, ...g.screens.map(c => card(c))) : null)));
+      g.screens.length ? h("ul", { class: "highlights screens" }, ...g.screens.map(c => card(c))) : null,
+      g.flipbooks.length ? flipbookPlayer(g.flipbooks) : null)));
+    return groups.length;
   }
+  renderTaggedGroups("ui", $("#ui-grid"));
 
   /* ================= Home: selected work ================= */
   {
     const tiles = (D.homeGallery ?? []).map(t => ({ ...t, p: D.projects.find(p => p.id === t.project) })).filter(t => t.src);
     $("#home-work").hidden = !tiles.length;
+    // A YouTube link shows the video's thumbnail (the big HD one, or the standard one if the video has no HD thumbnail).
+    const ytThumb = id => {
+      const img = h("img", { src: `https://i.ytimg.com/vi/${id}/maxresdefault.jpg`, alt: "", loading: "lazy" });
+      const fallback = () => { if (!img.src.includes("hqdefault")) img.src = `https://i.ytimg.com/vi/${id}/hqdefault.jpg`; };
+      img.addEventListener("error", fallback);
+      img.addEventListener("load", () => { if (img.naturalWidth <= 120) fallback(); }); // YouTube's "no thumbnail" image is 120px wide
+      return img;
+    };
     $("#home-work-grid").replaceChildren(...tiles.map((t, i) => {
-      const media = kindOf(t.src) === "video" ? ambientVideo(t.src, t.poster) : h("img", { src: t.src, alt: "", loading: "lazy" });
-      const label = [t.p?.title, t.caption].filter(Boolean).join(" · ");
-      const attrs = t.p ? { href: `#projects/${t.p.id}`, "data-goto": `projects/${t.p.id}`, "data-nav": true } : {};
-      return h(t.p ? "a" : "div", { class: `work-tile${i === 0 ? " big" : ""}${t.wide ? " wide" : ""}`, style: `--i:${i}`, "aria-label": label, ...attrs },
+      const kind = kindOf(t.src);
+      const media = kind === "video" ? ambientVideo(t.src, t.poster)
+        : kind === "youtube" ? (t.poster ? h("img", { src: t.poster, alt: "", loading: "lazy" }) : ytThumb(ytId(t.src)))
+        : h("img", { src: t.src, alt: "", loading: "lazy" });
+      // A tile opens its project, or with `goto` another screen (e.g. "motion", "illustration"); `from` is its small label then.
+      const from = t.p?.title ?? t.from;
+      const target = t.p ? `projects/${t.p.id}` : t.goto;
+      const label = [from, t.caption].filter(Boolean).join(" · ");
+      const attrs = target ? { href: `#${target}`, "data-goto": target, "data-nav": true } : {};
+      return h(target ? "a" : "div", { class: `work-tile${i === 0 ? " big" : ""}${t.wide ? " wide" : ""}`, style: `--i:${i}`, "aria-label": label, ...attrs },
         media,
         h("span", { class: "work-tile-label", "aria-hidden": "true" },
-          h("span", {}, t.p ? h("small", { text: t.p.title }) : null, h("strong", { text: t.caption ?? "" })),
-          t.p ? h("span", { class: "work-tile-go", text: "→" }) : null));
+          h("span", {}, from ? h("small", { text: from }) : null, h("strong", { text: t.caption ?? "" })),
+          target ? h("span", { class: "work-tile-go", text: "→" }) : null));
     }));
   }
 
@@ -1125,7 +1165,7 @@
   function iconBoard(set) {
     const BGS = [["dark", "Dark"], ["light", "Light"], ["brand", "Colour"]];
     const SIZES = [24, 48, 96];
-    const board = h("div", { class: "iconboard", "data-bg": "dark", style: "--size:48px" });
+    const board = h("div", { class: "iconboard", "data-bg": "brand", style: "--size:48px" });
     const glyph = (name, cls = "ib-glyph") =>
       h("img", { class: cls, src: `${set.path}${set.prefix ?? ""}${name}.svg`, alt: "", draggable: "false", loading: "lazy" });
     const focusArt = h("span", { class: "ib-focus-art" });
@@ -1157,13 +1197,36 @@
     });
     show(set.files[0]);
 
+    // "Try me": a quick wave across the grid, each icon popping and showing in the big preview.
+    const tryBtn = h("button", { class: "ib-try", "data-nav": true, text: "Try me" });
+    let tour = 0;
+    // Jump out once the board scrolls into view.
+    new IntersectionObserver((entries, io) => {
+      if (entries.some(e => e.isIntersecting)) { tryBtn.classList.add("in"); io.disconnect(); }
+    }, { threshold: 0.35 }).observe(board);
+    tryBtn.addEventListener("click", () => {
+      tryBtn.classList.add("done");   // stop hopping once someone has tried it
+      clearInterval(tour);
+      const btns = tiles.map(li => li.firstChild);
+      if (reduceMotion) { const k = Math.floor(Math.random() * btns.length); show(set.files[k]); btns[k].focus(); return; }
+      let k = 0;
+      tour = setInterval(() => {
+        const b = btns[k];
+        show(set.files[k]);
+        b.classList.remove("pop"); void b.offsetWidth; b.classList.add("pop");
+        Sound.tone(660 + (k % 8) * 60, 0.05, "triangle", 0.02);
+        if (++k >= btns.length) clearInterval(tour);
+      }, 70);
+    });
+
     board.append(
       h("div", { class: "ib-bar" },
         h("p", { class: "ib-title" }, h("span", { text: set.title ?? "Icon set" }), h("small", { text: `${set.files.length} icons` })),
-        seg("Background", BGS, 0, v => { board.dataset.bg = v; }),
+        seg("Background", BGS, 2, v => { board.dataset.bg = v; }),
         seg("Icon size", SIZES.map(s => [s, `${s}px`]), 1, v => { board.style.setProperty("--size", `${v}px`); })),
       h("div", { class: "ib-body" }, focus, h("ul", { class: "ib-grid" }, ...tiles)));
-    return board;
+    // The Try me button sits outside the board, so it's clear at a glance that the board is interactive.
+    return h("div", { class: "ib-wrap" }, tryBtn, board);
   }
 
   /* ================= Footer (project pages and other long screens) ================= */
@@ -1182,12 +1245,13 @@
 
   /* ================= Motion ================= */
   const MOTION = D.motion ?? { reel: [] };
+  if (MOTION.intro) $("#motion-intro").textContent = MOTION.intro;
   // A grid of video tiles; each opens in the lightbox and starts playing.
   const reelCtx = r => [r.context, r.year].filter(Boolean).join(" · ");
   const openReel = i => openLightbox(MOTION.reel.map(r => ({
     render: () => h("div", { class: "lb-video" }, mediaEl({ src: r.video, poster: r.poster, alt: r.title, kind: "video" }, 0,
       { autoplay: true, placeholder: (it, k, big) => motionCanvas(r.title, r.hue, big) })),
-    kicker: reelCtx(r), title: r.title, award: r.award, note: r.description ?? ""
+    kicker: reelCtx(r), title: r.title, award: r.award, note: r.description ?? "", pages: r.storyboard, pagesLabel: "Storyboard"
   })), i);
   // Silent hover preview for a motion piece: a short local clip if there is one, otherwise the YouTube video (muted, no controls).
   const hoverPreviews = matchMedia("(hover: hover) and (pointer: fine)").matches && !reduceMotion;
@@ -1221,7 +1285,8 @@
       h("span", { class: "motion-tile-text" },
         h("small", { text: reelCtx(r) }),
         h("strong", { text: r.title }),
-        r.award ? h("span", { class: "badge", text: `✦ ${r.award}` }) : null));
+        r.award ? h("span", { class: "badge", text: `✦ ${r.award}` }) : null,
+        r.storyboard?.length ? h("span", { class: "motion-tile-extra", text: "+ Storyboard" }) : null));
     b.addEventListener("click", () => openReel(i));
     b.style.animationDelay = `${i * 70}ms`;
     if (hoverPreviews) {
@@ -1244,6 +1309,8 @@
     }
     return h("li", {}, b);
   }));
+  // Below the reel: motion work from project pages (cards and sections tagged "motion").
+  $("#motion-projects-wrap").hidden = !renderTaggedGroups("motion", $("#motion-projects"));
 
   /* ================= Illustration ================= */
   const ILLU = D.illustration ?? { pieces: [] };
@@ -1268,6 +1335,7 @@
     const b = h("button", { class: "art", "data-nav": true, style: `--i:${i}; --r:${item.ratio || 1}`, "aria-label": `${item.title}${item.award ? `, ${item.award}` : ""}. View larger.` },
       artFor(item),
       item.award ? h("span", { class: "art-award", "aria-hidden": "true", text: `✦ ${item.award}` }) : null,
+      item.sticker ? h("span", { class: "sticker", text: item.sticker }) : null,
       h("span", { class: "art-caption", "aria-hidden": "true" },
         h("strong", { text: item.title }),
         h("small", { text: [item.medium, item.year, item.images?.length ? `${item.images.length + 1} images` : ""].filter(Boolean).join(" · ") })));

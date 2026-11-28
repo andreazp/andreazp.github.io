@@ -878,6 +878,9 @@ main { position: relative; min-height: 0; }
 
 .project-section h3 { display: flex; align-items: baseline; gap: 10px; }
 .project-section h3 small { font-family: var(--font-body); font-size: 13px; font-weight: 500; color: var(--faint); }
+.project-section h3 { flex-wrap: wrap; }
+.project-section h3 .section-sub { font-family: var(--font-body); font-size: 13px; font-weight: 400; letter-spacing: 0; color: var(--muted); }
+.project-section h3 .section-sub::before { content: "·"; margin-right: 10px; color: var(--faint); }
 .highlights {
   list-style: none; margin: 0; padding: 0;
   display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px;
@@ -1149,6 +1152,35 @@ main { position: relative; min-height: 0; }
 .ib-opt[aria-pressed="true"] { background: var(--ib-fg); color: #17181c; }
 .iconboard[data-bg="light"] .ib-opt[aria-pressed="true"] { color: #fff; }
 .iconboard[data-bg="brand"] .ib-opt[aria-pressed="true"] { color: #c73d7a; }
+/* Try me: a sticker on the board's top-right corner, tilted, that jumps out when it scrolls into view and hops now and then */
+.ib-wrap { position: relative; }
+.ib-try {
+  position: absolute; z-index: 2; top: -14px; right: -12px;
+  min-height: 42px; padding: 0 20px; border: 2px solid #17181c; border-radius: 999px;
+  background: #ffe14d; color: #17181c; font-size: 15px; font-weight: 800; letter-spacing: 0.01em;
+  box-shadow: 4px 5px 0 #17181c;
+  rotate: 10deg; transform-origin: 70% 50%;
+  transition: scale 0.2s var(--spring), box-shadow 0.2s var(--ease);
+}
+.ib-try:hover { scale: 1.08; box-shadow: 5px 7px 0 #17181c; }
+.ib-try:active { scale: 0.94; box-shadow: 2px 2px 0 #17181c; }
+.ib-try:focus-visible { outline: 3px solid #c73d7a; outline-offset: 3px; }
+@media (prefers-reduced-motion: no-preference) {
+  .ib-try { opacity: 0; scale: 0.4; }
+  .ib-try.in { opacity: 1; scale: 1; animation: ib-try-in 0.7s var(--spring), ib-try-hop 4s ease-in-out 1.4s infinite; }
+  .ib-try.in:hover, .ib-try.done { animation: none; }
+  .ib-try.in:hover { scale: 1.08; }
+}
+@keyframes ib-try-in {
+  0% { opacity: 0; scale: 0.4; translate: 0 18px; rotate: -12deg; }
+  60% { opacity: 1; scale: 1.15; translate: 0 -6px; rotate: 14deg; }
+  100% { scale: 1; translate: 0 0; rotate: 10deg; }
+}
+@keyframes ib-try-hop {
+  0%, 82%, 100% { translate: 0 0; rotate: 10deg; }
+  88% { translate: 0 -10px; rotate: 4deg; }
+  94% { translate: 0 0; rotate: 14deg; }
+}
 .ib-body { display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 16px; align-items: start; }
 .ib-focus {
   position: sticky; top: 12px; display: grid; justify-items: center; gap: 14px; padding: 26px 16px 18px;
@@ -1287,7 +1319,7 @@ body, .topbar, .panel { transition: background-color 0.4s var(--ease), color 0.4
 .part-title { margin: 0; font-size: clamp(30px, 3.6vw, 52px); line-height: 1; letter-spacing: -0.045em; }
 .part-intro { margin: 0 0 20px; max-width: 68ch; font-size: clamp(16px, 1.4vw, 18px); line-height: 1.65; }
 .part-media { display: grid; gap: 16px; margin-bottom: 22px; }
-.part .project-section:first-of-type, .part .iconboard + .project-section { margin-top: 8px; }
+.part .project-section:first-of-type, .part .ib-wrap + .project-section { margin-top: 8px; }
 .part-empty { margin: 0; padding: 28px; border: 1.5px dashed var(--line-strong); border-radius: var(--radius); text-align: center; color: var(--faint); }
 
 
@@ -1599,4 +1631,38 @@ body[data-screen="title"] .topbar-actions { margin-left: auto; }
 }
 
 /* UI page: screenshots follow a group's normal cards */
-.ui-group .highlights + .highlights { margin-top: 12px; }
+.ui-group .highlights + * { margin-top: 12px; }
+
+/* Lightbox: extra pages for an item (e.g. storyboard), as thumbnails that swap the big view */
+.lb-extras { margin: 4px 0 12px; }
+.lb-extras-label { margin: 0 0 6px; font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+.lb-extras-row { display: flex; flex-wrap: wrap; gap: 8px; }
+.lb-extra {
+  display: grid; place-items: center; width: 96px; aspect-ratio: 16 / 9; padding: 0; overflow: hidden;
+  border: 2px solid var(--line); border-radius: 10px; background: var(--bg-2); color: inherit; font-size: 13px; font-weight: 700;
+  transition: border-color 0.2s, translate 0.2s var(--ease);
+}
+.lb-extra img { width: 100%; height: 100%; object-fit: cover; }
+.lb-extra:hover { translate: 0 -2px; }
+.lb-extra[aria-pressed="true"] { border-color: var(--accent, currentColor); }
+.lb-page { display: block; width: 100%; height: 100%; object-fit: contain; background: #fff; }
+.motion-tile-extra { font-size: 12px; font-weight: 600; color: var(--muted); }
+
+/* Motion screen: motion work from project pages, below the reel */
+.motion-projects { margin-top: clamp(48px, 8vh, 80px); }
+.motion-projects-title { margin: 0; font-family: var(--font-display); font-size: clamp(26px, 3vw, 36px); font-weight: 700; letter-spacing: -0.03em; }
+.motion-projects > .muted { margin: 6px 0 clamp(24px, 4vh, 36px); }
+
+/* ---------- Sticker: tilted yellow label (same look as the icon board's "Try me"), on project cards and illustrations ---------- */
+.sticker {
+  position: absolute; z-index: 2; top: 12px; right: 12px; pointer-events: none;
+  padding: 6px 13px; border: 2px solid #17181c; border-radius: 999px;
+  background: #ffe14d; color: #17181c; font-size: 13px; font-weight: 800; letter-spacing: 0.01em; white-space: nowrap;
+  box-shadow: 3px 4px 0 #17181c; rotate: 7deg;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .sticker { animation: sticker-in 0.7s var(--spring) 0.5s backwards, sticker-hop 4.5s ease-in-out 2s infinite; }
+}
+@keyframes sticker-in { from { opacity: 0; scale: 0.4; rotate: -10deg; } 60% { opacity: 1; scale: 1.12; rotate: 12deg; } to { scale: 1; rotate: 7deg; } }
+@keyframes sticker-hop { 0%, 84%, 100% { translate: 0 0; rotate: 7deg; } 90% { translate: 0 -6px; rotate: 2deg; } 95% { translate: 0 0; rotate: 10deg; } }
+@media (max-width: 720px) { .sticker { top: 8px; right: 8px; padding: 4px 10px; font-size: 11px; } }

@@ -147,9 +147,14 @@
       <section class="screen" id="screen-motion" data-screen="motion" aria-labelledby="motion-h">
         <div class="screen-head">
           <h2 class="screen-title" id="motion-h">Motion</h2>
-          <p class="muted screen-sub">Motion graphics and short film.</p>
+          <p class="muted screen-sub" id="motion-intro">Motion graphics and short film.</p>
         </div>
         <ul class="motion-grid" id="motion-list"></ul>
+        <div class="motion-projects" id="motion-projects-wrap" hidden>
+          <h3 class="motion-projects-title">From projects</h3>
+          <p class="muted">Animation work from my project pages.</p>
+          <div class="ui-groups" id="motion-projects"></div>
+        </div>
       </section>
 
       <!-- ILLUSTRATION -->
@@ -227,6 +232,7 @@
         <h2 id="lb-title"></h2>
         <p class="badge" id="lb-award" hidden></p>
         <p class="muted" id="lb-note"></p>
+        <div class="lb-extras" id="lb-extras" hidden></div>
         <div class="viewer-bar">
           <button class="icon-btn" data-nav data-lb="-1" aria-label="Previous">←</button>
           <span class="viewer-count" id="lb-count"></span>
